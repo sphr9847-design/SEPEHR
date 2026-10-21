@@ -6,12 +6,12 @@
 <title>🚀 تیراندازی فضایی</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:#04060f;
+  html,body{height:100%;overflow:hidden;background:#1a0000;
             font-family:system-ui,sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
-    background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
+    background:rgba(26, 0, 0, 0.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
   .tab{flex:1;background:transparent;border:none;
     color:#5a7d8f;font-size:14px;font-weight:600;
@@ -20,13 +20,12 @@
   .tab:active{background:rgba(0,255,255,.05)}
 
   .panel{position:fixed;top:50px;left:0;right:0;bottom:0;
-    background:#04060f;color:#7df9ff;
+    background:#1a0000;color:#7df9ff;
     padding:20px;overflow-y:auto;display:none;z-index:5}
   .panel.show{display:block}
   .panel h2{text-align:center;font-size:22px;margin-bottom:20px;
     text-shadow:0 0 15px rgba(0,255,255,.5)}
 
-  /* رتبه‌ها */
   #rankList{list-style:none;max-width:400px;margin:0 auto}
   #rankList li{display:flex;align-items:center;
     padding:12px 18px;margin-bottom:10px;
@@ -51,10 +50,9 @@
     border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
-  /* پروفایل */
   .profile-card {
     max-width: 400px; margin: 0 auto 25px auto; padding: 25px 20px;
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(26,0,0,0.8));
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0,255,255,0.05);
     border-radius: 20px; text-align: center; position: relative; overflow: hidden;
@@ -93,12 +91,11 @@
   .avatar-btn.selected svg { filter: drop-shadow(0 0 10px currentColor); }
   
   .save-btn{display:block;width:100%;max-width:400px;margin:25px auto;padding:15px;
-    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:12px;
+    background:linear-gradient(90deg, #00d2ff, #0ff);color:#1a0000;border:none;border-radius:12px;
     font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;transition: 0.3s;
     box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
 
-  /* 🎨 فروشگاه بازطراحی شده */
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
   .weapon-card{
@@ -142,19 +139,18 @@
 
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
-    background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
+    background:rgba(26, 0, 0, 0.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
   #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a}
   #gameOver p{font-size:20px;color:#7df9ff}
   #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
   #restartBtn{margin-top:20px;padding:14px 40px;font-size:20px;
     border:2px solid #0ff;background:transparent;color:#0ff;
     border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
-  #restartBtn:active{background:#0ff;color:#04060f}
+  #restartBtn:active{background:#0ff;color:#1a0000}
 
-  /* 🎵 بخش موسیقی بازطراحی شده */
   .music-player { 
     max-width: 400px; margin: 20px auto; padding: 20px; 
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(26,0,0,0.8));
     border: 1px solid rgba(0,255,255,0.2); border-radius: 15px;
     box-shadow: inset 0 0 20px rgba(0,255,255,0.05);
     text-align: center;
@@ -179,6 +175,16 @@
   #playBgmBtn:active { transform: scale(0.95); }
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
   #pauseBgmBtn:active { transform: scale(0.95); background: rgba(255,92,138,0.1); }
+
+  /* 👇 نشانگر سیو آنلاین */
+  #syncIndicator {
+    position: fixed; bottom: 20px; left: 20px;
+    color: #0ff; font-size: 24px; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; z-index: 100;
+    text-shadow: 0 0 10px #0ff;
+  }
+  #syncIndicator.syncing { opacity: 1; animation: pulse 1s infinite alternate; }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
 </style>
 </head>
 <body>
@@ -188,6 +194,9 @@
   <button class="tab" data-tab="rank">🏆 رتبه‌ها</button>
   <button class="tab" data-tab="profile">👤 پروفایل</button>
 </div>
+
+<!-- 👇 نشانگر سیو شدن آنلاین -->
+<div id="syncIndicator">☁️</div>
 
 <canvas id="c"></canvas>
 
@@ -324,6 +333,11 @@ window.addEventListener('beforeunload', () => {
   localStorage.setItem('shooter_equipped', equippedWeapon);
   localStorage.setItem('shooter_total_score', totalScore);
   if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
+  
+  // 👇 ذخیره نهایی در دیتابیس آنلاین موقع خروج
+  if(!isDead && S && S.score > 0) {
+    saveScoreToLeaderboard(totalScore + S.score, true);
+  }
 });
 
 let selectedAvatarId = profile.avatar;
@@ -483,16 +497,15 @@ function fire(){
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
   
-  // 👇 سختی بر اساس امتیاز
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
 
   S.enemies.push({
     x: 30 + Math.random()*(W - 60), y: -30, r,
-    vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25, // سرعت بیشتر میشه
+    vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25,
     vx: (Math.random() - 0.5) * 0.12,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
-    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp), // جون بیشتر میشه
+    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp),
     isBoss: false
   });
 }
@@ -518,6 +531,20 @@ function boom(x, y, hue, n){
     S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 });
   }
 }
+
+// 👇 همگام‌سازی خودکار با دیتابیس
+let lastSync = 0;
+function autoSync() {
+    if(!isDead && S && S.score > 0) {
+        let currentTotal = totalScore + S.score;
+        if(currentTotal > lastSync + 20) { // هر ۲۰ امتیاز یکبار سیو بشه
+            saveScoreToLeaderboard(currentTotal, true);
+            lastSync = currentTotal;
+        }
+    }
+}
+// هر ۱۰ ثانیه یکبار همگام‌سازی در پس‌زمینه انجام میشه
+setInterval(autoSync, 10000);
 
 function update(dt){
   if(S.lives <= 0) return;
@@ -578,11 +605,10 @@ function update(dt){
           S.enemies.splice(j, 1); 
           S.score += e.isBoss ? 500 : 10; coins += e.isBoss ? 50 : 2; 
           
-          // 👇 شانس آوردن قدرت‌ها کمتر شد
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; 
-            if (Math.random() < 0.5) spawnPowerup(e.x, e.y, true); // غول 50 درصد شانس
-          } else if (Math.random() < 0.01) { // دشمن عادی فقط 1 درصد شانس
+            if (Math.random() < 0.5) spawnPowerup(e.x, e.y, true);
+          } else if (Math.random() < 0.01) {
             spawnPowerup(e.x, e.y, false);
           }
           saveData(); 
@@ -632,7 +658,10 @@ function triggerGameOver() {
   isDead = true;
   const achievedScore = S.score;
   if(achievedScore > 0) {
-    totalScore += achievedScore; saveData(); localStorage.setItem('shooter_current_score', 0); saveScoreToLeaderboard(totalScore); 
+    totalScore += achievedScore; 
+    saveData(); 
+    localStorage.setItem('shooter_current_score', 0); 
+    saveScoreToLeaderboard(totalScore); // ذخیره قطعی موقع مرگ
   } else {
     localStorage.setItem('shooter_current_score', 0);
   }
@@ -643,9 +672,11 @@ function triggerGameOver() {
 function draw(){
   const sh = S.shake > 0 ? (Math.random() - 0.5) * S.shake * 0.03 : 0;
   ctx.setTransform(1, 0, 0, 1, sh, sh);
-  ctx.fillStyle = 'rgba(4,6,15,0.5)'; ctx.fillRect(-10, -10, W + 20, H + 20);
+  
+  ctx.fillStyle = 'rgba(26, 0, 0, 0.5)'; 
+  ctx.fillRect(-10, -10, W + 20, H + 20);
 
-  ctx.fillStyle = '#8fd8ff';
+  ctx.fillStyle = '#ff9999';
   for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); }
   ctx.globalAlpha = 1;
 
@@ -735,13 +766,19 @@ async function getScores(){
   return unique.slice(0, 10);
 }
 
-async function saveScoreToLeaderboard(newTotalScore){
+async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(newTotalScore <= 0) return;
-  localScores = localScores.filter(s => s.name !== profile.name);
-  localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
-  localScores.sort((a,b) => b.score - a.score);
-  localScores = localScores.slice(0, 10);
-  localStorage.setItem('shooter_local_ranks', JSON.stringify(localScores));
+  
+  if(!isSilent) {
+      localScores = localScores.filter(s => s.name !== profile.name);
+      localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
+      localScores.sort((a,b) => b.score - a.score);
+      localScores = localScores.slice(0, 10);
+      localStorage.setItem('shooter_local_ranks', JSON.stringify(localScores));
+  }
+
+  const syncIcon = document.getElementById('syncIndicator');
+  syncIcon.classList.add('syncing');
 
   try {
     let onlineScores = [];
@@ -750,16 +787,22 @@ async function saveScoreToLeaderboard(newTotalScore){
         const data = await res.json();
         if(Array.isArray(data)) onlineScores = data;
     }
+    
+    // آپدیت رکورد کاربر فعلی
     onlineScores = onlineScores.filter(s => s.name !== profile.name);
     onlineScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
     onlineScores.sort((a,b) => b.score - a.score);
     onlineScores = onlineScores.slice(0, 10);
+    
     await fetch(PANTRY_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(onlineScores)
     });
-  } catch(e) {}
+  } catch(e) {
+  } finally {
+    setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+  }
 }
 
 async function renderRank(){
