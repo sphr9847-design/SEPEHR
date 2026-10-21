@@ -11,13 +11,12 @@
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
-    background:rgba(4,6,15,.85);
-    border-bottom:1px solid rgba(0,255,255,.15);
+    background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
   .tab{flex:1;background:transparent;border:none;
     color:#5a7d8f;font-size:14px;font-weight:600;
-    cursor:pointer;transition:.2s;font-family:inherit}
-  .tab.active{color:#7df9ff;box-shadow:inset 0 -2px 0 #0ff}
+    cursor:pointer;transition:.3s;font-family:inherit}
+  .tab.active{color:#7df9ff;box-shadow:inset 0 -2px 0 #0ff;text-shadow:0 0 10px rgba(0,255,255,.5)}
   .tab:active{background:rgba(0,255,255,.05)}
 
   .panel{position:fixed;top:50px;left:0;right:0;bottom:0;
@@ -27,38 +26,77 @@
   .panel h2{text-align:center;font-size:22px;margin-bottom:20px;
     text-shadow:0 0 15px rgba(0,255,255,.5)}
 
+  /* رتبه‌ها */
   #rankList{list-style:none;max-width:400px;margin:0 auto}
   #rankList li{display:flex;align-items:center;
     padding:12px 18px;margin-bottom:10px;
-    background:rgba(0,255,255,.05);
-    border:1px solid rgba(0,255,255,.2);
-    border-radius:12px;font-size:16px}
+    background:rgba(0,255,255,.05); border:1px solid rgba(0,255,255,.2);
+    border-radius:12px;font-size:16px; transition: 0.3s;}
+  #rankList li:hover { background:rgba(0,255,255,.1); transform: translateX(-5px); }
   #rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
   #rankList .pos{width:28px;height:28px;border-radius:50%;
-    background:rgba(0,255,255,.1);
-    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,255,255,.1); display:flex;align-items:center;justify-content:center;
     font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px}
-  #rankList li:nth-child(1) .pos{background:gold;color:#04060f}
-  #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f}
-  #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f}
-  #rankList .avatar{font-size:20px;margin-right:10px}
+  #rankList li:nth-child(1) .pos{background:gold;color:#04060f;box-shadow:0 0 10px gold;}
+  #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f;}
+  #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f;}
+  
+  #rankList .avatar-svg { width: 28px; height: 28px; margin-right: 10px; display: flex; align-items: center; justify-content: center; }
+  #rankList .avatar-svg svg { width: 100%; height: 100%; filter: drop-shadow(0 0 5px currentColor); }
   #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
 
-  .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
-  .form-group label{display:block;margin-bottom:8px;color:#aaa}
-  .form-group input{width:100%;padding:12px;border-radius:8px;
-    background:rgba(255,255,255,.05);border:1px solid rgba(0,255,255,.3);
-    color:#fff;font-family:inherit;font-size:16px;outline:none}
-  .form-group input:focus{border-color:#0ff}
-  .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(50px, 1fr));gap:10px}
-  .emoji-btn{font-size:24px;background:rgba(255,255,255,.05);border:2px solid transparent;
-    border-radius:10px;padding:10px;cursor:pointer;transition:.2s;text-align:center}
-  .emoji-btn.selected{border-color:#0ff;background:rgba(0,255,255,.15);transform:scale(1.1)}
-  .save-btn{display:block;width:100%;max-width:400px;margin:20px auto;padding:14px;
-    background:#0ff;color:#04060f;border:none;border-radius:10px;
-    font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit}
+  .refresh-btn { display: block; margin: 0 auto 15px auto; padding: 10px 20px; 
+    background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff; 
+    border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
+  .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
+  /* پروفایل */
+  .profile-card {
+    max-width: 400px; margin: 0 auto 25px auto; padding: 25px 20px;
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0,255,255,0.05);
+    border-radius: 20px; text-align: center; position: relative; overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .profile-card::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    transform: skewX(-25deg); transition: 0.5s;
+  }
+  .profile-card:hover::before { left: 150%; }
+  .preview-avatar { width: 90px; height: 90px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
+  .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 15px currentColor); }
+  .preview-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+  .preview-title { font-size: 12px; color: #0ff; margin-top: 5px; opacity: 0.8; letter-spacing: 2px; }
+
+  .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
+  .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
+  .form-group input{width:100%;padding:14px;border-radius:12px;
+    background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,255,0.2);
+    color:#fff;font-family:inherit;font-size:16px;outline:none;transition: 0.3s;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
+  .form-group input:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.3), inset 0 2px 5px rgba(0,0,0,0.5);}
+  
+  .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(60px, 1fr));gap:12px}
+  .avatar-btn{
+    background:rgba(255,255,255,0.03);border:2px solid transparent;
+    border-radius:15px;padding:10px;cursor:pointer;transition:.3s;
+    display: flex; align-items: center; justify-content: center; height: 70px;
+  }
+  .avatar-btn svg { width: 100%; height: 100%; transition: 0.3s; }
+  .avatar-btn:hover { background:rgba(0,255,255,0.1); transform: translateY(-2px);}
+  .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.15);transform:scale(1.1); box-shadow: 0 0 15px rgba(0,255,255,0.4);}
+  .avatar-btn.selected svg { filter: drop-shadow(0 0 10px currentColor); }
+  
+  .save-btn{display:block;width:100%;max-width:400px;margin:25px auto;padding:15px;
+    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:12px;
+    font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
+
+  /* فروشگاه */
   .shop-header{text-align:center;margin-bottom:15px;font-size:18px;color:#ffd700;font-weight:bold}
   .shop-list{display:flex;flex-direction:column;gap:12px;max-width:500px;margin:0 auto}
   .weapon-card{display:flex;align-items:center;justify-content:space-between;
@@ -77,16 +115,16 @@
   .btn-equip{background:transparent;border:1px solid #0ff;color:#0ff}
   .btn-equipped{background:#0ff;color:#000;border:1px solid #0ff}
 
+  /* مودال Game Over */
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
-    background:rgba(4,6,15,.9);color:#fff;text-align:center;
-    z-index:20;backdrop-filter:blur(5px)}
+    background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
   #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a}
   #gameOver p{font-size:20px;color:#7df9ff}
   #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
   #restartBtn{margin-top:20px;padding:14px 40px;font-size:20px;
     border:2px solid #0ff;background:transparent;color:#0ff;
-    border-radius:40px;cursor:pointer;font-family:inherit}
+    border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
 </style>
 </head>
@@ -108,18 +146,26 @@
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
+  <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
   <ol id="rankList"></ol>
 </div>
 
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
+  
+  <div class="profile-card">
+    <div class="preview-avatar" id="previewAvatar"></div>
+    <div class="preview-name" id="previewName">بازیکن ناشناس</div>
+    <div class="preview-title">SPACE COMMANDER</div>
+  </div>
+
   <div class="form-group">
-    <label>اسم شما:</label>
-    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس...">
+    <label>اسم شما (نام فرمانده):</label>
+    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
   </div>
   <div class="form-group">
-    <label>انتخاب آواتار (ایموجی):</label>
-    <div class="emoji-grid" id="emojiGrid"></div>
+    <label>انتخاب آواتار (نشان فرماندهی):</label>
+    <div class="avatar-grid" id="avatarGrid"></div>
   </div>
   <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل</button>
 </div>
@@ -151,14 +197,28 @@ const WEAPONS = [
   { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 5, cd: 80, size: 8, count: 7, spread: 45 },
 ];
 
-let profile = { name: 'بازیکن ناشناس', avatar: '👾' };
+const AVATARS = [
+  { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
+  { id: 2, name: "فضایی", color: "#ff00ff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg>` },
+  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 4, name: "ربات", color: "#ffcc00", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 5, name: "ماسک", color: "#ff3333", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg>` },
+  { id: 6, name: "کریستال", color: "#00ff88", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg>` },
+  { id: 7, name: "روح", color: "#aaffff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg>` },
+  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
+];
+
+let profile = { name: 'بازیکن ناشناس', avatar: 1 };
 let coins = parseInt(localStorage.getItem('shooter_coins') || '0');
 let ownedWeapons = JSON.parse(localStorage.getItem('shooter_weapons') || '[1]');
 let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
 
 try {
   const savedProf = localStorage.getItem('shooter_profile');
-  if(savedProf) profile = JSON.parse(savedProf);
+  if(savedProf) {
+    profile = JSON.parse(savedProf);
+    if (typeof profile.avatar !== 'number') profile.avatar = 1;
+  }
 } catch(e) {}
 
 function saveData() {
@@ -167,25 +227,35 @@ function saveData() {
   localStorage.setItem('shooter_equipped', equippedWeapon);
 }
 
-const emojis = ['👾', '🚀', '👽', '🐱', '🐶', '🦊', '🐼', '🦁', '🐸', '🤖', '🦄', '👻', '💩', '🐉', '🦅', '🐺'];
-let selectedEmoji = profile.avatar;
+let selectedAvatarId = profile.avatar;
+
+function getAvatarById(id) {
+  return AVATARS.find(a => a.id === id) || AVATARS[0];
+}
 
 function renderProfileUI() {
   document.getElementById('nameInput').value = profile.name;
-  const grid = document.getElementById('emojiGrid');
-  grid.innerHTML = emojis.map(e => 
-    '<div class="emoji-btn ' + (e === selectedEmoji ? 'selected' : '') + '" onclick="selectEmoji(\'' + e + '\')">' + e + '</div>'
+  
+  const av = getAvatarById(selectedAvatarId);
+  document.getElementById('previewAvatar').innerHTML = av.svg;
+  document.getElementById('previewAvatar').style.color = av.color;
+  document.getElementById('previewName').textContent = profile.name;
+  
+  const grid = document.getElementById('avatarGrid');
+  grid.innerHTML = AVATARS.map(a => 
+    `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`
   ).join('');
 }
 
-window.selectEmoji = (e) => {
-  selectedEmoji = e;
-  renderProfileUI();
+window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
+window.updatePreview = () => {
+  const val = document.getElementById('nameInput').value.trim();
+  document.getElementById('previewName').textContent = val || 'بازیکن ناشناس';
 };
 
 document.getElementById('saveProfileBtn').onclick = () => {
   const newName = document.getElementById('nameInput').value.trim() || 'بازیکن ناشناس';
-  profile = { name: newName, avatar: selectedEmoji };
+  profile = { name: newName, avatar: selectedAvatarId };
   localStorage.setItem('shooter_profile', JSON.stringify(profile));
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
   document.querySelector('.tab[data-tab="game"]').click();
@@ -211,36 +281,22 @@ function renderShop() {
     }
 
     return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
-      '<div class="w-info">' +
-        '<h3>' + w.name + '</h3>' +
-        '<p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + '</p>' +
-      '</div>' +
+      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
       '<div class="w-action">' +
-        (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') +
-        actionHtml +
-      '</div>' +
-    '</div>';
+        (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml +
+      '</div></div>';
   }).join('');
 }
 
 window.buyWeapon = (id) => {
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
-    coins -= w.cost;
-    ownedWeapons.push(id);
-    equippedWeapon = id;
-    saveData();
-    renderShop();
-    alert('سلاح "' + w.name + '" با موفقیت خریداری و مجهز شد! 🎉');
+    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveData(); renderShop();
+    alert('سلاح "' + w.name + '" خریداری و مجهز شد! 🎉');
   }
 };
-
 window.equipWeapon = (id) => {
-  if (ownedWeapons.includes(id)) {
-    equippedWeapon = id;
-    saveData();
-    renderShop();
-  }
+  if (ownedWeapons.includes(id)) { equippedWeapon = id; saveData(); renderShop(); }
 };
 
 function resize(){
@@ -249,23 +305,16 @@ function resize(){
   cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
 }
 resize();
-addEventListener('resize', () => {
-  resize();
-  if(S){ S.player.y = H - 90; S.player.x = Math.min(S.player.x, W - 22); }
-});
+addEventListener('resize', () => { resize(); if(S){ S.player.y = H - 90; S.player.x = Math.min(S.player.x, W - 22); } });
 
 let S, lastSaved = 0, isDead = false;
 
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
-  if(isDead) {
-    savedScore = 0;
-    localStorage.setItem('shooter_current_score', 0);
-    isDead = false;
-  }
+  if(isDead) { savedScore = 0; localStorage.setItem('shooter_current_score', 0); isDead = false; }
   
   S = {
-    player: {x: W/2, y: H - 90, r: 15},
+    player: {x: W/2, y: H - 90, r: 8},
     bullets: [], enemies: [], parts: [], stars: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
   };
@@ -273,10 +322,7 @@ function reset(){
   document.getElementById('gameOver').style.display = 'none';
 
   for(let i = 0; i < 40; i++){
-    S.stars.push({
-      x: Math.random()*W, y: Math.random()*H,
-      z: Math.random()*0.8 + 0.2,
-    });
+    S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
   }
 }
 reset();
@@ -295,19 +341,9 @@ addEventListener('keyup', e => {
   if(e.key === ' ') keys.fire = false;
 });
 
-cvs.addEventListener('touchstart', e => {
-  e.preventDefault(); touching = true;
-  const t = e.touches[0];
-  if(t) touchX = t.clientX;
-}, {passive:false});
-cvs.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const t = e.touches[0];
-  if(t) touchX = t.clientX;
-}, {passive:false});
-cvs.addEventListener('touchend', e => {
-  e.preventDefault(); touching = false; touchX = null;
-}, {passive:false});
+cvs.addEventListener('touchstart', e => { e.preventDefault(); touching = true; const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
+cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
+cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; }, {passive:false});
 
 cvs.addEventListener('mousedown', () => { keys.fire = true; });
 addEventListener('mouseup', () => keys.fire = false);
@@ -316,27 +352,14 @@ cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 function fire(){
   const w = WEAPONS.find(x => x.id === equippedWeapon);
   S.cool = w.cd;
-  
   for(let i = 0; i < w.count; i++){
     let angle = 0;
     if(w.count > 1){
       const spreadRad = (w.spread * Math.PI) / 180;
       angle = -spreadRad/2 + (spreadRad / (w.count - 1)) * i;
     }
-    
     const speed = 1.6;
-    const vx = Math.sin(angle) * speed;
-    const vy = -Math.cos(angle) * speed;
-    
-    S.bullets.push({
-      x: S.player.x, 
-      y: S.player.y - 22, 
-      vx: vx, 
-      vy: vy, 
-      dmg: w.dmg, 
-      color: w.color, 
-      size: w.size
-    });
+    S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: w.dmg, color: w.color, size: w.size });
   }
 }
 
@@ -344,13 +367,9 @@ function spawnEnemy(){
   const r = 11 + Math.random()*9;
   const diff = Math.min(S.score / 400, 1);
   S.enemies.push({
-    x: 30 + Math.random()*(W - 60),
-    y: -30, r,
-    vy: 0.16 + Math.random()*0.10 + diff*0.15,
-    vx: (Math.random() - 0.5) * 0.12,
-    hue: 330 + Math.random()*50,
-    rot: Math.random()*6.28,
-    rv: (Math.random() - 0.5) * 0.005,
+    x: 30 + Math.random()*(W - 60), y: -30, r,
+    vy: 0.16 + Math.random()*0.10 + diff*0.15, vx: (Math.random() - 0.5) * 0.12,
+    hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
     hp: r > 17 ? 3 : 2,
   });
 }
@@ -358,49 +377,34 @@ function spawnEnemy(){
 function boom(x, y, hue, n){
   for(let i = 0; i < n; i++){
     const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05;
-    S.parts.push({
-      x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s,
-      life: 1, hue, r: Math.random()*2.5 + 1,
-    });
+    S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 });
   }
 }
 
 function update(dt){
   if(S.lives <= 0) return;
-
   S.t++;
   localStorage.setItem('shooter_current_score', S.score);
 
-  for(const s of S.stars){
-    s.y += s.z * dt * 0.12;
-    if(s.y > H){ s.y = 0; s.x = Math.random()*W; }
-  }
+  for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
+  
   const p = S.player;
   const sp = 0.9 * dt;
   if(keys.left)  p.x -= sp;
   if(keys.right) p.x += sp;
-  if(touchX !== null){
-    const d = touchX - p.x;
-    p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d));
-  }
+  if(touchX !== null){ const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); }
   p.x = Math.max(22, Math.min(W - 22, p.x));
 
   S.cool -= dt;
   if((keys.fire || touching) && S.cool <= 0) fire();
-  
-  for(const b of S.bullets) {
-    b.x += b.vx * dt; 
-    b.y += b.vy * dt;
-  }
+  for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
   S.spawnT -= dt;
   const interval = Math.max(280, 820 - S.score * 1.2);
   if(S.spawnT <= 0){ spawnEnemy(); S.spawnT = interval; }
 
   for(const e of S.enemies){
-    e.y += e.vy * dt;
-    e.x += e.vx * dt;
-    e.rot += e.rv * dt;
+    e.y += e.vy * dt; e.x += e.vx * dt; e.rot += e.rv * dt;
     if(e.x < e.r || e.x > W - e.r) e.vx *= -1;
   }
 
@@ -410,16 +414,8 @@ function update(dt){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
       if(dx*dx + dy*dy < (e.r + 4)**2){
-        S.bullets.splice(i, 1);
-        e.hp -= b.dmg; 
-        boom(b.x, b.y, 180, 3);
-        if(e.hp <= 0){
-          boom(e.x, e.y, e.hue, 10);
-          S.enemies.splice(j, 1);
-          S.score += 10;
-          coins += 2; 
-          saveData();
-        }
+        S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
+        if(e.hp <= 0){ boom(e.x, e.y, e.hue, 10); S.enemies.splice(j, 1); S.score += 10; coins += 2; saveData(); }
         break;
       }
     }
@@ -428,29 +424,20 @@ function update(dt){
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
-    if(dx*dx + dy*dy < (e.r + p.r)**2){
-      boom(e.x, e.y, e.hue, 12);
-      S.enemies.splice(j, 1);
-      S.shake = 220;
-      S.lives--;
+    if(dx*dx + dy*dy < (e.r + p.r - 2)**2){
+      boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
       if(S.lives <= 0) triggerGameOver();
       break;
     }
   }
 
   for(let j = S.enemies.length - 1; j >= 0; j--){
-    if(S.enemies[j].y > H + 40){
-      S.enemies.splice(j, 1);
-      S.lives--;
-      if(S.lives <= 0) triggerGameOver();
-    }
+    if(S.enemies[j].y > H + 40){ S.enemies.splice(j, 1); S.lives--; if(S.lives <= 0) triggerGameOver(); }
   }
 
   for(let i = S.parts.length - 1; i >= 0; i--){
     const q = S.parts[i];
-    q.x += q.vx * dt; q.y += q.vy * dt;
-    q.vy += 0.0004 * dt;
-    q.life -= dt * 0.0016;
+    q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 0.0004 * dt; q.life -= dt * 0.0016;
     if(q.life <= 0) S.parts.splice(i, 1);
   }
   if(S.shake > 0) S.shake -= dt;
@@ -468,93 +455,63 @@ function triggerGameOver() {
 function draw(){
   const sh = S.shake > 0 ? (Math.random() - 0.5) * S.shake * 0.03 : 0;
   ctx.setTransform(1, 0, 0, 1, sh, sh);
-  ctx.fillStyle = 'rgba(4,6,15,0.5)';
-  ctx.fillRect(-10, -10, W + 20, H + 20);
+  ctx.fillStyle = 'rgba(4,6,15,0.5)'; ctx.fillRect(-10, -10, W + 20, H + 20);
 
   ctx.fillStyle = '#8fd8ff';
-  for(const s of S.stars){
-    ctx.globalAlpha = s.z * 0.7;
-    ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6);
-  }
+  for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); }
   ctx.globalAlpha = 1;
 
   for(const q of S.parts){
-    ctx.globalAlpha = Math.max(q.life, 0);
-    ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)';
-    ctx.beginPath();
-    ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28);
-    ctx.fill();
+    ctx.globalAlpha = Math.max(q.life, 0); ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)';
+    ctx.beginPath(); ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28); ctx.fill();
   }
   ctx.globalAlpha = 1;
 
   for(const b of S.bullets) {
-    ctx.fillStyle = b.color;
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, b.size, 0, 6.28);
-    ctx.fill();
-    ctx.globalAlpha = 0.5;
-    ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10);
-    ctx.globalAlpha = 1;
+    ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fill();
+    ctx.globalAlpha = 0.5; ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10); ctx.globalAlpha = 1;
   }
 
   for(const e of S.enemies){
-    ctx.save();
-    ctx.translate(e.x, e.y);
-    ctx.rotate(e.rot);
-    ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)';
-    ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
+    ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
+    ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
+    ctx.lineWidth = 2; ctx.beginPath();
     for(let k = 0; k < 6; k++){
-      const a = k / 6 * 6.283;
-      const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
+      const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
       k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
     }
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.restore();
+    ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
   }
 
   if(S.lives > 0) {
     const p = S.player;
-    ctx.fillStyle = '#a8ffd0';
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y - 20);
-    ctx.lineTo(p.x - 14, p.y + 12);
-    ctx.lineTo(p.x, p.y + 6);
-    ctx.lineTo(p.x + 14, p.y + 12);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = 'hsla(' + (30 + Math.random()*20) + ',100%,65%,.85)';
-    ctx.beginPath();
-    ctx.moveTo(p.x - 5, p.y + 10);
-    ctx.lineTo(p.x, p.y + 16 + Math.random()*10);
-    ctx.lineTo(p.x + 5, p.y + 10);
-    ctx.closePath();
-    ctx.fill();
+    ctx.fillStyle = '#a8ffd0'; ctx.beginPath();
+    ctx.moveTo(p.x, p.y - 20); ctx.lineTo(p.x - 14, p.y + 12); ctx.lineTo(p.x, p.y + 6); ctx.lineTo(p.x + 14, p.y + 12);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'hsla(' + (30 + Math.random()*20) + ',100%,65%,.85)'; ctx.beginPath();
+    ctx.moveTo(p.x - 5, p.y + 10); ctx.lineTo(p.x, p.y + 16 + Math.random()*10); ctx.lineTo(p.x + 5, p.y + 10);
+    ctx.closePath(); ctx.fill();
   }
 
-  ctx.font = '600 16px system-ui,sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#7df9ff';
-  ctx.fillText('امتیاز  ' + S.score, 18, 82);
-  ctx.fillStyle = '#ffd700';
-  ctx.fillText('💰 ' + coins, 18, 110);
+  ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز  ' + S.score, 18, 82);
+  ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
   
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#ff5c8a';
-  ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
+// 🕵️ توابع اصلاح‌شده برای رتبه‌بندی
 async function getScores(){
   try {
-    const res = await fetch(PANTRY_URL);
-    if(res.status === 400) return [];
+    const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
+    if(res.status === 400 || res.status === 404) return []; // لیست خالیه
+    if(!res.ok) throw new Error("Network error");
+    
     const data = await res.json();
     if(!Array.isArray(data)) return [];
     return data.sort((a,b) => b.score - a.score).slice(0, 10);
   } catch(e) {
-    return [];
+    return null; // خطای شبکه
   }
 }
 
@@ -563,11 +520,15 @@ async function saveScore(){
   lastSaved = S.score;
   try {
     let scores = await getScores();
+    
+    // 🚨 جلوگیری از باگ پاک شدن لیست: اگه شبکه قطع بود، ذخیره نکن!
+    if(scores === null) {
+      console.log("خطای شبکه: امتیاز در دیتابیس آنلاین ذخیره نشد تا لیست قبلی پاک نشود.");
+      return; 
+    }
+    
     scores.push({
-      score: S.score, 
-      date: Date.now(),
-      name: profile.name,
-      avatar: profile.avatar
+      score: S.score, date: Date.now(), name: profile.name, avatar: profile.avatar
     });
     scores.sort((a,b) => b.score - a.score);
     scores = scores.slice(0, 10);
@@ -577,9 +538,7 @@ async function saveScore(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(scores)
     });
-  } catch(e) {
-    console.log("خطا در ذخیره", e);
-  }
+  } catch(e) {}
 }
 
 async function renderRank(){
@@ -587,14 +546,28 @@ async function renderRank(){
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   
   const scores = await getScores();
+  
+  if(scores === null){
+    list.innerHTML = '<li class="empty" style="color:#ff5c8a;">خطا در اتصال به سرور! اینترنت را بررسی کنید.</li>';
+    return;
+  }
+  
   if(scores.length === 0){
     list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
     return;
   }
+  
   list.innerHTML = scores.map((s, i) => {
+    let avatarHtml = '';
+    if (typeof s.avatar === 'number') {
+      const av = getAvatarById(s.avatar);
+      avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
+    } else {
+      avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
+    }
+
     return '<li>' +
-      '<span class="pos">' + (i+1) + '</span>' +
-      '<span class="avatar">' + (s.avatar || '👾') + '</span>' +
+      '<span class="pos">' + (i+1) + '</span>' + avatarHtml +
       '<span class="name">' + (s.name || 'ناشناس') + '</span>' +
       '<span class="sc">' + s.score + '</span>' +
     '</li>';
@@ -604,8 +577,7 @@ async function renderRank(){
 document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = async () => {
     const tab = btn.dataset.tab;
-    document.querySelectorAll('.tab').forEach(b =>
-      b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
     
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
@@ -632,10 +604,7 @@ function loop(ts){
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
                  !document.getElementById('profilePanel').classList.contains('show') &&
                  !document.getElementById('shopPanel').classList.contains('show');
-  if(onGame){
-    update(dt);
-    draw();
-  }
+  if(onGame){ update(dt); draw(); }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
