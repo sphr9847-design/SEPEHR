@@ -515,7 +515,7 @@ function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
   
   S = {
-    player: {x: W/2, y: H - 90, r: 3, inv: 0}, // 👈 مصونیت بازیکن
+    player: {x: W/2, y: H - 90, r: 3, inv: 0}, 
     bullets: [], enemies: [], parts: [], stars: [], powerups: [],
     ebullets: [], 
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
@@ -572,9 +572,9 @@ function fire(){
   }
 }
 
-// 👈 شلیک غول‌ها (تعادل جدید)
+// 👈 شلیک غول‌ها (کاملاً آروم)
 function bossShoot(boss, pattern) {
-  const speed = 1.2 + currentBossIndex * 0.05; // سرعت خیلی کمتر شد
+  const speed = 0.9 + currentBossIndex * 0.05; // سرعت خیلی کم شد
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
   
   if (pattern === 'aimed') {
@@ -586,9 +586,9 @@ function bossShoot(boss, pattern) {
     });
   } 
   else if (pattern === 'spread') {
-    const count = 3; // از ۵ تا به ۳ تا کم شد
+    const count = 3; 
     for (let i = 0; i < count; i++) {
-      const spreadAngle = angleToPlayer + (i - 1) * 0.3; // فاصله زاویه بیشتر
+      const spreadAngle = angleToPlayer + (i - 1) * 0.3; 
       S.ebullets.push({
         x: boss.x, y: boss.y + 20,
         vx: Math.cos(spreadAngle) * speed,
@@ -598,7 +598,7 @@ function bossShoot(boss, pattern) {
     }
   }
   else if (pattern === 'radial') {
-    const count = 6; // از ۱۲ تا به ۶ تا کم شد (جای فرار هست)
+    const count = 6; 
     const baseAngle = boss.t * 0.2;
     for (let i = 0; i < count; i++) {
       const angle = baseAngle + (i / count) * Math.PI * 2;
@@ -617,26 +617,40 @@ function spawnEnemy(){
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
 
-  S.enemies.push({
+  // 👈 محاسبه جون شهاب‌سنگ بر اساس امتیاز (هر ۵۰ امتیاز، ۵ تا بیشتر)
+  const rockBaseHp = 3 + Math.floor(S.score / 50) * 5;
+
+  const enemy = {
     x: 30 + Math.random()*(W - 60), y: -30, r,
     vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25,
     vx: (Math.random() - 0.5) * 0.12,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
     hp: (r > 17 ? 3 : 2) + Math.floor(diffHp),
     isBoss: false
-  });
+  };
+
+  if (Math.random() < 0.3) { // تبدیل بخشی از دشمن‌ها به شهاب‌سنگ
+      enemy.type = 'rock';
+      enemy.hp = rockBaseHp;
+      enemy.r = 20 + Math.random()*10;
+  }
+
+  S.enemies.push(enemy);
 }
 
 function spawnBoss(){
+  const hp = 200 + (currentBossIndex * 300); // 👈 ۲۰۰، ۵۰۰، ۸۰۰...
+  
   S.enemies.push({
     x: W/2, y: -150, r: 65,
     vy: 0.05, vx: 0.15, 
     hue: 280, rot: 0, rv: 0.01,
-    hp: 150 + (currentBossIndex * 50), // جون بیشتر برای طولانی تر شدن فایت
+    hp: hp, 
+    maxHp: hp, // 👈 ذخیره جون اصلی برای نوار خون
     isBoss: true,
-    shootT: 3, // ۳ ثانیه فرصت آماده باش
+    shootT: 4, // ۴ ثانیه فرصت آماده باش
     patternIdx: 0,
-    entering: true // 👈 فاز ورود
+    entering: true 
   });
 }
 
@@ -675,13 +689,12 @@ function update(dt){
     if (S.tempWeaponTime <= 0) S.tempWeapon = null;
   }
   
-  // 👈 کد شدن تایمر مصونیت
   if (S.player.inv > 0) S.player.inv -= dt;
 
   if (S.score >= nextBossScore && !isBossActive) {
     spawnBoss();
     isBossActive = true;
-    S.enemies = S.enemies.filter(e => e.isBoss); // 👈 پاک کردن دشمنای عادی موقع اومدن غول
+    S.enemies = S.enemies.filter(e => e.isBoss);
   }
 
   for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
@@ -701,12 +714,11 @@ function update(dt){
 
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    // 👈 وقتی غول هست، هیچ دشمن عادی نمیاد
     if (!isBossActive) {
         spawnEnemy();
         S.spawnT = Math.max(280, 820 - S.score * 1.2);
     } else {
-        S.spawnT = 1000; // تایمر بیفایده در زمان غول
+        S.spawnT = 1000; 
     }
   }
 
@@ -716,21 +728,20 @@ function update(dt){
     
     if(e.isBoss) {
       if (e.entering) {
-          // 👈 فاز ورود: با سرعت ثابت میاد پایین
           e.y += 80 * dt;
           if (e.y >= 120) {
               e.y = 120;
               e.entering = false;
           }
       } else {
-          // 👈 فاز حمله: شناور میمونه
           e.y = 120 + Math.sin(S.t * 0.05) * 20;
-          e.x += e.vx * dt * 60; // حرکت افقی
+          e.x += e.vx * dt * 60; 
           if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
           
           e.shootT -= dt;
           if (e.shootT <= 0) {
-            e.shootT = Math.max(1.2, 2.5 - currentBossIndex * 0.1);
+            // 👈 زمان بین شلیک‌ها (خیلی کند: از ۴.۵ ثانیه شروع میشه)
+            e.shootT = Math.max(2.0, 4.5 - currentBossIndex * 0.2);
             const patterns = ['aimed', 'spread', 'radial'];
             bossShoot(e, patterns[e.patternIdx % patterns.length]);
             e.patternIdx++;
@@ -741,7 +752,6 @@ function update(dt){
     }
   }
 
-  // 👈 حرکت گلوله‌های دشمن
   for(let i = S.ebullets.length - 1; i >= 0; i--) {
     const eb = S.ebullets[i];
     eb.x += eb.vx * dt;
@@ -760,7 +770,7 @@ function update(dt){
         S.ebullets.splice(i, 1);
         S.lives--;
         S.shake = 220;
-        S.player.inv = 1.5; // 👈 ۱.۵ ثانیه مصونیت
+        S.player.inv = 1.5; 
         boom(S.player.x, S.player.y, 0, 15);
         if(S.lives <= 0) triggerGameOver();
       }
@@ -798,14 +808,13 @@ function update(dt){
     }
   }
 
-  // 👈 برخورد فیزیکی دشمن با بازیکن
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
     if(dx*dx + dy*dy < (e.r + p.r)**2){
       if (S.player.inv <= 0) {
           boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
-          S.player.inv = 1.5; // 👈 مصونیت
+          S.player.inv = 1.5; 
           if(e.isBoss) isBossActive = false;
           if(S.lives <= 0) triggerGameOver();
       }
@@ -928,7 +937,8 @@ function draw(){
     if (e.isBoss) {
         ctx.rotate(-e.rot); ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
         ctx.fillStyle = 'lime';
-        const hpPct = Math.max(0, e.hp / (150 + (currentBossIndex * 50)));
+        // 👈 استفاده از maxHp برای نوار خون غول
+        const hpPct = Math.max(0, e.hp / e.maxHp);
         ctx.fillRect(-e.r, -e.r - 20, e.r*2 * hpPct, 6);
     }
     ctx.restore();
@@ -936,7 +946,6 @@ function draw(){
 
   if(S.lives > 0) {
     const p = S.player;
-    // 👈 افکت چشمک زدن موقع مصونیت
     if (p.inv > 0 && Math.floor(S.t * 10) % 2 === 0) {
         // چشمک نمیزنه
     } else {
