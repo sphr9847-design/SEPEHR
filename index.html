@@ -214,8 +214,6 @@
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
-  <div class="stats-bar">👁️ بازدیدکنندگان سایت: <span id="visitorCount">در حال بارگذاری...</span></div>
-  
   <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
   <ol id="rankList"></ol>
 </div>
@@ -267,7 +265,6 @@ const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
 let W, H;
 
-// 👇 کلیدهای اتصال به دیتابیس Supabase
 const SUPABASE_URL = "https://wjgnbgbcqdtdcxonyrsb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs";
 
@@ -812,7 +809,6 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
-// 👇 سیستم رتبه‌بندی با Supabase (با قابلیت آپدیت صحیح)
 async function getScores(){
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
@@ -832,7 +828,6 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if (syncIcon) syncIcon.classList.add('syncing');
 
   try {
-    // 👈 اینجا ?on_conflict=dev_id اضافه شد تا رکورد قبلی آپدیت بشه
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: {
@@ -851,10 +846,12 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
     
     if (!res.ok) {
         const errorData = await res.text();
-        console.log("خطا در ذخیره امتیاز:", errorData);
+        // اگه خطا داشت، بهمون نشون بده
+        if (!isSilent) alert("خطا در ذخیره امتیاز:\n" + errorData);
+        console.log("خطای سوپابیس:", errorData);
     }
   } catch(e) {
-    console.log("خطای شبکه:", e);
+    if (!isSilent) alert("خطای شبکه در ذخیره امتیاز:\n" + e.message);
   }
 
   if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
@@ -895,8 +892,13 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
     
-    if(tab === 'shop') { renderShop(); } 
-    else if(tab === 'rank'){ renderRank(); }
+    if(tab === 'shop') { 
+        renderShop(); 
+    } else if(tab === 'rank'){ 
+        // 👈 وقتی روی تب رتبه‌ها می‌زنی، امتیاز فعلی رو زورکی سیو میکنه
+        await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false);
+        renderRank(); 
+    }
   };
 });
 
