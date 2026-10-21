@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>🚀 تیراندازی فضایی</title>
-<!-- 👇 اضافه کردن فونت زیبای وزیرمتن -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
@@ -14,11 +13,10 @@
             font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
-  /* 👇 اعلان یاقوتی تیره و گرد */
   #purchaseToast {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #800b1b, #3e0006); /* یاقوتی تیره */
-    color: #ffe6e6; padding: 16px 32px; border-radius: 20px; /* گوشه‌های گردتر */
+    background: linear-gradient(135deg, #800b1b, #3e0006);
+    color: #ffe6e6; padding: 16px 32px; border-radius: 20px;
     font-size: 15px; font-weight: 700;
     box-shadow: 0 10px 30px rgba(62, 0, 6, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 100, 100, 0.2);
@@ -158,7 +156,6 @@
     color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
   }
 
-  /* 👇 دکمه ارتقا (یاقوتی تیره و خوشگل) */
   .btn-upgrade {
     background: linear-gradient(135deg, #800b1b, #3e0006);
     color:#ffe6e6; 
@@ -167,7 +164,7 @@
     border: 1px solid rgba(255, 100, 100, 0.2);
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     font-weight: 900;
-    border-radius: 15px; /* گوشه‌های گردتر */
+    border-radius: 15px;
   }
   .btn-upgrade:hover {
     box-shadow: 0 6px 20px rgba(128, 11, 27, 0.7);
@@ -178,6 +175,30 @@
     background: #222; color:#555; box-shadow:none; cursor:not-allowed; 
     transform:none; border:1px solid #333; text-shadow: none;
   }
+
+  /* 👇 دکمه کنترل صدا */
+  .sound-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 400px; margin: 15px auto; padding: 15px 20px;
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(0,0,0,0.4));
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 15px;
+    cursor: pointer; transition: 0.3s;
+  }
+  .sound-toggle:hover { border-color: rgba(0,255,255,0.4); background: linear-gradient(145deg, rgba(0,255,255,0.1), rgba(0,0,0,0.4)); }
+  .sound-toggle span { color: #fff; font-weight: 700; font-size: 15px; }
+  .sound-toggle .icon {
+    width: 50px; height: 28px; border-radius: 14px;
+    background: #333; position: relative; transition: 0.3s;
+  }
+  .sound-toggle .icon::after {
+    content: ''; position: absolute;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #666; top: 3px; left: 3px;
+    transition: 0.3s;
+  }
+  .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.5); }
+  .sound-toggle.on .icon::after { left: 25px; background: #04060f; }
 
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
@@ -232,7 +253,6 @@
 </style>
 </head>
 <body>
-<!-- 👇 الماس‌ها حذف شدند -->
 <div id="purchaseToast">
   <span id="toastText">سلاح خریداری شد!</span>
 </div>
@@ -279,6 +299,12 @@
     <div class="avatar-grid" id="avatarGrid"></div>
   </div>
   
+  <!-- 👇 کلید صدا -->
+  <div class="sound-toggle on" id="soundToggle">
+    <span>🔊 افکت‌های صوتی</span>
+    <div class="icon"></div>
+  </div>
+  
   <div class="music-player">
     <label>🎵 پخش آهنگ دلخواه از گوشی:</label>
     <div class="file-upload-wrapper">
@@ -316,6 +342,123 @@ if (!deviceId) {
     localStorage.setItem('shooter_device_id', deviceId);
 }
 
+/* ═══════════════ سیستم صدا با Web Audio API ═══════════════ */
+const SND = {
+  ctx: null,
+  masterGain: null,
+  enabled: localStorage.getItem('shooter_sound') !== 'false',
+  
+  init() {
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return;
+    }
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.enabled ? 0.25 : 0;
+      this.masterGain.connect(this.ctx.destination);
+    } catch(e) {}
+  },
+  
+  setEnabled(v) {
+    this.enabled = v;
+    localStorage.setItem('shooter_sound', v ? 'true' : 'false');
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime);
+    }
+  },
+  
+  sweep(type, f0, f1, dur, vol, delay) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + (delay || 0);
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f0, t);
+    osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
+  },
+  
+  noise(dur, vol, filterFreq) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    
+    const src = this.ctx.createBufferSource();
+    src.buffer = buffer;
+    
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(filterFreq || 2000, t);
+    filter.frequency.exponentialRampToValueAtTime(200, t + dur);
+    
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    src.start(t);
+    src.stop(t + dur);
+  },
+  
+  play(name) {
+    if (!this.ctx || !this.enabled) return;
+    switch(name) {
+      case 'shoot':
+        this.sweep('square', 800, 200, 0.06, 0.04);
+        break;
+      case 'explosion':
+        this.noise(0.25, 0.12, 1500);
+        this.sweep('sine', 150, 40, 0.2, 0.08);
+        break;
+      case 'bigExplosion':
+        this.noise(0.5, 0.25, 2000);
+        this.sweep('sine', 100, 25, 0.5, 0.18);
+        break;
+      case 'playerHit':
+        this.sweep('sawtooth', 200, 50, 0.35, 0.18);
+        this.noise(0.15, 0.12, 3000);
+        break;
+      case 'powerup':
+        [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05));
+        break;
+      case 'purchase':
+        [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06));
+        break;
+      case 'upgrade':
+        [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05));
+        break;
+      case 'bossWarn':
+        for (let i = 0; i < 3; i++) {
+          this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28);
+        }
+        break;
+      case 'bossShoot':
+        this.sweep('square', 300, 100, 0.12, 0.05);
+        break;
+      case 'gameOver':
+        [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15));
+        break;
+      case 'uiClick':
+        this.sweep('square', 600, 800, 0.04, 0.025);
+        break;
+    }
+  }
+};
+
+/* ═══════════════ دیتای بازی ═══════════════ */
 const WEAPONS = [
   { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
   { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
@@ -424,6 +567,10 @@ function renderProfileUI() {
   grid.innerHTML = AVATARS.map(a => 
     `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`
   ).join('');
+  
+  // آپدیت وضعیت دکمه صدا
+  const st = document.getElementById('soundToggle');
+  st.classList.toggle('on', SND.enabled);
 }
 
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
@@ -437,6 +584,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const btn = document.getElementById('saveProfileBtn');
   
   if(!newName) { alert('لطفا یک اسم وارد کنید.'); return; }
+  SND.play('uiClick');
 
   btn.textContent = 'در حال بررسی...';
   btn.disabled = true;
@@ -464,6 +612,14 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
 };
+
+// 👇 دکمه قطع/وصل صدا
+document.getElementById('soundToggle').addEventListener('click', () => {
+  SND.init();
+  SND.setEnabled(!SND.enabled);
+  renderProfileUI();
+  if (SND.enabled) SND.play('uiClick');
+});
 
 renderProfileUI();
 
@@ -524,6 +680,7 @@ function showPurchaseToast(msg) {
 }
 
 window.buyWeapon = (id) => {
+  SND.init();
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
     coins -= w.cost; 
@@ -532,10 +689,12 @@ window.buyWeapon = (id) => {
     saveData(); 
     renderShop();
     showPurchaseToast(`سلاح «${w.name}» با موفقیت خریداری شد!`);
+    SND.play('purchase');
   }
 };
 
 window.upgradeWeapon = (id) => {
+    SND.init();
     const w = WEAPONS.find(x => x.id === id);
     const lvl = weaponLevels[id] || 0;
     const cost = Math.floor(200 * Math.pow(1.5, lvl));
@@ -549,10 +708,13 @@ window.upgradeWeapon = (id) => {
         const newLvl = lvl + 1;
         const newDmg = w.dmg + (newLvl * 2);
         showPurchaseToast(`سلاح «${w.name}» به لول ${newLvl} ارتقا یافت! (دمیج: ${newDmg})`);
+        SND.play('upgrade');
     }
 };
 
 window.equipWeapon = (id) => {
+  SND.init();
+  SND.play('uiClick');
   if (ownedWeapons.includes(id)) { equippedWeapon = id; saveData(); renderShop(); }
 };
 
@@ -600,6 +762,7 @@ addEventListener('keydown', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = true;
   if(['ArrowRight','d','D'].includes(e.key)) keys.right = true;
   if(e.key === ' '){ keys.fire = true; e.preventDefault(); }
+  if(e.key === 'Enter') SND.init();
 });
 addEventListener('keyup', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = false;
@@ -607,11 +770,17 @@ addEventListener('keyup', e => {
   if(e.key === ' ') keys.fire = false;
 });
 
-cvs.addEventListener('touchstart', e => { e.preventDefault(); touching = true; const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
+cvs.addEventListener('touchstart', e => { 
+  e.preventDefault(); 
+  SND.init();
+  touching = true; 
+  const t = e.touches[0]; 
+  if(t) touchX = t.clientX; 
+}, {passive:false});
 cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
 cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; }, {passive:false});
 
-cvs.addEventListener('mousedown', () => { keys.fire = true; });
+cvs.addEventListener('mousedown', () => { SND.init(); keys.fire = true; });
 addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
@@ -643,9 +812,12 @@ function fire(){
     const speed = 1.6;
     S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: dmg, color: w.color, size: w.size });
   }
+  
+  SND.play('shoot');
 }
 
 function bossShoot(boss, pattern) {
+  SND.play('bossShoot');
   const speed = 0.2 + currentBossIndex * 0.05; 
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
   
@@ -711,6 +883,8 @@ function spawnEnemy(){
 
 function spawnBoss(){
   const hp = 200 + (currentBossIndex * 300);
+  
+  SND.play('bossWarn');
   
   S.enemies.push({
     x: W/2, y: -150, r: 65, 
@@ -834,6 +1008,7 @@ function update(dt){
         S.shake = 220;
         S.player.inv = 1500; 
         boom(S.player.x, S.player.y, 0, 15);
+        SND.play('playerHit');
         if(S.lives <= 0) triggerGameOver();
       }
     }
@@ -859,9 +1034,13 @@ function update(dt){
             isBossActive = false; 
             currentBossIndex++; 
             nextBossScore = (currentBossIndex + 1) * 1000;
+            SND.play('bigExplosion');
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y, true);
-          } else if (Math.random() < 0.01) {
-            spawnPowerup(e.x, e.y, false);
+          } else {
+            SND.play('explosion');
+            if (Math.random() < 0.01) {
+              spawnPowerup(e.x, e.y, false);
+            }
           }
           saveData(); 
         }
@@ -877,6 +1056,7 @@ function update(dt){
       if (S.player.inv <= 0) {
           boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
           S.player.inv = 1500; 
+          SND.play('playerHit');
           if(e.isBoss) isBossActive = false;
           if(S.lives <= 0) triggerGameOver();
       }
@@ -891,6 +1071,7 @@ function update(dt){
     if(dx*dx + dy*dy < (pu.r + p.r + 15)**2){
       S.tempWeapon = pu.weapon; S.tempWeaponTime = 10000;
       S.powerups.splice(i, 1); boom(pu.x, pu.y, 180, 15);
+      SND.play('powerup');
       continue;
     }
     if(pu.y > H + 50) S.powerups.splice(i, 1);
@@ -911,6 +1092,7 @@ function update(dt){
 
 function triggerGameOver() {
   isDead = true;
+  SND.play('gameOver');
   const achievedScore = S.score;
   const bonusCoins = Math.floor(achievedScore / 10);
   
@@ -1112,6 +1294,8 @@ async function renderRank(){
 
 document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = async () => {
+    SND.init();
+    SND.play('uiClick');
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
@@ -1128,6 +1312,7 @@ document.querySelectorAll('.tab').forEach(btn => {
 });
 
 document.getElementById('restartBtn').onclick = () => {
+  SND.play('uiClick');
   reset();
   document.querySelector('.tab[data-tab="game"]').click();
 };
