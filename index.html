@@ -70,6 +70,12 @@
   .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 15px currentColor); }
   .preview-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
   .preview-title { font-size: 12px; color: #0ff; margin-top: 5px; opacity: 0.8; letter-spacing: 2px; }
+  
+  /* 👇 استایل مجموع امتیازات */
+  .preview-total { 
+    margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2);
+    font-size: 16px; color: #ffd700; font-weight: bold;
+  }
 
   .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
@@ -145,7 +151,7 @@
 </div>
 
 <div id="rankPanel" class="panel">
-  <h2>🏆 رتبه‌بندی آنلاین</h2>
+  <h2>🏆 رتبه‌بندی آنلاین (مجموع امتیازات)</h2>
   <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
   <ol id="rankList"></ol>
 </div>
@@ -157,6 +163,7 @@
     <div class="preview-avatar" id="previewAvatar"></div>
     <div class="preview-name" id="previewName">بازیکن ناشناس</div>
     <div class="preview-title">SPACE COMMANDER</div>
+    <div class="preview-total">🌟 مجموع امتیازات: <span id="totalScoreVal">0</span></div>
   </div>
 
   <div class="form-group">
@@ -173,8 +180,8 @@
 <div id="gameOver">
   <h1>💥 بازی تموم شد!</h1>
   <p>جونات تموم شد...</p>
-  <div class="final-score">امتیاز نهایی: <span id="finalScoreVal">0</span></div>
-  <button id="restartBtn">دوباره بازی کن</button>
+  <div class="final-score">امتیاز این دست: <span id="finalScoreVal">0</span></div>
+  <button id="restartBtn">شروع مجدد</button>
 </div>
 
 <script>
@@ -212,6 +219,10 @@ let profile = { name: 'بازیکن ناشناس', avatar: 1 };
 let coins = parseInt(localStorage.getItem('shooter_coins') || '0');
 let ownedWeapons = JSON.parse(localStorage.getItem('shooter_weapons') || '[1]');
 let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
+let localScores = JSON.parse(localStorage.getItem('shooter_local_ranks') || '[]');
+
+// 👇 متغیر جدید برای مجموع امتیازات
+let totalScore = parseInt(localStorage.getItem('shooter_total_score') || '0');
 
 try {
   const savedProf = localStorage.getItem('shooter_profile');
@@ -225,6 +236,7 @@ function saveData() {
   localStorage.setItem('shooter_coins', coins);
   localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
   localStorage.setItem('shooter_equipped', equippedWeapon);
+  localStorage.setItem('shooter_total_score', totalScore); // ذخیره مجموع امتیاز
 }
 
 let selectedAvatarId = profile.avatar;
@@ -235,12 +247,14 @@ function getAvatarById(id) {
 
 function renderProfileUI() {
   document.getElementById('nameInput').value = profile.name;
-  
   const av = getAvatarById(selectedAvatarId);
   document.getElementById('previewAvatar').innerHTML = av.svg;
   document.getElementById('previewAvatar').style.color = av.color;
   document.getElementById('previewName').textContent = profile.name;
   
+  // 👇 نمایش مجموع امتیاز در پروفایل
+  document.getElementById('totalScoreVal').textContent = totalScore;
+
   const grid = document.getElementById('avatarGrid');
   grid.innerHTML = AVATARS.map(a => 
     `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`
@@ -282,9 +296,7 @@ function renderShop() {
 
     return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
       '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
-      '<div class="w-action">' +
-        (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml +
-      '</div></div>';
+      '<div class="w-action">' + (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml + '</div></div>';
   }).join('');
 }
 
@@ -307,18 +319,16 @@ function resize(){
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = H - 90; S.player.x = Math.min(S.player.x, W - 22); } });
 
-let S, lastSaved = 0, isDead = false;
+let S, isDead = false;
 
 function reset(){
-  let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
-  if(isDead) { savedScore = 0; localStorage.setItem('shooter_current_score', 0); isDead = false; }
-  
   S = {
-    player: {x: W/2, y: H - 90, r: 8},
+    // 👇 هیت‌باکس خیلی کوچیک (r: 4)
+    player: {x: W/2, y: H - 90, r: 4},
     bullets: [], enemies: [], parts: [], stars: [],
-    score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
+    score: 0, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
   };
-  lastSaved = savedScore;
+  isDead = false;
   document.getElementById('gameOver').style.display = 'none';
 
   for(let i = 0; i < 40; i++){
@@ -383,9 +393,8 @@ function boom(x, y, hue, n){
 
 function update(dt){
   if(S.lives <= 0) return;
-  S.t++;
-  localStorage.setItem('shooter_current_score', S.score);
 
+  S.t++;
   for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
   
   const p = S.player;
@@ -421,10 +430,11 @@ function update(dt){
     }
   }
 
+  // 👇 اصلاح برخورد: منهای 8 پیکسل برای بخشش بیشتر
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
-    if(dx*dx + dy*dy < (e.r + p.r - 2)**2){
+    if(dx*dx + dy*dy < (e.r + p.r - 8)**2){
       boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
       if(S.lives <= 0) triggerGameOver();
       break;
@@ -432,7 +442,7 @@ function update(dt){
   }
 
   for(let j = S.enemies.length - 1; j >= 0; j--){
-    if(S.enemies[j].y > H + 40){ S.enemies.splice(j, 1); S.lives--; if(S.lives <= 0) triggerGameOver(); }
+    if(S.enemies[j].y > H + 100){ S.enemies.splice(j, 1); S.lives--; if(S.lives <= 0) triggerGameOver(); }
   }
 
   for(let i = S.parts.length - 1; i >= 0; i--){
@@ -446,10 +456,17 @@ function update(dt){
 
 function triggerGameOver() {
   isDead = true;
-  localStorage.setItem('shooter_current_score', 0);
-  document.getElementById('finalScoreVal').textContent = S.score;
+  const achievedScore = S.score;
+  
+  // 👇 ذخیره امتیاز در مجموع
+  if(achievedScore > 0) {
+    totalScore += achievedScore;
+    saveData();
+    saveScoreToLeaderboard(totalScore); // ارسال مجموع به رتبه‌بندی
+  }
+
+  document.getElementById('finalScoreVal').textContent = achievedScore;
   document.getElementById('gameOver').style.display = 'flex';
-  saveScore();
 }
 
 function draw(){
@@ -494,51 +511,72 @@ function draw(){
   }
 
   ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
-  ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز  ' + S.score, 18, 82);
+  ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
   
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
-// 🕵️ توابع اصلاح‌شده برای رتبه‌بندی
+// 🕵️ سیستم جدید رتبه‌بندی (بر اساس مجموع)
 async function getScores(){
+  let combined = [...localScores];
   try {
     const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
-    if(res.status === 400 || res.status === 404) return []; // لیست خالیه
-    if(!res.ok) throw new Error("Network error");
-    
-    const data = await res.json();
-    if(!Array.isArray(data)) return [];
-    return data.sort((a,b) => b.score - a.score).slice(0, 10);
-  } catch(e) {
-    return null; // خطای شبکه
+    if(res.ok) {
+      const data = await res.json();
+      if(Array.isArray(data)) {
+         combined = [...combined, ...data];
+      }
+    }
+  } catch(e) {}
+
+  // 👇 مرتب‌سازی نزولی و حذف تکراری‌ها (نگه داشتن بالاترین امتیاز هر اسم)
+  combined.sort((a,b) => b.score - a.score);
+  const unique = [];
+  const seenNames = new Set();
+  
+  for (const item of combined) {
+    if(!item || item.score === undefined || !item.name) continue;
+    if(!seenNames.has(item.name)) {
+        seenNames.add(item.name);
+        unique.push(item);
+    }
   }
+  return unique.slice(0, 10);
 }
 
-async function saveScore(){
-  if(S.score <= lastSaved || S.score <= 0) return;
-  lastSaved = S.score;
+async function saveScoreToLeaderboard(newTotalScore){
+  if(newTotalScore <= 0) return;
+  
+  // آپدیت رکورد محلی
+  localScores = localScores.filter(s => s.name !== profile.name);
+  localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
+  localScores.sort((a,b) => b.score - a.score);
+  localScores = localScores.slice(0, 10);
+  localStorage.setItem('shooter_local_ranks', JSON.stringify(localScores));
+
   try {
-    let scores = await getScores();
-    
-    // 🚨 جلوگیری از باگ پاک شدن لیست: اگه شبکه قطع بود، ذخیره نکن!
-    if(scores === null) {
-      console.log("خطای شبکه: امتیاز در دیتابیس آنلاین ذخیره نشد تا لیست قبلی پاک نشود.");
-      return; 
+    let onlineScores = [];
+    const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
+    if(res.ok) {
+        const data = await res.json();
+        if(Array.isArray(data)) onlineScores = data;
     }
     
-    scores.push({
-      score: S.score, date: Date.now(), name: profile.name, avatar: profile.avatar
-    });
-    scores.sort((a,b) => b.score - a.score);
-    scores = scores.slice(0, 10);
+    // آپدیت رکورد آنلاین
+    onlineScores = onlineScores.filter(s => s.name !== profile.name);
+    onlineScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
+    onlineScores.sort((a,b) => b.score - a.score);
+    onlineScores = onlineScores.slice(0, 10);
     
     await fetch(PANTRY_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scores)
+      body: JSON.stringify(onlineScores)
     });
-  } catch(e) {}
+  } catch(e) {
+     console.log("Failed to sync with online leaderboard.");
+  }
 }
 
 async function renderRank(){
@@ -546,11 +584,6 @@ async function renderRank(){
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   
   const scores = await getScores();
-  
-  if(scores === null){
-    list.innerHTML = '<li class="empty" style="color:#ff5c8a;">خطا در اتصال به سرور! اینترنت را بررسی کنید.</li>';
-    return;
-  }
   
   if(scores.length === 0){
     list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
@@ -586,7 +619,6 @@ document.querySelectorAll('.tab').forEach(btn => {
     if(tab === 'shop') {
       renderShop();
     } else if(tab === 'rank'){
-      await saveScore();
       renderRank();
     }
   };
