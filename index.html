@@ -132,9 +132,9 @@
   .w-price{font-size:15px;font-weight:bold;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
   .w-btn{
-    padding:10px 20px;border-radius:25px;border:none;cursor:pointer;
-    font-family:inherit;font-weight:bold;font-size:14px;transition:.3s;
-    letter-spacing: 0.5px;
+    padding:8px 15px;border-radius:25px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:bold;font-size:13px;transition:.3s;
+    letter-spacing: 0.5px;width: 140px;text-align: center;
   }
   .btn-buy{
     background: linear-gradient(45deg, #ffd700, #ffaa00);
@@ -153,6 +153,15 @@
     background: linear-gradient(45deg, #00ffcc, #00ccff);
     color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
   }
+
+  /* 👈 استایل دکمه ارتقا */
+  .btn-upgrade {
+    background: linear-gradient(45deg, #ff00ff, #8a2be2);
+    color:#fff; box-shadow: 0 0 15px rgba(255,0,255,0.4);
+    margin-top: 5px;
+  }
+  .btn-upgrade:active { transform: scale(0.95); }
+  .btn-upgrade:disabled { background: #333; color:#666; box-shadow:none; cursor:not-allowed; transform:none;}
 
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
@@ -341,6 +350,9 @@ let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
 let localScores = JSON.parse(localStorage.getItem('shooter_local_ranks') || '[]');
 let totalScore = parseInt(localStorage.getItem('shooter_total_score') || '0');
 
+// 👈 ذخیره لول ارتقای هر اسلحه
+let weaponLevels = JSON.parse(localStorage.getItem('shooter_weapon_levels') || '{}');
+
 try {
   const savedProf = localStorage.getItem('shooter_profile');
   if(savedProf) {
@@ -362,6 +374,7 @@ function saveData() {
     localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
     localStorage.setItem('shooter_equipped', equippedWeapon);
     localStorage.setItem('shooter_total_score', totalScore);
+    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); // 👈 ذخیره لول‌ها
     if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
   }, 500);
 }
@@ -371,6 +384,7 @@ window.addEventListener('beforeunload', () => {
   localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
   localStorage.setItem('shooter_equipped', equippedWeapon);
   localStorage.setItem('shooter_total_score', totalScore);
+  localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); // 👈 ذخیره لول‌ها
   if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
   
   if(!isDead && S && S.score > 0) {
@@ -456,8 +470,13 @@ function renderShop() {
   list.innerHTML = WEAPONS.map(w => {
     const isOwned = ownedWeapons.includes(w.id);
     const isEquipped = equippedWeapon === w.id;
-    let actionHtml = '';
     
+    // 👈 محاسبه لول و دمیج واقعی
+    const lvl = weaponLevels[w.id] || 0;
+    const actualDmg = w.dmg + (lvl * 2);
+    const upgradeCost = Math.floor(50 * Math.pow(1.4, lvl));
+    
+    let actionHtml = '';
     if (isEquipped) {
       actionHtml = '<button class="w-btn btn-equipped">مجهز شده</button>';
     } else if (isOwned) {
@@ -466,16 +485,26 @@ function renderShop() {
       const canAfford = coins >= w.cost;
       actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buyWeapon(' + w.id + ')">خرید</button>';
     }
+
+    // 👈 دکمه ارتقا فقط برای اسلحه‌های خریداری شده
+    let upgradeHtml = '';
+    if (isOwned) {
+        const canAffordUpgrade = coins >= upgradeCost;
+        upgradeHtml = `<button class="w-btn btn-upgrade" ${!canAffordUpgrade ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">ارتقا (Lvl ${lvl}) - 💰 ${upgradeCost}</button>`;
+    }
     
     return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
-      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
-      '<div class="w-action">' + (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml + '</div></div>';
+      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + actualDmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
+      '<div class="w-action">' + 
+        (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + 
+        actionHtml + upgradeHtml + 
+      '</div></div>';
   }).join('');
 }
 
-function showPurchaseToast(weaponName) {
+function showPurchaseToast(msg) {
   const toast = document.getElementById('purchaseToast');
-  document.getElementById('toastText').textContent = `سلاح «${weaponName}» با موفقیت خریداری شد!`;
+  document.getElementById('toastText').textContent = msg;
   toast.classList.remove('show');
   void toast.offsetWidth; 
   toast.classList.add('show');
@@ -490,8 +519,23 @@ window.buyWeapon = (id) => {
     equippedWeapon = id; 
     saveData(); 
     renderShop();
-    showPurchaseToast(w.name);
+    showPurchaseToast(`سلاح «${w.name}» با موفقیت خریداری شد!`);
   }
+};
+
+// 👈 تابع ارتقای اسلحه
+window.upgradeWeapon = (id) => {
+    const w = WEAPONS.find(x => x.id === id);
+    const lvl = weaponLevels[id] || 0;
+    const cost = Math.floor(50 * Math.pow(1.4, lvl));
+    
+    if (coins >= cost) {
+        coins -= cost;
+        weaponLevels[id] = lvl + 1;
+        saveData();
+        renderShop();
+        showPurchaseToast(`سلاح «${w.name}» به سطح ${lvl + 1} ارتقا یافت! ⚡`);
+    }
 };
 
 window.equipWeapon = (id) => {
@@ -558,8 +602,24 @@ addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
 function fire(){
-  const w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
+  let w;
+  let isTemp = false;
+  
+  if (S.tempWeapon) {
+      w = S.tempWeapon;
+      isTemp = true;
+  } else {
+      w = WEAPONS.find(x => x.id === equippedWeapon);
+  }
+  
   S.cool = w.cd;
+
+  // 👈 محاسبه دمیج با در نظر گرفتن لول ارتقا (فقط برای اسلحه‌های فروشگاه)
+  let dmg = w.dmg;
+  if (!isTemp) {
+      const lvl = weaponLevels[w.id] || 0;
+      dmg += lvl * 2;
+  }
 
   for(let i = 0; i < w.count; i++){
     let angle = 0;
@@ -568,13 +628,12 @@ function fire(){
       angle = -spreadRad/2 + (spreadRad / (w.count - 1)) * i;
     }
     const speed = 1.6;
-    S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: w.dmg, color: w.color, size: w.size });
+    S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: dmg, color: w.color, size: w.size });
   }
 }
 
-// 👈 شلیک غول‌ها (خیلی آروم و با فاصله)
 function bossShoot(boss, pattern) {
-  const speed = 0.2 + currentBossIndex * 0.05; // سرعت خیلی کم
+  const speed = 0.2 + currentBossIndex * 0.05; 
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
   
   if (pattern === 'aimed') {
@@ -617,8 +676,8 @@ function spawnEnemy(){
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
 
-  // 👈 محاسبه جون شهاب‌سنگ بر اساس امتیاز (هر ۵۰ امتیاز، ۵ تا بیشتر)
-  const rockBaseHp = 5 + Math.floor(S.score / 50) * 5;
+  // 👈 کاهش جون شهاب سنگ‌ها (هر ۱۰۰ امتیاز، ۳ تا)
+  const rockBaseHp = 3 + Math.floor(S.score / 100) * 3;
 
   const enemy = {
     x: 30 + Math.random()*(W - 60), y: -30, r,
@@ -639,16 +698,16 @@ function spawnEnemy(){
 }
 
 function spawnBoss(){
-  const hp = 200 + (currentBossIndex * 300); // 👈 ۲۰۰، ۵۰۰، ۸۰۰...
+  const hp = 200 + (currentBossIndex * 300);
   
   S.enemies.push({
-    x: W/2, y: -150, r: 65, // از بالا شروع میکنه
+    x: W/2, y: -150, r: 65, 
     vy: 0.05, vx: 0.15, 
     hue: 280, rot: 0, rv: 0.01,
     hp: hp, 
     maxHp: hp, 
     isBoss: true,
-    shootT: 4000, // ۴ ثانیه فرصت قبل از اولین شلیک (بر حسب میلی‌ثانیه)
+    shootT: 4000, 
     patternIdx: 0
   });
 }
@@ -727,15 +786,12 @@ function update(dt){
     
     if(e.isBoss) {
       if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
-      
-      // 👈 غول آروم میاد پایین و وایمیسه
       if (e.y > 120) e.y = 120; 
 
-      // اگه به جایگاهش رسید، شروع میکنه به شلیک کردن
       if (e.y >= 120) {
           e.shootT -= dt;
           if (e.shootT <= 0) {
-            e.shootT = Math.max(3000, 5000 - currentBossIndex * 200); // هر ۳ تا ۵ ثانیه
+            e.shootT = Math.max(3000, 5000 - currentBossIndex * 200);
             const patterns = ['aimed', 'spread', 'radial'];
             bossShoot(e, patterns[e.patternIdx % patterns.length]);
             e.patternIdx++;
@@ -764,7 +820,7 @@ function update(dt){
         S.ebullets.splice(i, 1);
         S.lives--;
         S.shake = 220;
-        S.player.inv = 1500; // 👈 ۱.۵ ثانیه مصونیت (بر حسب میلی‌ثانیه)
+        S.player.inv = 1500; 
         boom(S.player.x, S.player.y, 0, 15);
         if(S.lives <= 0) triggerGameOver();
       }
@@ -939,7 +995,6 @@ function draw(){
 
   if(S.lives > 0) {
     const p = S.player;
-    // افکت چشمک زدن موقع مصونیت
     if (p.inv > 0 && Math.floor(S.t * 0.1) % 2 === 0) {
         // چشمک نمیزنه
     } else {
