@@ -812,7 +812,7 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
-// 👇 سیستم رتبه‌بندی با Supabase
+// 👇 سیستم رتبه‌بندی با Supabase (با قابلیت آپدیت صحیح)
 async function getScores(){
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
@@ -825,14 +825,15 @@ async function getScores(){
   return [];
 }
 
-async function saveScoreToLeaderboard(newTotalScore){
+async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(newTotalScore <= 0) return;
   
   const syncIcon = document.getElementById('syncIndicator');
-  syncIcon.classList.add('syncing');
+  if (syncIcon) syncIcon.classList.add('syncing');
 
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+    // 👈 اینجا ?on_conflict=dev_id اضافه شد تا رکورد قبلی آپدیت بشه
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -847,9 +848,16 @@ async function saveScoreToLeaderboard(newTotalScore){
         avatar: profile.avatar 
       })
     });
-  } catch(e) {}
+    
+    if (!res.ok) {
+        const errorData = await res.text();
+        console.log("خطا در ذخیره امتیاز:", errorData);
+    }
+  } catch(e) {
+    console.log("خطای شبکه:", e);
+  }
 
-  setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+  if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
 }
 
 async function renderRank(){
