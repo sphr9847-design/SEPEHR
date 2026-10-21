@@ -78,11 +78,11 @@
 
   .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
-  .form-group input{width:100%;padding:14px;border-radius:12px;
+  .form-group input[type="text"]{width:100%;padding:14px;border-radius:12px;
     background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,255,0.2);
     color:#fff;font-family:inherit;font-size:16px;outline:none;transition: 0.3s;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
-  .form-group input:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.3), inset 0 2px 5px rgba(0,0,0,0.5);}
+  .form-group input[type="text"]:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.3), inset 0 2px 5px rgba(0,0,0,0.5);}
   
   .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(60px, 1fr));gap:12px}
   .avatar-btn{
@@ -131,6 +131,13 @@
     border:2px solid #0ff;background:transparent;color:#0ff;
     border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
+
+  /* استایل موزیک پلیر */
+  .music-player { margin-top: 20px; padding: 15px; background: rgba(0,255,255,0.05); border-radius: 15px; border: 1px solid rgba(0,255,255,0.2); }
+  .music-player label { font-size: 14px; color: #8bb5c9; display: block; margin-bottom: 10px; }
+  .music-player input[type="file"] { font-size: 12px; color: #fff; width: 100%; cursor: pointer; }
+  .music-controls { display: flex; gap: 10px; margin-top: 10px; }
+  .music-controls button { flex: 1; padding: 8px; border: 1px solid #0ff; background: transparent; color: #0ff; border-radius: 8px; cursor: pointer; font-family: inherit; }
 </style>
 </head>
 <body>
@@ -173,6 +180,16 @@
     <label>انتخاب آواتار (نشان فرماندهی):</label>
     <div class="avatar-grid" id="avatarGrid"></div>
   </div>
+  
+  <div class="music-player">
+    <label>🎵 پخش آهنگ دلخواه از گوشی:</label>
+    <input type="file" id="bgmUpload" accept="audio/*">
+    <div class="music-controls">
+      <button id="playBgmBtn">▶️ پخش</button>
+      <button id="pauseBgmBtn">⏸️ توقف</button>
+    </div>
+  </div>
+
   <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل</button>
 </div>
 
@@ -190,6 +207,7 @@ let W, H;
 
 const PANTRY_URL = "https://getpantry.cloud/apiv1/pantry/151e51ac-1424-4786-9386-be9f3b059221/basket/scores";
 
+// 👇 اسلحه‌های فروشگاه (۱۰ تا)
 const WEAPONS = [
   { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
   { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
@@ -202,6 +220,23 @@ const WEAPONS = [
   { id: 9, name: "ریل‌گان", cost: 5000, color: "#ffffff", dmg: 12, cd: 150, size: 8, count: 1, spread: 0 },
   { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 5, cd: 80, size: 8, count: 7, spread: 45 },
 ];
+
+// 👇 ۵۰ قدرت مخفی (که فقط از دشمن‌ها می‌افتن)
+const DROP_WEAPONS = [];
+const dropColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ff8800", "#ff0088", "#88ff00", "#0088ff"];
+for(let i=1; i<=50; i++) {
+  DROP_WEAPONS.push({
+    id: 'drop_' + i,
+    name: 'قدرت ویژه ' + i,
+    color: dropColors[i % dropColors.length],
+    dmg: Math.floor(Math.random() * 5) + 3, // دمیج بین ۳ تا ۷
+    cd: Math.floor(Math.random() * 40) + 20, // سرعت شلیک بالا
+    size: Math.floor(Math.random() * 8) + 4,
+    count: Math.floor(Math.random() * 4) + 1, // ۱ تا ۴ گلوله
+    spread: Math.floor(Math.random() * 45),
+    isDrop: true
+  });
+}
 
 const AVATARS = [
   { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
@@ -229,7 +264,6 @@ try {
   }
 } catch(e) {}
 
-// 👇 ذخیره‌سازی هوشمند (Debounce) برای جلوگیری از هنگ کردن مرورگر
 let saveTimeout = null;
 function saveData() {
   clearTimeout(saveTimeout);
@@ -242,7 +276,6 @@ function saveData() {
   }, 500);
 }
 
-// ذخیره قطعی در زمان خروج از صفحه
 window.addEventListener('beforeunload', () => {
   localStorage.setItem('shooter_coins', coins);
   localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
@@ -263,7 +296,6 @@ function renderProfileUI() {
   document.getElementById('previewAvatar').innerHTML = av.svg;
   document.getElementById('previewAvatar').style.color = av.color;
   document.getElementById('previewName').textContent = profile.name;
-  
   document.getElementById('totalScoreVal').textContent = totalScore;
 
   const grid = document.getElementById('avatarGrid');
@@ -288,6 +320,19 @@ document.getElementById('saveProfileBtn').onclick = () => {
 
 renderProfileUI();
 
+// 🎵 سیستم پخش موسیقی
+let bgmAudio = new Audio();
+document.getElementById('bgmUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    bgmAudio.src = URL.createObjectURL(file);
+    bgmAudio.play();
+  }
+});
+document.getElementById('playBgmBtn').onclick = () => bgmAudio.play();
+document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
+
+// 🛒 فروشگاه
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   const list = document.getElementById('shopList');
@@ -331,17 +376,27 @@ resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = H - 90; S.player.x = Math.min(S.player.x, W - 22); } });
 
 let S, isDead = false;
+let bossMilestones = [2000, 8000, 15000, 25000, 40000, 60000];
+let currentBossIndex = 0;
+let isBossActive = false;
 
 function reset(){
-  // 👇 امتیاز بازی قبلی رو لود می‌کنه تا با رفرش پاک نشه
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
   
   S = {
-    // 👇 هیت‌باکس فوق‌العاده کوچیک (r: 2)
-    player: {x: W/2, y: H - 90, r: 2},
-    bullets: [], enemies: [], parts: [], stars: [],
+    // 👇 هیت‌باکس دقیق: ۳ پیکسل
+    player: {x: W/2, y: H - 90, r: 3},
+    bullets: [], enemies: [], parts: [], stars: [], powerups: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
+    tempWeapon: null, tempWeaponTime: 0 // 👈 متغیرهای قدرت موقت
   };
+  
+  // اگه امتیاز از قبل از غول رد شده بود، غول جدید رو ست کن
+  currentBossIndex = 0;
+  for(let i=0; i<bossMilestones.length; i++) {
+    if (savedScore >= bossMilestones[i]) currentBossIndex = i + 1;
+  }
+  isBossActive = false;
   isDead = false;
   document.getElementById('gameOver').style.display = 'none';
 
@@ -374,7 +429,8 @@ addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
 function fire(){
-  const w = WEAPONS.find(x => x.id === equippedWeapon);
+  // اگه قدرت موقت داشتیم از اون استفاده کن، وگرنه اسلحه فروشگاه
+  const w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
   S.cool = w.cd;
   for(let i = 0; i < w.count; i++){
     let angle = 0;
@@ -395,7 +451,24 @@ function spawnEnemy(){
     vy: 0.16 + Math.random()*0.10 + diff*0.15, vx: (Math.random() - 0.5) * 0.12,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
     hp: r > 17 ? 3 : 2,
+    isBoss: false
   });
+}
+
+function spawnBoss(){
+  S.enemies.push({
+    x: W/2, y: -100, r: 65,
+    vy: 0.05, vx: 0.15, 
+    hue: 280, rot: 0, rv: 0.01,
+    hp: 50 + (currentBossIndex * 20), // جون غول بر اساس تعدادش
+    isBoss: true
+  });
+}
+
+// 👇 سیستم انداختن قدرت‌ها
+function spawnPowerup(x, y, isBossDrop) {
+  let w = DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)];
+  S.powerups.push({ x: x, y: y, vy: 0.5, weapon: w, r: 12, rot: 0 });
 }
 
 function boom(x, y, hue, n){
@@ -405,15 +478,23 @@ function boom(x, y, hue, n){
   }
 }
 
-// 👇 ذخیره دوره‌ای امتیاز در حین بازی
-let lastSaveTime = 0;
-
 function update(dt){
   if(S.lives <= 0) return;
 
   S.t++;
-  
-  if(S.t % 120 === 0) saveData(); // هر ۲ ثانیه یکبار سیو میکنه
+  if(S.t % 120 === 0) saveData();
+
+  // زمان‌سنج قدرت موقت
+  if (S.tempWeaponTime > 0) {
+    S.tempWeaponTime -= dt;
+    if (S.tempWeaponTime <= 0) S.tempWeapon = null;
+  }
+
+  // چک کردن اسپاون غول
+  if (currentBossIndex < bossMilestones.length && S.score >= bossMilestones[currentBossIndex] && !isBossActive) {
+    spawnBoss();
+    isBossActive = true;
+  }
 
   for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
   
@@ -428,13 +509,21 @@ function update(dt){
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
+  // اسپاون دشمن (اگه غول فعاله، سرعتش رو کم میکنیم)
   S.spawnT -= dt;
-  const interval = Math.max(280, 820 - S.score * 1.2);
-  if(S.spawnT <= 0){ spawnEnemy(); S.spawnT = interval; }
+  if (S.spawnT <= 0) {
+    if (!isBossActive || Math.random() < 0.3) spawnEnemy();
+    S.spawnT = isBossActive ? 1500 : Math.max(280, 820 - S.score * 1.2);
+  }
 
-  for(const e of S.enemies){
+  for(let i = S.enemies.length - 1; i >= 0; i--){
+    const e = S.enemies[i];
     e.y += e.vy * dt; e.x += e.vx * dt; e.rot += e.rv * dt;
-    if(e.x < e.r || e.x > W - e.r) e.vx *= -1;
+    if(!e.isBoss && (e.x < e.r || e.x > W - e.r)) e.vx *= -1;
+    if(e.isBoss) {
+      if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
+      if (e.y > 150) e.y = 150; // غول بالای صفحه می‌مونه
+    }
   }
 
   for(let i = S.bullets.length - 1; i >= 0; i--){
@@ -443,26 +532,66 @@ function update(dt){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
       if(dx*dx + dy*dy < (e.r + 4)**2){
-        S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
-        if(e.hp <= 0){ boom(e.x, e.y, e.hue, 10); S.enemies.splice(j, 1); S.score += 10; coins += 2; saveData(); }
+        S.bullets.splice(i, 1); 
+        e.hp -= b.dmg; 
+        boom(b.x, b.y, 180, 3);
+        
+        if(e.hp <= 0){ 
+          boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
+          S.enemies.splice(j, 1); 
+          S.score += e.isBoss ? 500 : 10; 
+          coins += e.isBoss ? 50 : 2; 
+          
+          if (e.isBoss) {
+            isBossActive = false;
+            currentBossIndex++;
+            spawnPowerup(e.x, e.y, true); // غول همیشه قدرت میندازه
+          } else if (Math.random() < 0.03) {
+            spawnPowerup(e.x, e.y, false); // ۳ درصد شانس برای دشمن عادی
+          }
+          
+          saveData(); 
+        }
         break;
       }
     }
   }
 
-  // 👇 اصلاح برخورد: منهای 5 پیکسل
+  // 👇 برخورد دقیق: بدون منهای اضافه
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
-    if(dx*dx + dy*dy < (e.r + p.r - 5)**2){
-      boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
+    if(dx*dx + dy*dy < (e.r + p.r)**2){
+      boom(e.x, e.y, e.hue, 12); 
+      S.enemies.splice(j, 1); 
+      S.shake = 220; 
+      S.lives--;
+      if(e.isBoss) isBossActive = false; // اگه به غول خوردی غول میره
       if(S.lives <= 0) triggerGameOver();
       break;
     }
   }
 
+  // حرکت و برخورد پاورآپ‌ها
+  for(let i = S.powerups.length - 1; i >= 0; i--){
+    const pu = S.powerups[i];
+    pu.y += pu.vy * dt;
+    pu.rot += 0.05 * dt;
+    
+    const dx = p.x - pu.x, dy = p.y - pu.y;
+    if(dx*dx + dy*dy < (pu.r + p.r + 15)**2){
+      // گرفتن قدرت
+      S.tempWeapon = pu.weapon;
+      S.tempWeaponTime = 10000; // ۱۰ ثانیه
+      S.powerups.splice(i, 1);
+      boom(pu.x, pu.y, 180, 15);
+      continue;
+    }
+    if(pu.y > H + 50) S.powerups.splice(i, 1);
+  }
+
   for(let j = S.enemies.length - 1; j >= 0; j--){
-    if(S.enemies[j].y > H + 100){ S.enemies.splice(j, 1); S.lives--; if(S.lives <= 0) triggerGameOver(); }
+    if(S.enemies[j].y > H + 100 && !S.enemies[j].isBoss){ S.enemies.splice(j, 1); S.lives--; if(S.lives <= 0) triggerGameOver(); }
   }
 
   for(let i = S.parts.length - 1; i >= 0; i--){
@@ -481,7 +610,7 @@ function triggerGameOver() {
   if(achievedScore > 0) {
     totalScore += achievedScore;
     saveData();
-    localStorage.setItem('shooter_current_score', 0); // صفر کردن امتیاز برای دست بعدی
+    localStorage.setItem('shooter_current_score', 0);
     saveScoreToLeaderboard(totalScore); 
   } else {
     localStorage.setItem('shooter_current_score', 0);
@@ -506,6 +635,22 @@ function draw(){
   }
   ctx.globalAlpha = 1;
 
+  // پاورآپ‌ها
+  for(const pu of S.powerups) {
+    ctx.save();
+    ctx.translate(pu.x, pu.y);
+    ctx.rotate(pu.rot);
+    ctx.fillStyle = pu.weapon.color;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = pu.weapon.color;
+    ctx.beginPath();
+    ctx.moveTo(0, -pu.r); ctx.lineTo(pu.r, 0); ctx.lineTo(0, pu.r); ctx.lineTo(-pu.r, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.shadowBlur = 0;
+
   for(const b of S.bullets) {
     ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fill();
     ctx.globalAlpha = 0.5; ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10); ctx.globalAlpha = 1;
@@ -514,12 +659,35 @@ function draw(){
   for(const e of S.enemies){
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
     ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
-    ctx.lineWidth = 2; ctx.beginPath();
-    for(let k = 0; k < 6; k++){
-      const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
-      k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    ctx.lineWidth = e.isBoss ? 5 : 2; 
+    ctx.beginPath();
+    
+    if (e.isBoss) {
+       // رسم غول به شکل ستاره بزرگ
+       for(let k=0; k<10; k++){
+          const r2 = k%2===0 ? e.r : e.r/2;
+          const a = k * Math.PI/5;
+          const px = Math.cos(a)*r2, py = Math.sin(a)*r2;
+          k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+       }
+    } else {
+       for(let k = 0; k < 6; k++){
+        const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
+        k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+       }
     }
-    ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    ctx.closePath(); ctx.fill(); ctx.stroke(); 
+    
+    // نوار خون غول
+    if (e.isBoss) {
+        ctx.rotate(-e.rot); // برگردوندن نوار خون به حالت افقی
+        ctx.fillStyle = 'red';
+        ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
+        ctx.fillStyle = 'lime';
+        const hpPct = Math.max(0, e.hp / (50 + (currentBossIndex * 20))); // تقریب
+        ctx.fillRect(-e.r, -e.r - 20, e.r*2 * hpPct, 6);
+    }
+    ctx.restore();
   }
 
   if(S.lives > 0) {
@@ -536,6 +704,11 @@ function draw(){
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
   
+  if (S.tempWeapon) {
+      ctx.fillStyle = S.tempWeapon.color; 
+      ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, 138);
+  }
+  
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
@@ -545,9 +718,7 @@ async function getScores(){
     const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
     if(res.ok) {
       const data = await res.json();
-      if(Array.isArray(data)) {
-         combined = [...combined, ...data];
-      }
+      if(Array.isArray(data)) { combined = [...combined, ...data]; }
     }
   } catch(e) {}
 
@@ -557,10 +728,7 @@ async function getScores(){
   
   for (const item of combined) {
     if(!item || item.score === undefined || !item.name) continue;
-    if(!seenNames.has(item.name)) {
-        seenNames.add(item.name);
-        unique.push(item);
-    }
+    if(!seenNames.has(item.name)) { seenNames.add(item.name); unique.push(item); }
   }
   return unique.slice(0, 10);
 }
@@ -632,11 +800,8 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
     
-    if(tab === 'shop') {
-      renderShop();
-    } else if(tab === 'rank'){
-      renderRank();
-    }
+    if(tab === 'shop') { renderShop(); } 
+    else if(tab === 'rank'){ renderRank(); }
   };
 });
 
