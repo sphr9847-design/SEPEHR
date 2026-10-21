@@ -10,12 +10,13 @@
             font-family:system-ui,sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
+  /* 👇 اعلان یاقوتی */
   #purchaseToast {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #ff2a6d, #b3003b);
+    background: linear-gradient(135deg, #e0115f, #9b111e); /* رنگ یاقوتی */
     color: #fff; padding: 14px 28px; border-radius: 50px;
     font-size: 16px; font-weight: 800;
-    box-shadow: 0 10px 30px rgba(179, 0, 59, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(155, 17, 30, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     z-index: 1000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0; pointer-events: none; text-align: center; white-space: nowrap;
@@ -115,15 +116,17 @@
 
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
+  
+  /* 👇 کارت اسلحه خوشگل‌تر */
   .weapon-card{
     display:flex;align-items:center;justify-content:space-between;
-    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.5));
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.6));
     border:1px solid rgba(0,255,255,.15);
     padding:15px 20px;border-radius:15px;transition:.3s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   }
   .weapon-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.1); border-color: rgba(0,255,255,0.4); }
-  .weapon-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.5)); }
+  .weapon-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.6)); }
   .weapon-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
   
   .w-info h3{font-size:17px;margin-bottom:5px;color:#fff}
@@ -132,9 +135,9 @@
   .w-price{font-size:15px;font-weight:bold;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
   .w-btn{
-    padding:8px 15px;border-radius:25px;border:none;cursor:pointer;
+    padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
     font-family:inherit;font-weight:bold;font-size:13px;transition:.3s;
-    letter-spacing: 0.5px;width: 140px;text-align: center;
+    letter-spacing: 0.5px;width: 150px;text-align: center;
   }
   .btn-buy{
     background: linear-gradient(45deg, #ffd700, #ffaa00);
@@ -154,14 +157,24 @@
     color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
   }
 
-  /* 👈 استایل دکمه ارتقا */
+  /* 👇 استایل دکمه ارتقا (یاقوتی خفن) */
   .btn-upgrade {
-    background: linear-gradient(45deg, #ff00ff, #8a2be2);
-    color:#fff; box-shadow: 0 0 15px rgba(255,0,255,0.4);
+    background: linear-gradient(135deg, #e0115f, #9b111e);
+    color:#fff; 
+    box-shadow: 0 4px 15px rgba(224, 17, 95, 0.4), inset 0 0 10px rgba(255,255,255,0.1);
     margin-top: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    font-weight: 900;
+  }
+  .btn-upgrade:hover {
+    box-shadow: 0 6px 20px rgba(224, 17, 95, 0.6);
   }
   .btn-upgrade:active { transform: scale(0.95); }
-  .btn-upgrade:disabled { background: #333; color:#666; box-shadow:none; cursor:not-allowed; transform:none;}
+  .btn-upgrade:disabled { 
+    background: #222; color:#555; box-shadow:none; cursor:not-allowed; 
+    transform:none; border:1px solid #333; text-shadow: none;
+  }
 
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
@@ -350,7 +363,6 @@ let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
 let localScores = JSON.parse(localStorage.getItem('shooter_local_ranks') || '[]');
 let totalScore = parseInt(localStorage.getItem('shooter_total_score') || '0');
 
-// 👈 ذخیره لول ارتقای هر اسلحه
 let weaponLevels = JSON.parse(localStorage.getItem('shooter_weapon_levels') || '{}');
 
 try {
@@ -374,7 +386,7 @@ function saveData() {
     localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
     localStorage.setItem('shooter_equipped', equippedWeapon);
     localStorage.setItem('shooter_total_score', totalScore);
-    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); // 👈 ذخیره لول‌ها
+    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); 
     if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
   }, 500);
 }
@@ -384,7 +396,7 @@ window.addEventListener('beforeunload', () => {
   localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
   localStorage.setItem('shooter_equipped', equippedWeapon);
   localStorage.setItem('shooter_total_score', totalScore);
-  localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); // 👈 ذخیره لول‌ها
+  localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); 
   if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
   
   if(!isDead && S && S.score > 0) {
@@ -471,10 +483,10 @@ function renderShop() {
     const isOwned = ownedWeapons.includes(w.id);
     const isEquipped = equippedWeapon === w.id;
     
-    // 👈 محاسبه لول و دمیج واقعی
     const lvl = weaponLevels[w.id] || 0;
     const actualDmg = w.dmg + (lvl * 2);
-    const upgradeCost = Math.floor(50 * Math.pow(1.4, lvl));
+    // 👈 قیمت ارتقا خیلی بیشتر شد (200 * 1.5^lvl)
+    const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
     
     let actionHtml = '';
     if (isEquipped) {
@@ -486,11 +498,10 @@ function renderShop() {
       actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buyWeapon(' + w.id + ')">خرید</button>';
     }
 
-    // 👈 دکمه ارتقا فقط برای اسلحه‌های خریداری شده
     let upgradeHtml = '';
     if (isOwned) {
         const canAffordUpgrade = coins >= upgradeCost;
-        upgradeHtml = `<button class="w-btn btn-upgrade" ${!canAffordUpgrade ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">ارتقا (Lvl ${lvl}) - 💰 ${upgradeCost}</button>`;
+        upgradeHtml = `<button class="w-btn btn-upgrade" ${!canAffordUpgrade ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>`;
     }
     
     return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
@@ -527,14 +538,18 @@ window.buyWeapon = (id) => {
 window.upgradeWeapon = (id) => {
     const w = WEAPONS.find(x => x.id === id);
     const lvl = weaponLevels[id] || 0;
-    const cost = Math.floor(50 * Math.pow(1.4, lvl));
+    const cost = Math.floor(200 * Math.pow(1.5, lvl));
     
     if (coins >= cost) {
         coins -= cost;
         weaponLevels[id] = lvl + 1;
         saveData();
         renderShop();
-        showPurchaseToast(`سلاح «${w.name}» به سطح ${lvl + 1} ارتقا یافت! ⚡`);
+        
+        // محاسبه دمیج جدید برای نمایش در اعلان
+        const newLvl = lvl + 1;
+        const newDmg = w.dmg + (newLvl * 2);
+        showPurchaseToast(`سلاح «${w.name}» به لول ${newLvl} ارتقا یافت! (دمیج: ${newDmg})`);
     }
 };
 
@@ -614,7 +629,6 @@ function fire(){
   
   S.cool = w.cd;
 
-  // 👈 محاسبه دمیج با در نظر گرفتن لول ارتقا (فقط برای اسلحه‌های فروشگاه)
   let dmg = w.dmg;
   if (!isTemp) {
       const lvl = weaponLevels[w.id] || 0;
@@ -676,7 +690,6 @@ function spawnEnemy(){
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
 
-  // 👈 کاهش جون شهاب سنگ‌ها (هر ۱۰۰ امتیاز، ۳ تا)
   const rockBaseHp = 3 + Math.floor(S.score / 100) * 3;
 
   const enemy = {
