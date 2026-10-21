@@ -4,27 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>🚀 تیراندازی فضایی</title>
+<!-- 👇 اضافه کردن فونت زیبای وزیرمتن -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;background:#04060f;
-            font-family:system-ui,sans-serif;direction:rtl}
+            font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
-  /* 👇 اعلان یاقوتی */
+  /* 👇 اعلان یاقوتی تیره و گرد */
   #purchaseToast {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #e0115f, #9b111e); /* رنگ یاقوتی */
-    color: #fff; padding: 14px 28px; border-radius: 50px;
-    font-size: 16px; font-weight: 800;
-    box-shadow: 0 10px 30px rgba(155, 17, 30, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #800b1b, #3e0006); /* یاقوتی تیره */
+    color: #ffe6e6; padding: 16px 32px; border-radius: 20px; /* گوشه‌های گردتر */
+    font-size: 15px; font-weight: 700;
+    box-shadow: 0 10px 30px rgba(62, 0, 6, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 100, 100, 0.2);
     z-index: 1000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0; pointer-events: none; text-align: center; white-space: nowrap;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
   }
   #purchaseToast.show { top: 20px; opacity: 1; }
-  #purchaseToast .gem { font-size: 20px; filter: drop-shadow(0 0 5px #ffd700); animation: pulseGem 1.5s infinite; }
-  @keyframes pulseGem { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
     background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
@@ -83,10 +85,10 @@
   .profile-card:hover::before { left: 150%; }
   .preview-avatar { width: 90px; height: 90px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
   .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 15px currentColor); }
-  .preview-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+  .preview-name { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
   .preview-title { font-size: 12px; color: #0ff; margin-top: 5px; opacity: 0.8; letter-spacing: 2px; }
   
-  .preview-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2); font-size: 16px; color: #ffd700; font-weight: bold; }
+  .preview-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2); font-size: 16px; color: #ffd700; font-weight: 700; }
 
   .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
@@ -109,15 +111,14 @@
   
   .save-btn{display:block;width:100%;max-width:400px;margin:25px auto;padding:15px;
     background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:12px;
-    font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;transition: 0.3s;
+    font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;transition: 0.3s;
     box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
+  .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
   
-  /* 👇 کارت اسلحه خوشگل‌تر */
   .weapon-card{
     display:flex;align-items:center;justify-content:space-between;
     background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.6));
@@ -129,14 +130,14 @@
   .weapon-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.6)); }
   .weapon-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
   
-  .w-info h3{font-size:17px;margin-bottom:5px;color:#fff}
-  .w-info p{font-size:13px;color:#8bb5c9}
+  .w-info h3{font-size:17px;margin-bottom:5px;color:#fff; font-weight: 700;}
+  .w-info p{font-size:13px;color:#8bb5c9; font-weight: 400;}
   .w-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .w-price{font-size:15px;font-weight:bold;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
+  .w-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
   .w-btn{
     padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
-    font-family:inherit;font-weight:bold;font-size:13px;transition:.3s;
+    font-family:inherit;font-weight:700;font-size:13px;transition:.3s;
     letter-spacing: 0.5px;width: 150px;text-align: center;
   }
   .btn-buy{
@@ -157,18 +158,20 @@
     color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
   }
 
-  /* 👇 استایل دکمه ارتقا (یاقوتی خفن) */
+  /* 👇 دکمه ارتقا (یاقوتی تیره و خوشگل) */
   .btn-upgrade {
-    background: linear-gradient(135deg, #e0115f, #9b111e);
-    color:#fff; 
-    box-shadow: 0 4px 15px rgba(224, 17, 95, 0.4), inset 0 0 10px rgba(255,255,255,0.1);
+    background: linear-gradient(135deg, #800b1b, #3e0006);
+    color:#ffe6e6; 
+    box-shadow: 0 4px 15px rgba(62, 0, 6, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     margin-top: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 100, 100, 0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     font-weight: 900;
+    border-radius: 15px; /* گوشه‌های گردتر */
   }
   .btn-upgrade:hover {
-    box-shadow: 0 6px 20px rgba(224, 17, 95, 0.6);
+    box-shadow: 0 6px 20px rgba(128, 11, 27, 0.7);
+    background: linear-gradient(135deg, #910c1e, #4e0007);
   }
   .btn-upgrade:active { transform: scale(0.95); }
   .btn-upgrade:disabled { 
@@ -179,15 +182,15 @@
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
     background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
-  #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a}
+  #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a; font-weight: 900;}
   #gameOver p{font-size:20px;color:#7df9ff}
-  #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
+  #gameOver .final-score{font-size:28px;font-weight:900;color:#fff;margin:10px 0}
   
-  #bonusCoins { font-size: 20px; color: #ffd700; font-weight: bold; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+  #bonusCoins { font-size: 20px; color: #ffd700; font-weight: 900; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 
   #restartBtn{margin-top:10px;padding:14px 40px;font-size:20px;
     border:2px solid #0ff;background:transparent;color:#0ff;
-    border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
+    border-radius:40px;cursor:pointer;font-family:inherit;font-weight: 700;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
 
   .music-player { 
@@ -197,7 +200,7 @@
     box-shadow: inset 0 0 20px rgba(0,255,255,0.05);
     text-align: center;
   }
-  .music-player label { font-size: 15px; color: #0ff; display: block; margin-bottom: 15px; font-weight: bold; }
+  .music-player label { font-size: 15px; color: #0ff; display: block; margin-bottom: 15px; font-weight: 700; }
   
   .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 15px; }
   .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
@@ -211,7 +214,7 @@
   .music-controls { display: flex; gap: 10px; }
   .music-controls button {
     flex: 1; padding: 12px; border-radius: 10px; font-family: inherit;
-    font-weight: bold; cursor: pointer; transition: 0.3s; border: none; font-size: 15px;
+    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 15px;
   }
   #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
   #playBgmBtn:active { transform: scale(0.95); }
@@ -229,10 +232,9 @@
 </style>
 </head>
 <body>
+<!-- 👇 الماس‌ها حذف شدند -->
 <div id="purchaseToast">
-  <span class="gem">💎</span>
   <span id="toastText">سلاح خریداری شد!</span>
-  <span class="gem">💎</span>
 </div>
 
 <div id="tabs">
@@ -485,7 +487,6 @@ function renderShop() {
     
     const lvl = weaponLevels[w.id] || 0;
     const actualDmg = w.dmg + (lvl * 2);
-    // 👈 قیمت ارتقا خیلی بیشتر شد (200 * 1.5^lvl)
     const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
     
     let actionHtml = '';
@@ -534,7 +535,6 @@ window.buyWeapon = (id) => {
   }
 };
 
-// 👈 تابع ارتقای اسلحه
 window.upgradeWeapon = (id) => {
     const w = WEAPONS.find(x => x.id === id);
     const lvl = weaponLevels[id] || 0;
@@ -546,7 +546,6 @@ window.upgradeWeapon = (id) => {
         saveData();
         renderShop();
         
-        // محاسبه دمیج جدید برای نمایش در اعلان
         const newLvl = lvl + 1;
         const newDmg = w.dmg + (newLvl * 2);
         showPurchaseToast(`سلاح «${w.name}» به لول ${newLvl} ارتقا یافت! (دمیج: ${newDmg})`);
@@ -1020,7 +1019,7 @@ function draw(){
     }
   }
 
-  ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
+  ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
   
