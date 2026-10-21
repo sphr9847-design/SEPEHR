@@ -145,7 +145,11 @@
   #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a}
   #gameOver p{font-size:20px;color:#7df9ff}
   #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
-  #restartBtn{margin-top:20px;padding:14px 40px;font-size:20px;
+  
+  /* 👇 استایل پاداش سکه */
+  #bonusCoins { font-size: 20px; color: #ffd700; font-weight: bold; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+  #restartBtn{margin-top:10px;padding:14px 40px;font-size:20px;
     border:2px solid #0ff;background:transparent;color:#0ff;
     border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
@@ -250,6 +254,10 @@
   <h1>💥 بازی تموم شد!</h1>
   <p>جونات تموم شد...</p>
   <div class="final-score">امتیاز این دست: <span id="finalScoreVal">0</span></div>
+  
+  <!-- 👇 نمایش پاداش سکه -->
+  <div id="bonusCoins">💰 پاداش سکه: +0</div>
+
   <button id="restartBtn">شروع مجدد</button>
 </div>
 
@@ -306,7 +314,6 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-// 👇 تولید اسم پیش‌فرض رندوم (memberXXXX)
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 
 let profile = { name: defaultName, avatar: 1 };
@@ -324,7 +331,6 @@ try {
   }
 } catch(e) {}
 
-// اگه قبلا اسم ناشناس داشته، اسمش رو به فرمت member تبدیل میکنیم
 if(profile.name === 'بازیکن ناشناس' || !profile.name) {
     profile.name = defaultName;
     localStorage.setItem('shooter_profile', JSON.stringify(profile));
@@ -380,7 +386,6 @@ window.updatePreview = () => {
   document.getElementById('previewName').textContent = val || profile.name;
 };
 
-// 👇 بررسی تکراری نبودن اسم موقع ذخیره
 document.getElementById('saveProfileBtn').onclick = async () => {
   const newName = document.getElementById('nameInput').value.trim();
   const btn = document.getElementById('saveProfileBtn');
@@ -393,10 +398,8 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   btn.textContent = 'در حال بررسی...';
   btn.disabled = true;
 
-  // گرفتن لیست آنلاین برای چک کردن اسم
   const currentScores = await getScores();
   
-  // چک کردن اینکه آیا این اسم قبلا توسط کس دیگه‌ای (با deviceId متفاوت) استفاده شده یا نه
   const isTaken = currentScores.some(s => 
       s.name.toLowerCase() === newName.toLowerCase() && s.devId !== deviceId
   );
@@ -408,11 +411,9 @@ document.getElementById('saveProfileBtn').onclick = async () => {
       return;
   }
 
-  // اگه آزاد بود، ذخیره کن
   profile = { name: newName, avatar: selectedAvatarId };
   localStorage.setItem('shooter_profile', JSON.stringify(profile));
   
-  // آپدیت فوری در دیتابیس
   await saveScoreToLeaderboard(totalScore, false);
 
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
@@ -648,7 +649,12 @@ function update(dt){
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
           S.enemies.splice(j, 1); 
-          S.score += e.isBoss ? 500 : 10; coins += e.isBoss ? 50 : 2; 
+          S.score += e.isBoss ? 500 : 10; 
+          
+          // 👇 سیستم جدید جایزه سکه در حین بازی
+          let coinMultiplier = 1 + Math.floor(S.score / 1000);
+          let coinReward = e.isBoss ? 50 : 2;
+          coins += coinReward * coinMultiplier; 
           
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; 
@@ -702,15 +708,26 @@ function update(dt){
 function triggerGameOver() {
   isDead = true;
   const achievedScore = S.score;
+  
+  // 👇 محاسبه پاداش سکه پایان بازی
+  const bonusCoins = Math.floor(achievedScore / 10);
+  
   if(achievedScore > 0) {
     totalScore += achievedScore; 
+    coins += bonusCoins; // اضافه کردن پاداش
     saveData(); 
     localStorage.setItem('shooter_current_score', 0); 
     saveScoreToLeaderboard(totalScore); 
+    
+    document.getElementById('finalScoreVal').textContent = achievedScore;
+    document.getElementById('bonusCoins').textContent = '💰 پاداش سکه: +' + bonusCoins;
+    document.getElementById('bonusCoins').style.display = 'block';
   } else {
     localStorage.setItem('shooter_current_score', 0);
+    document.getElementById('finalScoreVal').textContent = 0;
+    document.getElementById('bonusCoins').style.display = 'none';
   }
-  document.getElementById('finalScoreVal').textContent = achievedScore;
+  
   document.getElementById('gameOver').style.display = 'flex';
 }
 
@@ -785,8 +802,16 @@ function draw(){
   ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
+  
+  // 👇 نمایش ضریب سکه در HUD
+  let currentMultiplier = 1 + Math.floor(S.score / 1000);
+  if (currentMultiplier > 1) {
+      ctx.fillStyle = '#00ffcc';
+      ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138);
+  }
+
   if (S.tempWeapon) {
-      ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, 138);
+      ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138);
   }
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
