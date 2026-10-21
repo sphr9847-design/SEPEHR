@@ -71,10 +71,7 @@
   .preview-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
   .preview-title { font-size: 12px; color: #0ff; margin-top: 5px; opacity: 0.8; letter-spacing: 2px; }
   
-  .preview-total { 
-    margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2);
-    font-size: 16px; color: #ffd700; font-weight: bold;
-  }
+  .preview-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2); font-size: 16px; color: #ffd700; font-weight: bold; }
 
   .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
@@ -101,26 +98,48 @@
     box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
 
-  /* فروشگاه */
-  .shop-header{text-align:center;margin-bottom:15px;font-size:18px;color:#ffd700;font-weight:bold}
-  .shop-list{display:flex;flex-direction:column;gap:12px;max-width:500px;margin:0 auto}
-  .weapon-card{display:flex;align-items:center;justify-content:space-between;
-    background:rgba(255,255,255,.03);border:1px solid rgba(0,255,255,.2);
-    padding:15px;border-radius:12px;transition:.2s}
-  .weapon-card.owned{border-color:rgba(0,255,0,.4);background:rgba(0,255,0,.05)}
-  .weapon-card.equipped{border-color:#0ff;box-shadow:0 0 10px rgba(0,255,255,.3)}
-  .w-info h3{font-size:16px;margin-bottom:5px;color:#fff}
-  .w-info p{font-size:13px;color:#888}
-  .w-action{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
-  .w-price{font-size:15px;font-weight:bold;color:#ffd700}
-  .w-btn{padding:8px 16px;border-radius:20px;border:none;cursor:pointer;
-    font-family:inherit;font-weight:bold;font-size:14px;transition:.2s}
-  .btn-buy{background:#ffd700;color:#000}
-  .btn-buy:disabled{background:#555;color:#888;cursor:not-allowed}
-  .btn-equip{background:transparent;border:1px solid #0ff;color:#0ff}
-  .btn-equipped{background:#0ff;color:#000;border:1px solid #0ff}
+  /* 🎨 فروشگاه بازطراحی شده */
+  .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
+  .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
+  .weapon-card{
+    display:flex;align-items:center;justify-content:space-between;
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.5));
+    border:1px solid rgba(0,255,255,.15);
+    padding:15px 20px;border-radius:15px;transition:.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .weapon-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.1); border-color: rgba(0,255,255,0.4); }
+  .weapon-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.5)); }
+  .weapon-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+  
+  .w-info h3{font-size:17px;margin-bottom:5px;color:#fff}
+  .w-info p{font-size:13px;color:#8bb5c9}
+  .w-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .w-price{font-size:15px;font-weight:bold;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
+  
+  .w-btn{
+    padding:10px 20px;border-radius:25px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:bold;font-size:14px;transition:.3s;
+    letter-spacing: 0.5px;
+  }
+  .btn-buy{
+    background: linear-gradient(45deg, #ffd700, #ffaa00);
+    color:#000; box-shadow: 0 0 15px rgba(255,215,0,0.4);
+  }
+  .btn-buy:active { transform: scale(0.95); }
+  .btn-buy:disabled{ background: #333; color:#666; box-shadow:none; cursor:not-allowed; transform:none;}
+  
+  .btn-equip{
+    background: transparent; border:1px solid #0ff; color:#0ff;
+    box-shadow: inset 0 0 10px rgba(0,255,255,0.1);
+  }
+  .btn-equip:active { transform: scale(0.95); background: rgba(0,255,255,0.1); }
+  
+  .btn-equipped{
+    background: linear-gradient(45deg, #00ffcc, #00ccff);
+    color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
+  }
 
-  /* مودال Game Over */
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
     background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
@@ -132,12 +151,34 @@
     border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
 
-  /* استایل موزیک پلیر */
-  .music-player { margin-top: 20px; padding: 15px; background: rgba(0,255,255,0.05); border-radius: 15px; border: 1px solid rgba(0,255,255,0.2); }
-  .music-player label { font-size: 14px; color: #8bb5c9; display: block; margin-bottom: 10px; }
-  .music-player input[type="file"] { font-size: 12px; color: #fff; width: 100%; cursor: pointer; }
-  .music-controls { display: flex; gap: 10px; margin-top: 10px; }
-  .music-controls button { flex: 1; padding: 8px; border: 1px solid #0ff; background: transparent; color: #0ff; border-radius: 8px; cursor: pointer; font-family: inherit; }
+  /* 🎵 بخش موسیقی بازطراحی شده */
+  .music-player { 
+    max-width: 400px; margin: 20px auto; padding: 20px; 
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
+    border: 1px solid rgba(0,255,255,0.2); border-radius: 15px;
+    box-shadow: inset 0 0 20px rgba(0,255,255,0.05);
+    text-align: center;
+  }
+  .music-player label { font-size: 15px; color: #0ff; display: block; margin-bottom: 15px; font-weight: bold; }
+  
+  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 15px; }
+  .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .file-upload-btn {
+    border: 1px dashed #0ff; color: #0ff; padding: 15px;
+    border-radius: 10px; display: block; font-size: 14px;
+    background: rgba(0,255,255,0.05); transition: 0.3s;
+  }
+  .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); }
+  
+  .music-controls { display: flex; gap: 10px; }
+  .music-controls button {
+    flex: 1; padding: 12px; border-radius: 10px; font-family: inherit;
+    font-weight: bold; cursor: pointer; transition: 0.3s; border: none; font-size: 15px;
+  }
+  #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
+  #playBgmBtn:active { transform: scale(0.95); }
+  #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
+  #pauseBgmBtn:active { transform: scale(0.95); background: rgba(255,92,138,0.1); }
 </style>
 </head>
 <body>
@@ -157,7 +198,7 @@
 </div>
 
 <div id="rankPanel" class="panel">
-  <h2>🏆 رتبه‌بندی آنلاین (مجموع امتیازات)</h2>
+  <h2>🏆 رتبه‌بندی آنلاین</h2>
   <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
   <ol id="rankList"></ol>
 </div>
@@ -183,7 +224,10 @@
   
   <div class="music-player">
     <label>🎵 پخش آهنگ دلخواه از گوشی:</label>
-    <input type="file" id="bgmUpload" accept="audio/*">
+    <div class="file-upload-wrapper">
+      <div class="file-upload-btn">📂 برای انتخاب آهنگ کلیک کنید</div>
+      <input type="file" id="bgmUpload" accept="audio/*">
+    </div>
     <div class="music-controls">
       <button id="playBgmBtn">▶️ پخش</button>
       <button id="pauseBgmBtn">⏸️ توقف</button>
@@ -207,7 +251,6 @@ let W, H;
 
 const PANTRY_URL = "https://getpantry.cloud/apiv1/pantry/151e51ac-1424-4786-9386-be9f3b059221/basket/scores";
 
-// 👇 اسلحه‌های فروشگاه (۱۰ تا)
 const WEAPONS = [
   { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
   { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
@@ -221,7 +264,6 @@ const WEAPONS = [
   { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 5, cd: 80, size: 8, count: 7, spread: 45 },
 ];
 
-// 👇 ۵۰ قدرت مخفی (که فقط از دشمن‌ها می‌افتن)
 const DROP_WEAPONS = [];
 const dropColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ff8800", "#ff0088", "#88ff00", "#0088ff"];
 for(let i=1; i<=50; i++) {
@@ -229,10 +271,10 @@ for(let i=1; i<=50; i++) {
     id: 'drop_' + i,
     name: 'قدرت ویژه ' + i,
     color: dropColors[i % dropColors.length],
-    dmg: Math.floor(Math.random() * 5) + 3, // دمیج بین ۳ تا ۷
-    cd: Math.floor(Math.random() * 40) + 20, // سرعت شلیک بالا
+    dmg: Math.floor(Math.random() * 5) + 3,
+    cd: Math.floor(Math.random() * 40) + 20,
     size: Math.floor(Math.random() * 8) + 4,
-    count: Math.floor(Math.random() * 4) + 1, // ۱ تا ۴ گلوله
+    count: Math.floor(Math.random() * 4) + 1,
     spread: Math.floor(Math.random() * 45),
     isDrop: true
   });
@@ -320,7 +362,6 @@ document.getElementById('saveProfileBtn').onclick = () => {
 
 renderProfileUI();
 
-// 🎵 سیستم پخش موسیقی
 let bgmAudio = new Audio();
 document.getElementById('bgmUpload').addEventListener('change', function(e) {
   const file = e.target.files[0];
@@ -332,7 +373,6 @@ document.getElementById('bgmUpload').addEventListener('change', function(e) {
 document.getElementById('playBgmBtn').onclick = () => bgmAudio.play();
 document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
 
-// 🛒 فروشگاه
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   const list = document.getElementById('shopList');
@@ -384,14 +424,12 @@ function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
   
   S = {
-    // 👇 هیت‌باکس دقیق: ۳ پیکسل
     player: {x: W/2, y: H - 90, r: 3},
     bullets: [], enemies: [], parts: [], stars: [], powerups: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
-    tempWeapon: null, tempWeaponTime: 0 // 👈 متغیرهای قدرت موقت
+    tempWeapon: null, tempWeaponTime: 0
   };
   
-  // اگه امتیاز از قبل از غول رد شده بود، غول جدید رو ست کن
   currentBossIndex = 0;
   for(let i=0; i<bossMilestones.length; i++) {
     if (savedScore >= bossMilestones[i]) currentBossIndex = i + 1;
@@ -429,7 +467,6 @@ addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
 function fire(){
-  // اگه قدرت موقت داشتیم از اون استفاده کن، وگرنه اسلحه فروشگاه
   const w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
   S.cool = w.cd;
   for(let i = 0; i < w.count; i++){
@@ -445,12 +482,17 @@ function fire(){
 
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
-  const diff = Math.min(S.score / 400, 1);
+  
+  // 👇 سختی بر اساس امتیاز
+  const diffSpeed = Math.min(S.score / 500, 1); 
+  const diffHp = Math.min(S.score / 1000, 3);   
+
   S.enemies.push({
     x: 30 + Math.random()*(W - 60), y: -30, r,
-    vy: 0.16 + Math.random()*0.10 + diff*0.15, vx: (Math.random() - 0.5) * 0.12,
+    vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25, // سرعت بیشتر میشه
+    vx: (Math.random() - 0.5) * 0.12,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
-    hp: r > 17 ? 3 : 2,
+    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp), // جون بیشتر میشه
     isBoss: false
   });
 }
@@ -460,12 +502,11 @@ function spawnBoss(){
     x: W/2, y: -100, r: 65,
     vy: 0.05, vx: 0.15, 
     hue: 280, rot: 0, rv: 0.01,
-    hp: 50 + (currentBossIndex * 20), // جون غول بر اساس تعدادش
+    hp: 50 + (currentBossIndex * 20),
     isBoss: true
   });
 }
 
-// 👇 سیستم انداختن قدرت‌ها
 function spawnPowerup(x, y, isBossDrop) {
   let w = DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)];
   S.powerups.push({ x: x, y: y, vy: 0.5, weapon: w, r: 12, rot: 0 });
@@ -484,13 +525,11 @@ function update(dt){
   S.t++;
   if(S.t % 120 === 0) saveData();
 
-  // زمان‌سنج قدرت موقت
   if (S.tempWeaponTime > 0) {
     S.tempWeaponTime -= dt;
     if (S.tempWeaponTime <= 0) S.tempWeapon = null;
   }
 
-  // چک کردن اسپاون غول
   if (currentBossIndex < bossMilestones.length && S.score >= bossMilestones[currentBossIndex] && !isBossActive) {
     spawnBoss();
     isBossActive = true;
@@ -502,14 +541,15 @@ function update(dt){
   const sp = 0.9 * dt;
   if(keys.left)  p.x -= sp;
   if(keys.right) p.x += sp;
-  if(touchX !== null){ const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); }
+  if(touchX !== null){ 
+    const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); 
+  }
   p.x = Math.max(22, Math.min(W - 22, p.x));
 
   S.cool -= dt;
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
-  // اسپاون دشمن (اگه غول فعاله، سرعتش رو کم میکنیم)
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
     if (!isBossActive || Math.random() < 0.3) spawnEnemy();
@@ -522,7 +562,7 @@ function update(dt){
     if(!e.isBoss && (e.x < e.r || e.x > W - e.r)) e.vx *= -1;
     if(e.isBoss) {
       if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
-      if (e.y > 150) e.y = 150; // غول بالای صفحه می‌مونه
+      if (e.y > 150) e.y = 150;
     }
   }
 
@@ -532,24 +572,19 @@ function update(dt){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
       if(dx*dx + dy*dy < (e.r + 4)**2){
-        S.bullets.splice(i, 1); 
-        e.hp -= b.dmg; 
-        boom(b.x, b.y, 180, 3);
-        
+        S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
           S.enemies.splice(j, 1); 
-          S.score += e.isBoss ? 500 : 10; 
-          coins += e.isBoss ? 50 : 2; 
+          S.score += e.isBoss ? 500 : 10; coins += e.isBoss ? 50 : 2; 
           
+          // 👇 شانس آوردن قدرت‌ها کمتر شد
           if (e.isBoss) {
-            isBossActive = false;
-            currentBossIndex++;
-            spawnPowerup(e.x, e.y, true); // غول همیشه قدرت میندازه
-          } else if (Math.random() < 0.03) {
-            spawnPowerup(e.x, e.y, false); // ۳ درصد شانس برای دشمن عادی
+            isBossActive = false; currentBossIndex++; 
+            if (Math.random() < 0.5) spawnPowerup(e.x, e.y, true); // غول 50 درصد شانس
+          } else if (Math.random() < 0.01) { // دشمن عادی فقط 1 درصد شانس
+            spawnPowerup(e.x, e.y, false);
           }
-          
           saveData(); 
         }
         break;
@@ -557,34 +592,24 @@ function update(dt){
     }
   }
 
-  // 👇 برخورد دقیق: بدون منهای اضافه
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
     if(dx*dx + dy*dy < (e.r + p.r)**2){
-      boom(e.x, e.y, e.hue, 12); 
-      S.enemies.splice(j, 1); 
-      S.shake = 220; 
-      S.lives--;
-      if(e.isBoss) isBossActive = false; // اگه به غول خوردی غول میره
+      boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
+      if(e.isBoss) isBossActive = false;
       if(S.lives <= 0) triggerGameOver();
       break;
     }
   }
 
-  // حرکت و برخورد پاورآپ‌ها
   for(let i = S.powerups.length - 1; i >= 0; i--){
     const pu = S.powerups[i];
-    pu.y += pu.vy * dt;
-    pu.rot += 0.05 * dt;
-    
+    pu.y += pu.vy * dt; pu.rot += 0.05 * dt;
     const dx = p.x - pu.x, dy = p.y - pu.y;
     if(dx*dx + dy*dy < (pu.r + p.r + 15)**2){
-      // گرفتن قدرت
-      S.tempWeapon = pu.weapon;
-      S.tempWeaponTime = 10000; // ۱۰ ثانیه
-      S.powerups.splice(i, 1);
-      boom(pu.x, pu.y, 180, 15);
+      S.tempWeapon = pu.weapon; S.tempWeaponTime = 10000;
+      S.powerups.splice(i, 1); boom(pu.x, pu.y, 180, 15);
       continue;
     }
     if(pu.y > H + 50) S.powerups.splice(i, 1);
@@ -606,16 +631,11 @@ function update(dt){
 function triggerGameOver() {
   isDead = true;
   const achievedScore = S.score;
-  
   if(achievedScore > 0) {
-    totalScore += achievedScore;
-    saveData();
-    localStorage.setItem('shooter_current_score', 0);
-    saveScoreToLeaderboard(totalScore); 
+    totalScore += achievedScore; saveData(); localStorage.setItem('shooter_current_score', 0); saveScoreToLeaderboard(totalScore); 
   } else {
     localStorage.setItem('shooter_current_score', 0);
   }
-
   document.getElementById('finalScoreVal').textContent = achievedScore;
   document.getElementById('gameOver').style.display = 'flex';
 }
@@ -635,19 +655,11 @@ function draw(){
   }
   ctx.globalAlpha = 1;
 
-  // پاورآپ‌ها
   for(const pu of S.powerups) {
-    ctx.save();
-    ctx.translate(pu.x, pu.y);
-    ctx.rotate(pu.rot);
-    ctx.fillStyle = pu.weapon.color;
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = pu.weapon.color;
-    ctx.beginPath();
-    ctx.moveTo(0, -pu.r); ctx.lineTo(pu.r, 0); ctx.lineTo(0, pu.r); ctx.lineTo(-pu.r, 0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+    ctx.save(); ctx.translate(pu.x, pu.y); ctx.rotate(pu.rot);
+    ctx.fillStyle = pu.weapon.color; ctx.shadowBlur = 15; ctx.shadowColor = pu.weapon.color;
+    ctx.beginPath(); ctx.moveTo(0, -pu.r); ctx.lineTo(pu.r, 0); ctx.lineTo(0, pu.r); ctx.lineTo(-pu.r, 0);
+    ctx.closePath(); ctx.fill(); ctx.restore();
   }
   ctx.shadowBlur = 0;
 
@@ -659,11 +671,9 @@ function draw(){
   for(const e of S.enemies){
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
     ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
-    ctx.lineWidth = e.isBoss ? 5 : 2; 
-    ctx.beginPath();
+    ctx.lineWidth = e.isBoss ? 5 : 2; ctx.beginPath();
     
     if (e.isBoss) {
-       // رسم غول به شکل ستاره بزرگ
        for(let k=0; k<10; k++){
           const r2 = k%2===0 ? e.r : e.r/2;
           const a = k * Math.PI/5;
@@ -677,14 +687,10 @@ function draw(){
        }
     }
     ctx.closePath(); ctx.fill(); ctx.stroke(); 
-    
-    // نوار خون غول
     if (e.isBoss) {
-        ctx.rotate(-e.rot); // برگردوندن نوار خون به حالت افقی
-        ctx.fillStyle = 'red';
-        ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
+        ctx.rotate(-e.rot); ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
         ctx.fillStyle = 'lime';
-        const hpPct = Math.max(0, e.hp / (50 + (currentBossIndex * 20))); // تقریب
+        const hpPct = Math.max(0, e.hp / (50 + (currentBossIndex * 20)));
         ctx.fillRect(-e.r, -e.r - 20, e.r*2 * hpPct, 6);
     }
     ctx.restore();
@@ -703,12 +709,9 @@ function draw(){
   ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
-  
   if (S.tempWeapon) {
-      ctx.fillStyle = S.tempWeapon.color; 
-      ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, 138);
+      ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, 138);
   }
-  
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
@@ -725,7 +728,6 @@ async function getScores(){
   combined.sort((a,b) => b.score - a.score);
   const unique = [];
   const seenNames = new Set();
-  
   for (const item of combined) {
     if(!item || item.score === undefined || !item.name) continue;
     if(!seenNames.has(item.name)) { seenNames.add(item.name); unique.push(item); }
@@ -735,7 +737,6 @@ async function getScores(){
 
 async function saveScoreToLeaderboard(newTotalScore){
   if(newTotalScore <= 0) return;
-  
   localScores = localScores.filter(s => s.name !== profile.name);
   localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
   localScores.sort((a,b) => b.score - a.score);
@@ -749,12 +750,10 @@ async function saveScoreToLeaderboard(newTotalScore){
         const data = await res.json();
         if(Array.isArray(data)) onlineScores = data;
     }
-    
     onlineScores = onlineScores.filter(s => s.name !== profile.name);
     onlineScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
     onlineScores.sort((a,b) => b.score - a.score);
     onlineScores = onlineScores.slice(0, 10);
-    
     await fetch(PANTRY_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -766,14 +765,11 @@ async function saveScoreToLeaderboard(newTotalScore){
 async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
-  
   const scores = await getScores();
-  
   if(scores.length === 0){
     list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
     return;
   }
-  
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
     if (typeof s.avatar === 'number') {
@@ -782,7 +778,6 @@ async function renderRank(){
     } else {
       avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
     }
-
     return '<li>' +
       '<span class="pos">' + (i+1) + '</span>' + avatarHtml +
       '<span class="name">' + (s.name || 'ناشناس') + '</span>' +
@@ -795,11 +790,9 @@ document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = async () => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-    
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    
     if(tab === 'shop') { renderShop(); } 
     else if(tab === 'rank'){ renderRank(); }
   };
