@@ -6,12 +6,13 @@
 <title>🚀 تیراندازی فضایی</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:#1a0000;
+  /* 👇 برگشت به تم آبی/مشکی قبلی */
+  html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:system-ui,sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
-    background:rgba(26, 0, 0, 0.85); border-bottom:1px solid rgba(0,255,255,.15);
+    background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
   .tab{flex:1;background:transparent;border:none;
     color:#5a7d8f;font-size:14px;font-weight:600;
@@ -20,7 +21,7 @@
   .tab:active{background:rgba(0,255,255,.05)}
 
   .panel{position:fixed;top:50px;left:0;right:0;bottom:0;
-    background:#1a0000;color:#7df9ff;
+    background:#04060f;color:#7df9ff;
     padding:20px;overflow-y:auto;display:none;z-index:5}
   .panel.show{display:block}
   .panel h2{text-align:center;font-size:22px;margin-bottom:20px;
@@ -33,6 +34,7 @@
     border-radius:12px;font-size:16px; transition: 0.3s;}
   #rankList li:hover { background:rgba(0,255,255,.1); transform: translateX(-5px); }
   #rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
+  #rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px}
   #rankList .pos{width:28px;height:28px;border-radius:50%;
     background:rgba(0,255,255,.1); display:flex;align-items:center;justify-content:center;
     font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px}
@@ -52,7 +54,7 @@
 
   .profile-card {
     max-width: 400px; margin: 0 auto 25px auto; padding: 25px 20px;
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(26,0,0,0.8));
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0,255,255,0.05);
     border-radius: 20px; text-align: center; position: relative; overflow: hidden;
@@ -91,7 +93,7 @@
   .avatar-btn.selected svg { filter: drop-shadow(0 0 10px currentColor); }
   
   .save-btn{display:block;width:100%;max-width:400px;margin:25px auto;padding:15px;
-    background:linear-gradient(90deg, #00d2ff, #0ff);color:#1a0000;border:none;border-radius:12px;
+    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:12px;
     font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;transition: 0.3s;
     box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
@@ -139,18 +141,18 @@
 
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:15px;
-    background:rgba(26, 0, 0, 0.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
+    background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
   #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a}
   #gameOver p{font-size:20px;color:#7df9ff}
   #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
   #restartBtn{margin-top:20px;padding:14px 40px;font-size:20px;
     border:2px solid #0ff;background:transparent;color:#0ff;
     border-radius:40px;cursor:pointer;font-family:inherit;transition:0.3s}
-  #restartBtn:active{background:#0ff;color:#1a0000}
+  #restartBtn:active{background:#0ff;color:#04060f}
 
   .music-player { 
     max-width: 400px; margin: 20px auto; padding: 20px; 
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(26,0,0,0.8));
+    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
     border: 1px solid rgba(0,255,255,0.2); border-radius: 15px;
     box-shadow: inset 0 0 20px rgba(0,255,255,0.05);
     text-align: center;
@@ -176,7 +178,6 @@
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
   #pauseBgmBtn:active { transform: scale(0.95); background: rgba(255,92,138,0.1); }
 
-  /* 👇 نشانگر سیو آنلاین */
   #syncIndicator {
     position: fixed; bottom: 20px; left: 20px;
     color: #0ff; font-size: 24px; opacity: 0; transition: opacity 0.3s;
@@ -195,7 +196,6 @@
   <button class="tab" data-tab="profile">👤 پروفایل</button>
 </div>
 
-<!-- 👇 نشانگر سیو شدن آنلاین -->
 <div id="syncIndicator">☁️</div>
 
 <canvas id="c"></canvas>
@@ -259,6 +259,13 @@ const ctx = cvs.getContext('2d', { alpha: false });
 let W, H;
 
 const PANTRY_URL = "https://getpantry.cloud/apiv1/pantry/151e51ac-1424-4786-9386-be9f3b059221/basket/scores";
+
+// 👇 ساخت یک شناسه یکتا برای دستگاه (که با اسم افراد قاطی نشه)
+let deviceId = localStorage.getItem('shooter_device_id');
+if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    localStorage.setItem('shooter_device_id', deviceId);
+}
 
 const WEAPONS = [
   { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
@@ -334,7 +341,6 @@ window.addEventListener('beforeunload', () => {
   localStorage.setItem('shooter_total_score', totalScore);
   if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
   
-  // 👇 ذخیره نهایی در دیتابیس آنلاین موقع خروج
   if(!isDead && S && S.score > 0) {
     saveScoreToLeaderboard(totalScore + S.score, true);
   }
@@ -532,18 +538,16 @@ function boom(x, y, hue, n){
   }
 }
 
-// 👇 همگام‌سازی خودکار با دیتابیس
 let lastSync = 0;
 function autoSync() {
     if(!isDead && S && S.score > 0) {
         let currentTotal = totalScore + S.score;
-        if(currentTotal > lastSync + 20) { // هر ۲۰ امتیاز یکبار سیو بشه
+        if(currentTotal > lastSync + 20) { 
             saveScoreToLeaderboard(currentTotal, true);
             lastSync = currentTotal;
         }
     }
 }
-// هر ۱۰ ثانیه یکبار همگام‌سازی در پس‌زمینه انجام میشه
 setInterval(autoSync, 10000);
 
 function update(dt){
@@ -661,7 +665,7 @@ function triggerGameOver() {
     totalScore += achievedScore; 
     saveData(); 
     localStorage.setItem('shooter_current_score', 0); 
-    saveScoreToLeaderboard(totalScore); // ذخیره قطعی موقع مرگ
+    saveScoreToLeaderboard(totalScore); 
   } else {
     localStorage.setItem('shooter_current_score', 0);
   }
@@ -673,10 +677,10 @@ function draw(){
   const sh = S.shake > 0 ? (Math.random() - 0.5) * S.shake * 0.03 : 0;
   ctx.setTransform(1, 0, 0, 1, sh, sh);
   
-  ctx.fillStyle = 'rgba(26, 0, 0, 0.5)'; 
+  ctx.fillStyle = 'rgba(4,6,15,0.5)'; 
   ctx.fillRect(-10, -10, W + 20, H + 20);
 
-  ctx.fillStyle = '#ff9999';
+  ctx.fillStyle = '#8fd8ff';
   for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); }
   ctx.globalAlpha = 1;
 
@@ -746,22 +750,39 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
+// 🕵️ اصلاح نهایی رتبه‌بندی
 async function getScores(){
   let combined = [...localScores];
   try {
-    const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
+    // 👇 با اضافه کردن ?t=... از کش شدن توسط مرورگر جلوگیری میکنیم
+    const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store'
+    });
+    
     if(res.ok) {
       const data = await res.json();
       if(Array.isArray(data)) { combined = [...combined, ...data]; }
+    } else if (res.status !== 400) {
+      // خطای سرور (غیر از سبد خالی)
+      return null;
     }
-  } catch(e) {}
+  } catch(e) {
+    return null; // خطای شبکه
+  }
 
   combined.sort((a,b) => b.score - a.score);
   const unique = [];
-  const seenNames = new Set();
+  const seenDevices = new Set();
+  
   for (const item of combined) {
-    if(!item || item.score === undefined || !item.name) continue;
-    if(!seenNames.has(item.name)) { seenNames.add(item.name); unique.push(item); }
+    if(!item || item.score === undefined) continue;
+    // 👇 حالا بر اساس شناسه دستگاه (devId) تکراری‌ها رو حذف میکنیم، نه اسم
+    const id = item.devId || item.name || 'unknown';
+    if(!seenDevices.has(id)) {
+        seenDevices.add(id);
+        unique.push(item);
+    }
   }
   return unique.slice(0, 10);
 }
@@ -770,8 +791,8 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(newTotalScore <= 0) return;
   
   if(!isSilent) {
-      localScores = localScores.filter(s => s.name !== profile.name);
-      localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
+      localScores = localScores.filter(s => s.devId !== deviceId);
+      localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar, devId: deviceId });
       localScores.sort((a,b) => b.score - a.score);
       localScores = localScores.slice(0, 10);
       localStorage.setItem('shooter_local_ranks', JSON.stringify(localScores));
@@ -782,15 +803,26 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
 
   try {
     let onlineScores = [];
-    const res = await fetch(PANTRY_URL, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store'
+    });
+    
     if(res.ok) {
         const data = await res.json();
         if(Array.isArray(data)) onlineScores = data;
     }
     
-    // آپدیت رکورد کاربر فعلی
-    onlineScores = onlineScores.filter(s => s.name !== profile.name);
-    onlineScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar });
+    // 👇 حذف رکورد قدیمی این دستگاه و اضافه کردن رکورد جدید
+    onlineScores = onlineScores.filter(s => s.devId !== deviceId);
+    onlineScores.push({ 
+      score: newTotalScore, 
+      date: Date.now(), 
+      name: profile.name, 
+      avatar: profile.avatar,
+      devId: deviceId // ذخیره شناسه دستگاه
+    });
+    
     onlineScores.sort((a,b) => b.score - a.score);
     onlineScores = onlineScores.slice(0, 10);
     
@@ -808,11 +840,20 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
 async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
+  
   const scores = await getScores();
+  
+  // 👇 اگه getScores مقدار null برگردوند یعنی خطای شبکه بوده
+  if(scores === null){
+    list.innerHTML = '<li class="error">❌ خطا در اتصال به سرور! اینترنت را بررسی کنید.</li>';
+    return;
+  }
+  
   if(scores.length === 0){
     list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
     return;
   }
+  
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
     if (typeof s.avatar === 'number') {
