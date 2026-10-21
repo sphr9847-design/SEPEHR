@@ -96,6 +96,7 @@
     font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;transition: 0.3s;
     box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
+  .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:bold;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
@@ -216,7 +217,7 @@
   
   <div class="profile-card">
     <div class="preview-avatar" id="previewAvatar"></div>
-    <div class="preview-name" id="previewName">بازیکن ناشناس</div>
+    <div class="preview-name" id="previewName">در حال بارگذاری...</div>
     <div class="preview-title">SPACE COMMANDER</div>
     <div class="preview-total">🌟 مجموع امتیازات: <span id="totalScoreVal">0</span></div>
   </div>
@@ -305,7 +306,10 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-let profile = { name: 'بازیکن ناشناس', avatar: 1 };
+// 👇 تولید اسم پیش‌فرض رندوم (memberXXXX)
+let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
+
+let profile = { name: defaultName, avatar: 1 };
 let coins = parseInt(localStorage.getItem('shooter_coins') || '0');
 let ownedWeapons = JSON.parse(localStorage.getItem('shooter_weapons') || '[1]');
 let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
@@ -320,9 +324,9 @@ try {
   }
 } catch(e) {}
 
-// 👇 اگه کاربر اسمش رو عوض نکرده بود، یه اسم رندوم بهش میدیم که با بقیه قاطی نشه
-if(profile.name === 'بازیکن ناشناس') {
-    profile.name = 'فضانورد ' + Math.floor(Math.random() * 9000 + 1000);
+// اگه قبلا اسم ناشناس داشته، اسمش رو به فرمت member تبدیل میکنیم
+if(profile.name === 'بازیکن ناشناس' || !profile.name) {
+    profile.name = defaultName;
     localStorage.setItem('shooter_profile', JSON.stringify(profile));
 }
 
@@ -373,14 +377,47 @@ function renderProfileUI() {
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
 window.updatePreview = () => {
   const val = document.getElementById('nameInput').value.trim();
-  document.getElementById('previewName').textContent = val || 'بازیکن ناشناس';
+  document.getElementById('previewName').textContent = val || profile.name;
 };
 
-document.getElementById('saveProfileBtn').onclick = () => {
-  const newName = document.getElementById('nameInput').value.trim() || 'بازیکن ناشناس';
+// 👇 بررسی تکراری نبودن اسم موقع ذخیره
+document.getElementById('saveProfileBtn').onclick = async () => {
+  const newName = document.getElementById('nameInput').value.trim();
+  const btn = document.getElementById('saveProfileBtn');
+  
+  if(!newName) {
+      alert('لطفا یک اسم وارد کنید.');
+      return;
+  }
+
+  btn.textContent = 'در حال بررسی...';
+  btn.disabled = true;
+
+  // گرفتن لیست آنلاین برای چک کردن اسم
+  const currentScores = await getScores();
+  
+  // چک کردن اینکه آیا این اسم قبلا توسط کس دیگه‌ای (با deviceId متفاوت) استفاده شده یا نه
+  const isTaken = currentScores.some(s => 
+      s.name.toLowerCase() === newName.toLowerCase() && s.devId !== deviceId
+  );
+
+  if(isTaken) {
+      alert('❌ این اسم قبلا توسط بازیکن دیگری انتخاب شده است. لطفا اسم دیگری انتخاب کنید.');
+      btn.textContent = 'ذخیره پروفایل';
+      btn.disabled = false;
+      return;
+  }
+
+  // اگه آزاد بود، ذخیره کن
   profile = { name: newName, avatar: selectedAvatarId };
   localStorage.setItem('shooter_profile', JSON.stringify(profile));
+  
+  // آپدیت فوری در دیتابیس
+  await saveScoreToLeaderboard(totalScore, false);
+
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
+  btn.textContent = 'ذخیره پروفایل';
+  btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
 };
 
@@ -542,7 +579,6 @@ function boom(x, y, hue, n){
   }
 }
 
-// 👇 زمان‌بندی همگام‌سازی تغییر کرد (هر ۱۵ ثانیه)
 let lastSync = 0;
 function autoSync() {
     if(!isDead && S && S.score > 0) {
@@ -755,11 +791,9 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
-// 🕵️ اصلاح نهایی رتبه‌بندی
 async function getScores(){
   let combined = [...localScores];
   try {
-    // 👇 با اضافه کردن ?t=... از کش شدن توسط مرورگر جلوگیری میکنیم
     const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
       headers: { 'Accept': 'application/json' },
       cache: 'no-store'
@@ -769,9 +803,7 @@ async function getScores(){
       const data = await res.json();
       if(Array.isArray(data)) { combined = [...combined, ...data]; }
     }
-  } catch(e) {
-    // اگر خطای شبکه بود، فقط از داده‌های لوکال استفاده میکنیم
-  }
+  } catch(e) {}
 
   combined.sort((a,b) => b.score - a.score);
   const unique = [];
@@ -802,7 +834,6 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   const syncIcon = document.getElementById('syncIndicator');
   syncIcon.classList.add('syncing');
 
-  // 👇 سیستم تلاش مجدد (Retry)
   let success = false;
   let retries = 0;
   
@@ -844,7 +875,7 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
       
       if(!success) {
           retries++;
-          await new Promise(r => setTimeout(r, 1000)); // ۱ ثانیه صبر کن و دوباره تلاش کن
+          await new Promise(r => setTimeout(r, 1000)); 
       }
   }
 
