@@ -23,8 +23,11 @@
     background:#04060f;color:#7df9ff;
     padding:20px;overflow-y:auto;display:none;z-index:5}
   .panel.show{display:block}
-  .panel h2{text-align:center;font-size:22px;margin-bottom:20px;
+  .panel h2{text-align:center;font-size:22px;margin-bottom:10px;
     text-shadow:0 0 15px rgba(0,255,255,.5)}
+
+  .stats-bar { text-align: center; font-size: 14px; color: #8bb5c9; margin-bottom: 20px; }
+  .stats-bar span { color: #0ff; font-weight: bold; }
 
   #rankList{list-style:none;max-width:400px;margin:0 auto}
   #rankList li{display:flex;align-items:center;
@@ -146,7 +149,6 @@
   #gameOver p{font-size:20px;color:#7df9ff}
   #gameOver .final-score{font-size:28px;font-weight:bold;color:#fff;margin:10px 0}
   
-  /* 👇 استایل پاداش سکه */
   #bonusCoins { font-size: 20px; color: #ffd700; font-weight: bold; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 
   #restartBtn{margin-top:10px;padding:14px 40px;font-size:20px;
@@ -212,6 +214,8 @@
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
+  <div class="stats-bar">👁️ بازدیدکنندگان سایت: <span id="visitorCount">در حال بارگذاری...</span></div>
+  
   <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
   <ol id="rankList"></ol>
 </div>
@@ -254,10 +258,7 @@
   <h1>💥 بازی تموم شد!</h1>
   <p>جونات تموم شد...</p>
   <div class="final-score">امتیاز این دست: <span id="finalScoreVal">0</span></div>
-  
-  <!-- 👇 نمایش پاداش سکه -->
   <div id="bonusCoins">💰 پاداش سکه: +0</div>
-
   <button id="restartBtn">شروع مجدد</button>
 </div>
 
@@ -266,7 +267,9 @@ const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
 let W, H;
 
-const PANTRY_URL = "https://getpantry.cloud/apiv1/pantry/151e51ac-1424-4786-9386-be9f3b059221/basket/scores";
+// 👇 کلیدهای اتصال به دیتابیس Supabase
+const SUPABASE_URL = "https://wjgnbgbcqdtdcxonyrsb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs";
 
 let deviceId = localStorage.getItem('shooter_device_id');
 if (!deviceId) {
@@ -390,10 +393,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const newName = document.getElementById('nameInput').value.trim();
   const btn = document.getElementById('saveProfileBtn');
   
-  if(!newName) {
-      alert('لطفا یک اسم وارد کنید.');
-      return;
-  }
+  if(!newName) { alert('لطفا یک اسم وارد کنید.'); return; }
 
   btn.textContent = 'در حال بررسی...';
   btn.disabled = true;
@@ -401,11 +401,11 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const currentScores = await getScores();
   
   const isTaken = currentScores.some(s => 
-      s.name.toLowerCase() === newName.toLowerCase() && s.devId !== deviceId
+      s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId
   );
 
   if(isTaken) {
-      alert('❌ این اسم قبلا توسط بازیکن دیگری انتخاب شده است. لطفا اسم دیگری انتخاب کنید.');
+      alert('❌ این اسم قبلا توسط بازیکن دیگری انتخاب شده است.');
       btn.textContent = 'ذخیره پروفایل';
       btn.disabled = false;
       return;
@@ -414,7 +414,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   profile = { name: newName, avatar: selectedAvatarId };
   localStorage.setItem('shooter_profile', JSON.stringify(profile));
   
-  await saveScoreToLeaderboard(totalScore, false);
+  await saveScoreToLeaderboard(totalScore);
 
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
   btn.textContent = 'ذخیره پروفایل';
@@ -651,7 +651,6 @@ function update(dt){
           S.enemies.splice(j, 1); 
           S.score += e.isBoss ? 500 : 10; 
           
-          // 👇 سیستم جدید جایزه سکه در حین بازی
           let coinMultiplier = 1 + Math.floor(S.score / 1000);
           let coinReward = e.isBoss ? 50 : 2;
           coins += coinReward * coinMultiplier; 
@@ -708,13 +707,11 @@ function update(dt){
 function triggerGameOver() {
   isDead = true;
   const achievedScore = S.score;
-  
-  // 👇 محاسبه پاداش سکه پایان بازی
   const bonusCoins = Math.floor(achievedScore / 10);
   
   if(achievedScore > 0) {
     totalScore += achievedScore; 
-    coins += bonusCoins; // اضافه کردن پاداش
+    coins += bonusCoins; 
     saveData(); 
     localStorage.setItem('shooter_current_score', 0); 
     saveScoreToLeaderboard(totalScore); 
@@ -803,7 +800,6 @@ function draw(){
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
   
-  // 👇 نمایش ضریب سکه در HUD
   let currentMultiplier = 1 + Math.floor(S.score / 1000);
   if (currentMultiplier > 1) {
       ctx.fillStyle = '#00ffcc';
@@ -816,93 +812,42 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
+// 👇 سیستم رتبه‌بندی با Supabase
 async function getScores(){
-  let combined = [...localScores];
   try {
-    const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
-      headers: { 'Accept': 'application/json' },
-      cache: 'no-store'
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
-    
-    if(res.ok) {
-      const data = await res.json();
-      if(Array.isArray(data)) { combined = [...combined, ...data]; }
+    if (res.ok) {
+        return await res.json();
     }
   } catch(e) {}
-
-  combined.sort((a,b) => b.score - a.score);
-  const unique = [];
-  const seenDevices = new Set();
-  
-  for (const item of combined) {
-    if(!item || item.score === undefined) continue;
-    const id = item.devId || item.name || 'unknown';
-    if(!seenDevices.has(id)) {
-        seenDevices.add(id);
-        unique.push(item);
-    }
-  }
-  return unique.slice(0, 10);
+  return [];
 }
 
-async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
+async function saveScoreToLeaderboard(newTotalScore){
   if(newTotalScore <= 0) return;
   
-  if(!isSilent) {
-      localScores = localScores.filter(s => s.devId !== deviceId);
-      localScores.push({ score: newTotalScore, date: Date.now(), name: profile.name, avatar: profile.avatar, devId: deviceId });
-      localScores.sort((a,b) => b.score - a.score);
-      localScores = localScores.slice(0, 10);
-      localStorage.setItem('shooter_local_ranks', JSON.stringify(localScores));
-  }
-
   const syncIcon = document.getElementById('syncIndicator');
   syncIcon.classList.add('syncing');
 
-  let success = false;
-  let retries = 0;
-  
-  while(!success && retries < 3) {
-      try {
-        let onlineScores = [];
-        const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
-          headers: { 'Accept': 'application/json' },
-          cache: 'no-store'
-        });
-        
-        if(res.ok) {
-            const data = await res.json();
-            if(Array.isArray(data)) onlineScores = data;
-        }
-        
-        onlineScores = onlineScores.filter(s => s.devId !== deviceId);
-        onlineScores.push({ 
-          score: newTotalScore, 
-          date: Date.now(), 
-          name: profile.name, 
-          avatar: profile.avatar,
-          devId: deviceId 
-        });
-        
-        onlineScores.sort((a,b) => b.score - a.score);
-        onlineScores = onlineScores.slice(0, 10);
-        
-        const putRes = await fetch(PANTRY_URL, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(onlineScores)
-        });
-        
-        if(putRes.ok) success = true;
-      } catch(e) {
-        console.log("Sync failed, retrying...");
-      }
-      
-      if(!success) {
-          retries++;
-          await new Promise(r => setTimeout(r, 1000)); 
-      }
-  }
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ 
+        dev_id: deviceId, 
+        name: profile.name, 
+        score: newTotalScore, 
+        avatar: profile.avatar 
+      })
+    });
+  } catch(e) {}
 
   setTimeout(() => syncIcon.classList.remove('syncing'), 500);
 }
@@ -941,6 +886,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
+    
     if(tab === 'shop') { renderShop(); } 
     else if(tab === 'rank'){ renderRank(); }
   };
