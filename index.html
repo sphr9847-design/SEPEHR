@@ -572,9 +572,9 @@ function fire(){
   }
 }
 
-// 👈 شلیک غول‌ها (کاملاً آروم)
+// 👈 شلیک غول‌ها (خیلی آروم و با فاصله)
 function bossShoot(boss, pattern) {
-  const speed = 0.9 + currentBossIndex * 0.05; // سرعت خیلی کم شد
+  const speed = 0.2 + currentBossIndex * 0.05; // سرعت خیلی کم
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
   
   if (pattern === 'aimed') {
@@ -599,7 +599,7 @@ function bossShoot(boss, pattern) {
   }
   else if (pattern === 'radial') {
     const count = 6; 
-    const baseAngle = boss.t * 0.2;
+    const baseAngle = S.t * 0.02;
     for (let i = 0; i < count; i++) {
       const angle = baseAngle + (i / count) * Math.PI * 2;
       S.ebullets.push({
@@ -618,7 +618,7 @@ function spawnEnemy(){
   const diffHp = Math.min(S.score / 1000, 3);   
 
   // 👈 محاسبه جون شهاب‌سنگ بر اساس امتیاز (هر ۵۰ امتیاز، ۵ تا بیشتر)
-  const rockBaseHp = 3 + Math.floor(S.score / 50) * 5;
+  const rockBaseHp = 5 + Math.floor(S.score / 50) * 5;
 
   const enemy = {
     x: 30 + Math.random()*(W - 60), y: -30, r,
@@ -629,7 +629,7 @@ function spawnEnemy(){
     isBoss: false
   };
 
-  if (Math.random() < 0.3) { // تبدیل بخشی از دشمن‌ها به شهاب‌سنگ
+  if (Math.random() < 0.3) { 
       enemy.type = 'rock';
       enemy.hp = rockBaseHp;
       enemy.r = 20 + Math.random()*10;
@@ -642,15 +642,14 @@ function spawnBoss(){
   const hp = 200 + (currentBossIndex * 300); // 👈 ۲۰۰، ۵۰۰، ۸۰۰...
   
   S.enemies.push({
-    x: W/2, y: -150, r: 65,
+    x: W/2, y: -150, r: 65, // از بالا شروع میکنه
     vy: 0.05, vx: 0.15, 
     hue: 280, rot: 0, rv: 0.01,
     hp: hp, 
-    maxHp: hp, // 👈 ذخیره جون اصلی برای نوار خون
+    maxHp: hp, 
     isBoss: true,
-    shootT: 4, // ۴ ثانیه فرصت آماده باش
-    patternIdx: 0,
-    entering: true 
+    shootT: 4000, // ۴ ثانیه فرصت قبل از اولین شلیک (بر حسب میلی‌ثانیه)
+    patternIdx: 0
   });
 }
 
@@ -727,21 +726,16 @@ function update(dt){
     e.y += e.vy * dt; e.x += e.vx * dt; e.rot += e.rv * dt;
     
     if(e.isBoss) {
-      if (e.entering) {
-          e.y += 80 * dt;
-          if (e.y >= 120) {
-              e.y = 120;
-              e.entering = false;
-          }
-      } else {
-          e.y = 120 + Math.sin(S.t * 0.05) * 20;
-          e.x += e.vx * dt * 60; 
-          if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
-          
+      if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
+      
+      // 👈 غول آروم میاد پایین و وایمیسه
+      if (e.y > 120) e.y = 120; 
+
+      // اگه به جایگاهش رسید، شروع میکنه به شلیک کردن
+      if (e.y >= 120) {
           e.shootT -= dt;
           if (e.shootT <= 0) {
-            // 👈 زمان بین شلیک‌ها (خیلی کند: از ۴.۵ ثانیه شروع میشه)
-            e.shootT = Math.max(2.0, 4.5 - currentBossIndex * 0.2);
+            e.shootT = Math.max(3000, 5000 - currentBossIndex * 200); // هر ۳ تا ۵ ثانیه
             const patterns = ['aimed', 'spread', 'radial'];
             bossShoot(e, patterns[e.patternIdx % patterns.length]);
             e.patternIdx++;
@@ -770,7 +764,7 @@ function update(dt){
         S.ebullets.splice(i, 1);
         S.lives--;
         S.shake = 220;
-        S.player.inv = 1.5; 
+        S.player.inv = 1500; // 👈 ۱.۵ ثانیه مصونیت (بر حسب میلی‌ثانیه)
         boom(S.player.x, S.player.y, 0, 15);
         if(S.lives <= 0) triggerGameOver();
       }
@@ -814,7 +808,7 @@ function update(dt){
     if(dx*dx + dy*dy < (e.r + p.r)**2){
       if (S.player.inv <= 0) {
           boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
-          S.player.inv = 1.5; 
+          S.player.inv = 1500; 
           if(e.isBoss) isBossActive = false;
           if(S.lives <= 0) triggerGameOver();
       }
@@ -937,7 +931,6 @@ function draw(){
     if (e.isBoss) {
         ctx.rotate(-e.rot); ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
         ctx.fillStyle = 'lime';
-        // 👈 استفاده از maxHp برای نوار خون غول
         const hpPct = Math.max(0, e.hp / e.maxHp);
         ctx.fillRect(-e.r, -e.r - 20, e.r*2 * hpPct, 6);
     }
@@ -946,7 +939,8 @@ function draw(){
 
   if(S.lives > 0) {
     const p = S.player;
-    if (p.inv > 0 && Math.floor(S.t * 10) % 2 === 0) {
+    // افکت چشمک زدن موقع مصونیت
+    if (p.inv > 0 && Math.floor(S.t * 0.1) % 2 === 0) {
         // چشمک نمیزنه
     } else {
         ctx.fillStyle = '#a8ffd0'; ctx.beginPath();
