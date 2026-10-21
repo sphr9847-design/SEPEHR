@@ -10,6 +10,45 @@
             font-family:system-ui,sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
   
+  /* 👇 استایل اعلان یا قرمز یاقوتی */
+  #purchaseToast {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff2a6d, #b3003b);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    box-shadow: 0 10px 30px rgba(179, 0, 59, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #purchaseToast.show {
+    top: 20px;
+    opacity: 1;
+  }
+  #purchaseToast .gem {
+    font-size: 20px;
+    filter: drop-shadow(0 0 5px #ffd700);
+    animation: pulseGem 1.5s infinite;
+  }
+  @keyframes pulseGem {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
     background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
@@ -25,9 +64,6 @@
   .panel.show{display:block}
   .panel h2{text-align:center;font-size:22px;margin-bottom:10px;
     text-shadow:0 0 15px rgba(0,255,255,.5)}
-
-  .stats-bar { text-align: center; font-size: 14px; color: #8bb5c9; margin-bottom: 20px; }
-  .stats-bar span { color: #0ff; font-weight: bold; }
 
   #rankList{list-style:none;max-width:400px;margin:0 auto}
   #rankList li{display:flex;align-items:center;
@@ -195,6 +231,13 @@
 </style>
 </head>
 <body>
+<!-- 👇 کادر اعلان خرید -->
+<div id="purchaseToast">
+  <span class="gem">💎</span>
+  <span id="toastText">سلاح خریداری شد!</span>
+  <span class="gem">💎</span>
+</div>
+
 <div id="tabs">
   <button class="tab active" data-tab="game">🎮 بازی</button>
   <button class="tab" data-tab="shop">🛒 فروشگاه</button>
@@ -275,16 +318,16 @@ if (!deviceId) {
 }
 
 const WEAPONS = [
-  { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
-  { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
-  { id: 3, name: "لیزر سرخ", cost: 150, color: "#ff3333", dmg: 2, cd: 60, size: 6, count: 1, spread: 0 },
-  { id: 4, name: "سه‌گانه", cost: 300, color: "#ffff00", dmg: 1, cd: 75, size: 5, count: 3, spread: 15 },
-  { id: 5, name: "پلاسما", cost: 600, color: "#ff00ff", dmg: 4, cd: 100, size: 10, count: 1, spread: 0 },
-  { id: 6, name: "چهارگانه", cost: 1000, color: "#00ff00", dmg: 2, cd: 70, size: 5, count: 4, spread: 20 },
-  { id: 7, name: "مسلسل نئونی", cost: 1800, color: "#00ccff", dmg: 1, cd: 25, size: 4, count: 1, spread: 5 },
-  { id: 8, name: "شاتگان فضایی", cost: 3000, color: "#ff8800", dmg: 3, cd: 90, size: 6, count: 5, spread: 35 },
-  { id: 9, name: "ریل‌گان", cost: 5000, color: "#ffffff", dmg: 12, cd: 150, size: 8, count: 1, spread: 0 },
-  { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 5, cd: 80, size: 8, count: 7, spread: 45 },
+  { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0, heat: 0 },
+  { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10, heat: 0 },
+  { id: 3, name: "لیزر سرخ", cost: 150, color: "#ff3333", dmg: 2, cd: 60, size: 6, count: 1, spread: 0, heat: 0 },
+  { id: 4, name: "سه‌گانه", cost: 300, color: "#ffff00", dmg: 1, cd: 75, size: 5, count: 3, spread: 15, heat: 10 },
+  { id: 5, name: "پلاسما", cost: 600, color: "#ff00ff", dmg: 4, cd: 100, size: 10, count: 1, spread: 0, heat: 0 },
+  { id: 6, name: "چهارگانه", cost: 1000, color: "#00ff00", dmg: 1, cd: 70, size: 5, count: 4, spread: 20, heat: 15 },
+  { id: 7, name: "مسلسل نئونی", cost: 1800, color: "#00ccff", dmg: 1, cd: 25, size: 4, count: 1, spread: 5, heat: 5 },
+  { id: 8, name: "شاتگان فضایی", cost: 3000, color: "#ff8800", dmg: 1, cd: 90, size: 6, count: 5, spread: 35, heat: 25 },
+  { id: 9, name: "ریل‌گان", cost: 5000, color: "#ffffff", dmg: 15, cd: 150, size: 8, count: 1, spread: 0, heat: 0 },
+  { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 2, cd: 80, size: 8, count: 7, spread: 45, heat: 35 },
 ];
 
 const DROP_WEAPONS = [];
@@ -294,11 +337,12 @@ for(let i=1; i<=50; i++) {
     id: 'drop_' + i,
     name: 'قدرت ویژه ' + i,
     color: dropColors[i % dropColors.length],
-    dmg: Math.floor(Math.random() * 5) + 3,
+    dmg: Math.floor(Math.random() * 3) + 2,
     cd: Math.floor(Math.random() * 40) + 20,
     size: Math.floor(Math.random() * 8) + 4,
     count: Math.floor(Math.random() * 4) + 1,
     spread: Math.floor(Math.random() * 45),
+    heat: Math.floor(Math.random() * 10),
     isDrop: true
   });
 }
@@ -448,20 +492,43 @@ function renderShop() {
       const canAfford = coins >= w.cost;
       actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buyWeapon(' + w.id + ')">خرید</button>';
     }
-
+    
+    let heatText = w.heat > 0 ? ` | حرارت: ${w.heat}` : '';
     return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
-      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
+      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + w.dmg + ' | تعداد تیر: ' + w.count + heatText + '</p></div>' +
       '<div class="w-action">' + (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml + '</div></div>';
   }).join('');
+}
+
+// 👇 تابع نمایش اعلان خرید
+function showPurchaseToast(weaponName) {
+  const toast = document.getElementById('purchaseToast');
+  document.getElementById('toastText').textContent = `سلاح «${weaponName}» با موفقیت خریداری شد!`;
+  
+  // ریست انیمیشن
+  toast.classList.remove('show');
+  void toast.offsetWidth; 
+  
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
 }
 
 window.buyWeapon = (id) => {
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
-    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveData(); renderShop();
-    alert('سلاح "' + w.name + '" خریداری و مجهز شد! 🎉');
+    coins -= w.cost; 
+    ownedWeapons.push(id); 
+    equippedWeapon = id; 
+    saveData(); 
+    renderShop();
+    // 👈 استفاده از اعلان جدید
+    showPurchaseToast(w.name);
   }
 };
+
 window.equipWeapon = (id) => {
   if (ownedWeapons.includes(id)) { equippedWeapon = id; saveData(); renderShop(); }
 };
@@ -486,7 +553,8 @@ function reset(){
     player: {x: W/2, y: H - 90, r: 3},
     bullets: [], enemies: [], parts: [], stars: [], powerups: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
-    tempWeapon: null, tempWeaponTime: 0
+    tempWeapon: null, tempWeaponTime: 0,
+    heat: 0, overheated: false
   };
   
   currentBossIndex = 0;
@@ -526,8 +594,20 @@ addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
 function fire(){
+  if (S.overheated) return; 
+
   const w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
   S.cool = w.cd;
+  
+  if (w.heat) {
+      S.heat += w.heat;
+      if (S.heat >= 100) {
+          S.overheated = true;
+          S.cool = 2000; 
+          S.heat = 100;
+      }
+  }
+
   for(let i = 0; i < w.count; i++){
     let angle = 0;
     if(w.count > 1){
@@ -541,7 +621,6 @@ function fire(){
 
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
-  
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
 
@@ -594,6 +673,17 @@ function update(dt){
 
   S.t++;
   if(S.t % 120 === 0) saveData();
+
+  if (S.overheated) {
+      S.heat -= dt * 0.05; 
+      if (S.heat <= 0) {
+          S.heat = 0;
+          S.overheated = false;
+      }
+  } else if (S.heat > 0) {
+      S.heat -= dt * 0.02; 
+      if (S.heat < 0) S.heat = 0;
+  }
 
   if (S.tempWeaponTime > 0) {
     S.tempWeaponTime -= dt;
@@ -791,6 +881,11 @@ function draw(){
     ctx.fillStyle = 'hsla(' + (30 + Math.random()*20) + ',100%,65%,.85)'; ctx.beginPath();
     ctx.moveTo(p.x - 5, p.y + 10); ctx.lineTo(p.x, p.y + 16 + Math.random()*10); ctx.lineTo(p.x + 5, p.y + 10);
     ctx.closePath(); ctx.fill();
+    
+    if(S.overheated) {
+        ctx.fillStyle = `rgba(255, 50, 50, ${Math.random()*0.5})`;
+        ctx.beginPath(); ctx.arc(p.x + (Math.random()-0.5)*10, p.y - 20 + (Math.random()-0.5)*10, Math.random()*5, 0, 6.28); ctx.fill();
+    }
   }
 
   ctx.font = '600 16px system-ui,sans-serif'; ctx.textAlign = 'left';
@@ -806,6 +901,21 @@ function draw(){
   if (S.tempWeapon) {
       ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138);
   }
+
+  let heatY = currentMultiplier > 1 ? (S.tempWeapon ? 190 : 160) : (S.tempWeapon ? 160 : 130);
+  if (S.heat > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillRect(18, heatY, 100, 8);
+      ctx.fillStyle = S.overheated ? '#ff3333' : (S.heat > 50 ? '#ff8800' : '#ffff00');
+      ctx.fillRect(18, heatY, S.heat, 8);
+      if (S.overheated) {
+          ctx.fillStyle = '#ff3333';
+          ctx.font = 'bold 12px system-ui';
+          ctx.fillText('OVERHEATED!', 125, heatY + 8);
+          ctx.font = '600 16px system-ui,sans-serif';
+      }
+  }
+
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
@@ -846,7 +956,6 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
     
     if (!res.ok) {
         const errorData = await res.text();
-        // اگه خطا داشت، بهمون نشون بده
         if (!isSilent) alert("خطا در ذخیره امتیاز:\n" + errorData);
         console.log("خطای سوپابیس:", errorData);
     }
@@ -895,7 +1004,6 @@ document.querySelectorAll('.tab').forEach(btn => {
     if(tab === 'shop') { 
         renderShop(); 
     } else if(tab === 'rank'){ 
-        // 👈 وقتی روی تب رتبه‌ها می‌زنی، امتیاز فعلی رو زورکی سیو میکنه
         await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false);
         renderRank(); 
     }
