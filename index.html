@@ -6,7 +6,6 @@
 <title>🚀 تیراندازی فضایی</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  /* 👇 برگشت به تم آبی/مشکی قبلی */
   html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:system-ui,sans-serif;direction:rtl}
   canvas{display:block;position:fixed;inset:0;touch-action:none}
@@ -260,7 +259,6 @@ let W, H;
 
 const PANTRY_URL = "https://getpantry.cloud/apiv1/pantry/151e51ac-1424-4786-9386-be9f3b059221/basket/scores";
 
-// 👇 ساخت یک شناسه یکتا برای دستگاه (که با اسم افراد قاطی نشه)
 let deviceId = localStorage.getItem('shooter_device_id');
 if (!deviceId) {
     deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
@@ -321,6 +319,12 @@ try {
     if (typeof profile.avatar !== 'number') profile.avatar = 1;
   }
 } catch(e) {}
+
+// 👇 اگه کاربر اسمش رو عوض نکرده بود، یه اسم رندوم بهش میدیم که با بقیه قاطی نشه
+if(profile.name === 'بازیکن ناشناس') {
+    profile.name = 'فضانورد ' + Math.floor(Math.random() * 9000 + 1000);
+    localStorage.setItem('shooter_profile', JSON.stringify(profile));
+}
 
 let saveTimeout = null;
 function saveData() {
@@ -538,17 +542,18 @@ function boom(x, y, hue, n){
   }
 }
 
+// 👇 زمان‌بندی همگام‌سازی تغییر کرد (هر ۱۵ ثانیه)
 let lastSync = 0;
 function autoSync() {
     if(!isDead && S && S.score > 0) {
         let currentTotal = totalScore + S.score;
-        if(currentTotal > lastSync + 20) { 
+        if(currentTotal > lastSync + 10) { 
             saveScoreToLeaderboard(currentTotal, true);
             lastSync = currentTotal;
         }
     }
 }
-setInterval(autoSync, 10000);
+setInterval(autoSync, 15000);
 
 function update(dt){
   if(S.lives <= 0) return;
@@ -763,12 +768,9 @@ async function getScores(){
     if(res.ok) {
       const data = await res.json();
       if(Array.isArray(data)) { combined = [...combined, ...data]; }
-    } else if (res.status !== 400) {
-      // خطای سرور (غیر از سبد خالی)
-      return null;
     }
   } catch(e) {
-    return null; // خطای شبکه
+    // اگر خطای شبکه بود، فقط از داده‌های لوکال استفاده میکنیم
   }
 
   combined.sort((a,b) => b.score - a.score);
@@ -777,7 +779,6 @@ async function getScores(){
   
   for (const item of combined) {
     if(!item || item.score === undefined) continue;
-    // 👇 حالا بر اساس شناسه دستگاه (devId) تکراری‌ها رو حذف میکنیم، نه اسم
     const id = item.devId || item.name || 'unknown';
     if(!seenDevices.has(id)) {
         seenDevices.add(id);
@@ -801,40 +802,53 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   const syncIcon = document.getElementById('syncIndicator');
   syncIcon.classList.add('syncing');
 
-  try {
-    let onlineScores = [];
-    const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
-      headers: { 'Accept': 'application/json' },
-      cache: 'no-store'
-    });
-    
-    if(res.ok) {
-        const data = await res.json();
-        if(Array.isArray(data)) onlineScores = data;
-    }
-    
-    // 👇 حذف رکورد قدیمی این دستگاه و اضافه کردن رکورد جدید
-    onlineScores = onlineScores.filter(s => s.devId !== deviceId);
-    onlineScores.push({ 
-      score: newTotalScore, 
-      date: Date.now(), 
-      name: profile.name, 
-      avatar: profile.avatar,
-      devId: deviceId // ذخیره شناسه دستگاه
-    });
-    
-    onlineScores.sort((a,b) => b.score - a.score);
-    onlineScores = onlineScores.slice(0, 10);
-    
-    await fetch(PANTRY_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(onlineScores)
-    });
-  } catch(e) {
-  } finally {
-    setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+  // 👇 سیستم تلاش مجدد (Retry)
+  let success = false;
+  let retries = 0;
+  
+  while(!success && retries < 3) {
+      try {
+        let onlineScores = [];
+        const res = await fetch(PANTRY_URL + '?t=' + Date.now(), { 
+          headers: { 'Accept': 'application/json' },
+          cache: 'no-store'
+        });
+        
+        if(res.ok) {
+            const data = await res.json();
+            if(Array.isArray(data)) onlineScores = data;
+        }
+        
+        onlineScores = onlineScores.filter(s => s.devId !== deviceId);
+        onlineScores.push({ 
+          score: newTotalScore, 
+          date: Date.now(), 
+          name: profile.name, 
+          avatar: profile.avatar,
+          devId: deviceId 
+        });
+        
+        onlineScores.sort((a,b) => b.score - a.score);
+        onlineScores = onlineScores.slice(0, 10);
+        
+        const putRes = await fetch(PANTRY_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(onlineScores)
+        });
+        
+        if(putRes.ok) success = true;
+      } catch(e) {
+        console.log("Sync failed, retrying...");
+      }
+      
+      if(!success) {
+          retries++;
+          await new Promise(r => setTimeout(r, 1000)); // ۱ ثانیه صبر کن و دوباره تلاش کن
+      }
   }
+
+  setTimeout(() => syncIcon.classList.remove('syncing'), 500);
 }
 
 async function renderRank(){
@@ -842,12 +856,6 @@ async function renderRank(){
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   
   const scores = await getScores();
-  
-  // 👇 اگه getScores مقدار null برگردوند یعنی خطای شبکه بوده
-  if(scores === null){
-    list.innerHTML = '<li class="error">❌ خطا در اتصال به سرور! اینترنت را بررسی کنید.</li>';
-    return;
-  }
   
   if(scores.length === 0){
     list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
