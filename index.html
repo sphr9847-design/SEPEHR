@@ -515,7 +515,7 @@ const MINI_SHIPS = [
   { id: 2, name: "شبح نقره‌ای", cost: 1500, color: "#d68cff", bulletColor: "#ff4fd8", fireRate: 200, type: "phantom", baseDmg: 1.5 },
   { id: 3, name: "نگهبان طلایی", cost: 3500, color: "#ffd700", bulletColor: "#ffaa00", fireRate: 300, type: "guardian", baseDmg: 2 },
   { id: 4, name: "چشم فضایی", cost: 7000, color: "#00ff00", bulletColor: "#00ff00", fireRate: 150, type: "eye", baseDmg: 1 },
-  { id: 5, name: "مسلسل چرخان", cost: 15000, color: "#ff3333", bulletColor: "#ffff00", fireRate: 60, type: "gatling", baseDmg: 1 }, // مسلسل سریع
+  { id: 5, name: "مسلسل چرخان", cost: 15000, color: "#ff3333", bulletColor: "#ffff00", fireRate: 60, type: "gatling", baseDmg: 1 },
   { id: 6, name: "کریستال کوانتومی", cost: 25000, color: "#ffffff", bulletColor: "#aaffff", fireRate: 40, type: "crystal", baseDmg: 1 },
   { id: 7, name: "سیاه‌چاله", cost: 40000, color: "#800080", bulletColor: "#ff00ff", fireRate: 500, type: "blackhole", bulletSize: 8, bulletSpeed: 1.5, baseDmg: 5 }
 ];
@@ -563,7 +563,7 @@ let equippedSkin = 1;
 let ownedMinis = [1];
 let equippedMini = 1;
 let weaponLevels = {};
-let miniShipLevels = {}; // سطح مینی‌ها
+let miniShipLevels = {};
 let totalScore = 0;
 let recoveryCode = generateRecoveryCode(); 
 
@@ -810,7 +810,7 @@ function drawMiniShape(c, mini, scale) {
   } else if (mini.type === 'gatling') {
     c.fillStyle = '#222'; c.beginPath(); c.arc(0, 0, 10, 0, Math.PI*2); c.fill();
     c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.save(); c.rotate(S.t ? S.t * 0.1 : 0); // چرخش
+    c.save(); c.rotate(S.t ? S.t * 0.1 : 0);
     c.fillStyle = '#555'; c.fillRect(-2, -16, 4, 10); c.fillRect(-2, 6, 4, 10); c.fillRect(-16, -2, 10, 4); c.fillRect(6, -2, 10, 4);
     c.restore();
     c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0, 0, 3, 0, Math.PI*2); c.fill();
@@ -980,13 +980,13 @@ function update(dt){
     const mData = getMiniById(equippedMini);
     const lvl = miniShipLevels[equippedMini] || 0;
     const actualDmg = mData.baseDmg + (lvl * 1);
-    const actualFireRate = Math.max(40, mData.fireRate - (lvl * 30)); // ارتقا سرعت شلیک
+    const actualFireRate = Math.max(40, mData.fireRate - (lvl * 30));
     
     if (S.miniShipCool <= 0) {
       S.miniShipCool = actualFireRate;
       for (let i = 0; i < 2; i++) {
         let mX = p.x + (i === 0 ? -45 : 45);
-        let mY = p.y + 15; // هم‌تراز و بدون موج
+        let mY = p.y + 15;
         S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed || 2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize || 3.5 });
       }
     }
@@ -1140,7 +1140,7 @@ function draw(){
     const mData = getMiniById(equippedMini);
     for (let i = 0; i < 2; i++) {
       let drawX = p.x + (i === 0 ? -45 : 45);
-      let drawY = p.y + 15; // هم‌تراز
+      let drawY = p.y + 15;
       ctx.save(); ctx.translate(drawX, drawY); drawMiniShape(ctx, mData, 1); ctx.restore();
     }
   }
@@ -1197,4 +1197,36 @@ async function renderRank(){
   if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
-    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`; } else { avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28
+    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`; } else { avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`; }
+    return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
+  }).join('');
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.onclick = async () => {
+    SND.init(); SND.play('uiClick');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
+    document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
+    document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
+    if(tab === 'shop') { renderShop(); } else if(tab === 'rank') { let currentScore = S ? (S.score || 0) : 0; if (currentScore > 0) { await saveScoreToLeaderboard(totalScore + currentScore, true); } renderRank(); }
+  };
+});
+
+document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
+
+let last = 0;
+function loop(ts){
+  const dt = last ? Math.min(ts - last, 50) : 16;
+  last = ts;
+  const onGame = !document.getElementById('rankPanel').classList.contains('show') && !document.getElementById('profilePanel').classList.contains('show') && !document.getElementById('shopPanel').classList.contains('show');
+  if(onGame){ update(dt); draw(); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+renderShop();
+</script>
+</body>
+</html>
