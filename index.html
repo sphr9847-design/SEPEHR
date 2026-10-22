@@ -922,8 +922,6 @@ function drawSkinPreview(container, skinId) {
   const c = canvas.getContext('2d');
   const sk = getSkinById(skinId);
   c.translate(50, 50);
-  
-  // ضریب مقیاس به 1.1 کاهش یافت تا سفینه با حاشیه مناسب در کادر دیده شود
   drawShipShape(c, sk, 1.1); 
   
   container.innerHTML = '';
@@ -1168,20 +1166,28 @@ function fire(){
 
 function bossShoot(boss, pattern) {
   SND.play('bossShoot');
-  const speed = 0.2 + currentBossIndex * 0.05; 
+  const bossLvl = currentBossIndex;
+  const speed = 0.25 + bossLvl * 0.05; 
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
+  const bulletR = 6 + bossLvl * 1.5; 
+
   if (pattern === 'aimed') {
-    S.ebullets.push({ x: boss.x, y: boss.y + 20, vx: Math.cos(angleToPlayer) * speed, vy: Math.sin(angleToPlayer) * speed, r: 8, color: '#ff4fd8' });
-  } else if (pattern === 'spread') {
     for (let i = 0; i < 3; i++) {
-      const spreadAngle = angleToPlayer + (i - 1) * 0.3; 
-      S.ebullets.push({ x: boss.x, y: boss.y + 20, vx: Math.cos(spreadAngle) * speed, vy: Math.sin(spreadAngle) * speed, r: 6, color: '#ffd166' });
+      const spreadAngle = angleToPlayer + (i - 1) * 0.1; 
+      S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(spreadAngle) * (speed * 1.2), vy: Math.sin(spreadAngle) * (speed * 1.2), r: bulletR, color: '#ff4fd8' });
+    }
+  } else if (pattern === 'spread') {
+    const count = 3 + bossLvl; 
+    for (let i = 0; i < count; i++) {
+      const spreadAngle = angleToPlayer + (i - (count - 1) / 2) * 0.15; 
+      S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(spreadAngle) * speed, vy: Math.sin(spreadAngle) * speed, r: bulletR, color: '#ffd166' });
     }
   } else if (pattern === 'radial') {
-    const baseAngle = S.t * 0.02;
-    for (let i = 0; i < 6; i++) {
-      const angle = baseAngle + (i / 6) * Math.PI * 2;
-      S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(angle) * speed * 0.8, vy: Math.sin(angle) * speed * 0.8, r: 6, color: '#7df9ff' });
+    const count = 8 + bossLvl * 2;
+    const baseAngle = S.t * 0.05; 
+    for (let i = 0; i < count; i++) {
+      const angle = baseAngle + (i / count) * Math.PI * 2;
+      S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(angle) * speed * 0.8, vy: Math.sin(angle) * speed * 0.8, r: bulletR, color: '#7df9ff' });
     }
   }
 }
@@ -1212,11 +1218,16 @@ function spawnEnemy(){
 }
 
 function spawnBoss(){
-  const hp = 200 + (currentBossIndex * 300);
+  const bossLvl = currentBossIndex;
+  const hp = 200 + (bossLvl * 400); 
   SND.play('bossWarn');
   S.enemies.push({
-    x: W/2, y: -150, r: 65, vy: 0.05, vx: 0.15, hue: 280, rot: 0, rv: 0.01,
-    hp: hp, maxHp: hp, isBoss: true, shootT: 4000, patternIdx: 0
+    x: W/2, y: -150, 
+    r: 60 + bossLvl * 5, 
+    vy: 0.05 + bossLvl * 0.01, 
+    vx: 0.15 + bossLvl * 0.02, 
+    hue: 280, rot: 0, rv: 0.01,
+    hp: hp, maxHp: hp, isBoss: true, shootT: 2000, patternIdx: 0
   });
 }
 
@@ -1290,8 +1301,9 @@ function update(dt){
       if (e.y >= 120) {
           e.shootT -= dt;
           if (e.shootT <= 0) {
-            e.shootT = Math.max(3000, 5000 - currentBossIndex * 200);
-            bossShoot(e, ['aimed', 'spread', 'radial'][e.patternIdx % 3]);
+            e.shootT = Math.max(800, 2000 - currentBossIndex * 200);
+            const patterns = ['aimed', 'spread', 'radial', 'spread'];
+            bossShoot(e, patterns[e.patternIdx % patterns.length]);
             e.patternIdx++;
           }
       }
@@ -1377,6 +1389,82 @@ function update(dt){
   S.bullets = S.bullets.filter(b => b.y > -20 && b.y < H + 20 && b.x > -20 && b.x < W + 20);
 }
 
+/* ═══════════════ طراحی گرافیکی غول‌ها ═══════════════ */
+function drawBoss(c, e, bossLvl) {
+  const r = e.r;
+  let col1, col2, glow;
+
+  // تغییر رنگ بر اساس لول غول
+  if (bossLvl % 4 === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; } // بنفش
+  else if (bossLvl % 4 === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; } // قرمز
+  else if (bossLvl % 4 === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; } // فیروزه‌ای
+  else { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; } // طلایی
+
+  c.shadowColor = glow;
+  c.shadowBlur = 20;
+
+  // بدنه بیرونی (بال‌های بزرگ)
+  c.fillStyle = col1;
+  c.beginPath();
+  c.moveTo(-r * 1.8, 0);
+  c.lineTo(-r * 0.8, -r * 0.6);
+  c.lineTo(-r * 0.2, -r * 0.8);
+  c.lineTo(0, -r * 0.5); // فرورفتگی بالای غول
+  c.lineTo(r * 0.2, -r * 0.8);
+  c.lineTo(r * 0.8, -r * 0.6);
+  c.lineTo(r * 1.8, 0);
+  c.lineTo(r * 0.8, r * 0.8);
+  c.lineTo(0, r * 0.4); // فرورفتگی پایین غول
+  c.lineTo(-r * 0.8, r * 0.8);
+  c.closePath();
+  c.fill();
+  c.strokeStyle = glow;
+  c.lineWidth = 2;
+  c.stroke();
+
+  // بدنه داخلی (زره)
+  c.fillStyle = col2;
+  c.beginPath();
+  c.moveTo(-r * 0.6, -r * 0.4);
+  c.lineTo(r * 0.6, -r * 0.4);
+  c.lineTo(r * 0.8, r * 0.4);
+  c.lineTo(0, r * 0.6);
+  c.lineTo(-r * 0.8, r * 0.4);
+  c.closePath();
+  c.fill();
+  c.strokeStyle = '#fff';
+  c.lineWidth = 1;
+  c.stroke();
+
+  // هسته درخشان (چشم غول)
+  c.fillStyle = '#fff';
+  c.shadowBlur = 30;
+  c.beginPath();
+  c.arc(0, 0, r * 0.3, 0, Math.PI * 2);
+  c.fill();
+
+  c.fillStyle = glow;
+  c.beginPath();
+  c.arc(0, 0, r * 0.2, 0, Math.PI * 2);
+  c.fill();
+
+  // توپ‌های کناری
+  c.shadowBlur = 0;
+  c.fillStyle = '#222';
+  c.fillRect(-r * 1.2, -r * 0.2, r * 0.4, r * 0.4);
+  c.fillRect(r * 0.8, -r * 0.2, r * 0.4, r * 0.4);
+
+  // نور توپ‌ها
+  c.fillStyle = glow;
+  c.beginPath();
+  c.arc(-r * 1.0, 0, r * 0.1, 0, Math.PI * 2);
+  c.fill();
+  c.beginPath();
+  c.arc(r * 1.0, 0, r * 0.1, 0, Math.PI * 2);
+  c.fill();
+}
+
+
 function triggerGameOver() {
   isDead = true; SND.play('gameOver');
   const achievedScore = S.score;
@@ -1425,29 +1513,32 @@ function draw(){
     ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fill();
     ctx.globalAlpha = 0.5; ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10); ctx.globalAlpha = 1;
   }
+  
   for(const e of S.enemies){
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
-    ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
-    ctx.lineWidth = e.isBoss ? 5 : 2; ctx.beginPath();
+    
     if (e.isBoss) {
-       for(let k=0; k<10; k++){
-          const r2 = k%2===0 ? e.r : e.r/2;
-          const a = k * Math.PI/5;
-          const px = Math.cos(a)*r2, py = Math.sin(a)*r2;
-          k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-       }
+        drawBoss(ctx, e, currentBossIndex);
     } else {
-       for(let k = 0; k < 6; k++){
-        const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
-        k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-       }
+        // دشمنان عادی
+        ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
+        ctx.lineWidth = 2; ctx.beginPath();
+        for(let k = 0; k < 6; k++){
+          const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r;
+          k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke(); 
     }
-    ctx.closePath(); ctx.fill(); ctx.stroke(); 
+
+    // نوار سلامتی غول
     if (e.isBoss) {
-        ctx.rotate(-e.rot); ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 20, e.r*2, 6);
+        ctx.rotate(-e.rot); 
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(-e.r, -e.r - 30, e.r*2, 10);
+        ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 30, e.r*2, 10);
         ctx.fillStyle = 'lime';
         const hpPct = Math.max(0, e.hp / e.maxHp);
-        ctx.fillRect(-e.r, -e.r - 20, e.r*2 * hpPct, 6);
+        ctx.fillRect(-e.r, -e.r - 30, e.r*2 * hpPct, 10);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.strokeRect(-e.r, -e.r - 30, e.r*2, 10);
     }
     ctx.restore();
   }
