@@ -11,8 +11,6 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
-  
-  /* 👇 اصلاح باگ: فقط بوم اصلی بازی تمام‌صفحه بشه */
   #c { display:block; position:fixed; inset:0; touch-action:none; }
   
   #purchaseToast {
@@ -147,13 +145,9 @@
     display: flex; align-items: center; justify-content: center;
     margin-left: 10px; overflow: hidden;
   }
-  /* 👇 استایل بوم کوچک پیش‌نمایش */
   .skin-preview canvas { 
-    width: 100% !important; 
-    height: 100% !important; 
-    display: block; 
-    position: static !important; 
-    inset: auto !important;
+    width: 100% !important; height: 100% !important; 
+    display: block; position: static !important; inset: auto !important;
   }
 
   .w-btn{
@@ -436,7 +430,6 @@ const SND = {
   }
 };
 
-/* ═══════════════ اسکین‌ها ═══════════════ */
 const SKINS = [
   { id: 1, name: "لژیون", cost: 0, color: "#a8ffd0", glow: "#7df9ff", type: "default" },
   { id: 2, name: "فانتوم نئونی", cost: 500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
@@ -481,7 +474,6 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-/* ═══════════════ ذخیره‌سازی ═══════════════ */
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 let profile = { name: defaultName, avatar: 1 };
@@ -569,7 +561,6 @@ function saveData() {
   saveTimeout = setTimeout(saveGameData, 300);
 }
 
-/* ═══════════════ منطق پروفایل ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
 function getAvatarById(id) {
@@ -640,7 +631,6 @@ document.getElementById('bgmUpload').addEventListener('change', function(e) {
 document.getElementById('playBgmBtn').onclick = () => bgmAudio.play();
 document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
 
-/* ═══════════════ فروشگاه ═══════════════ */
 let currentShopTab = 'weapons';
 
 function switchShopTab(tab, btn) {
@@ -713,11 +703,9 @@ function renderShop() {
 }
 
 function drawSkinPreview(container, skinId) {
-  // 👇 ساخت بوم جدید مخصوص پیش‌نمایش
   const canvas = document.createElement('canvas');
   canvas.width = 100; 
   canvas.height = 100;
-  // با CSS استایل‌هاش رو محدود به کادر می‌کنیم
   canvas.style.width = '100%'; 
   canvas.style.height = '100%';
   canvas.style.display = 'block';
@@ -857,7 +845,6 @@ window.equipSkin = (id) => {
   if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); }
 };
 
-/* ═══════════════ منطق بازی ═══════════════ */
 function resize(){
   W = innerWidth; H = innerHeight;
   cvs.width = W; cvs.height = H;
@@ -947,19 +934,35 @@ function bossShoot(boss, pattern) {
   }
 }
 
+/* ═══════════════ تعادل جدید دشمنان ═══════════════ */
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
-  const diffSpeed = Math.min(S.score / 500, 1); 
-  const diffHp = Math.min(S.score / 1000, 3);   
-  const rockBaseHp = 3 + Math.floor(S.score / 100) * 3;
+  
+  // سرعت: رشد خیلی آهسته، سقف در ۲۰۰۰ امتیاز
+  const diffSpeed = Math.min(S.score / 2000, 1);
+  
+  // جون دشمن عادی: هر ۲۰۰۰ امتیاز +۱ (تا سقف ۲)
+  const diffHp = Math.min(Math.floor(S.score / 2000), 2);
+  
+  // جون شهاب‌سنگ: پایه ۲ + هر ۳۰۰ امتیاز ۱
+  const rockBaseHp = 2 + Math.floor(S.score / 300);
+  
   const enemy = {
     x: 30 + Math.random()*(W - 60), y: -30, r,
-    vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25,
-    vx: (Math.random() - 0.5) * 0.12,
+    vy: 0.12 + Math.random()*0.08 + diffSpeed*0.15,
+    vx: (Math.random() - 0.5) * 0.1,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
-    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp), isBoss: false
+    hp: (r > 17 ? 3 : 2) + diffHp, 
+    isBoss: false
   };
-  if (Math.random() < 0.3) { enemy.type = 'rock'; enemy.hp = rockBaseHp; enemy.r = 20 + Math.random()*10; }
+  
+  if (Math.random() < 0.28) { 
+    enemy.type = 'rock'; 
+    enemy.hp = rockBaseHp; 
+    enemy.r = 18 + Math.random()*8;
+    enemy.vy *= 0.9; // شهاب‌سنگ‌ها کمی آهسته‌تر
+  }
+  
   S.enemies.push(enemy);
 }
 
@@ -1020,10 +1023,18 @@ function update(dt){
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
+  // 👇 فاصله اسپاون خیلی آهسته‌تر رشد می‌کنه
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    if (!isBossActive) { spawnEnemy(); S.spawnT = Math.max(280, 820 - S.score * 1.2); }
-    else S.spawnT = 1000; 
+    const maxEnemies = 8 + Math.floor(S.score / 500);
+    if (!isBossActive && S.enemies.length < maxEnemies) {
+      spawnEnemy();
+      S.spawnT = Math.max(450, 950 - S.score * 0.4);
+    } else if (!isBossActive) {
+      S.spawnT = 500;
+    } else {
+      S.spawnT = 1000;
+    }
   }
 
   for(let i = S.enemies.length - 1; i >= 0; i--){
@@ -1068,14 +1079,16 @@ function update(dt){
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
           S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10; 
           let coinMultiplier = 1 + Math.floor(S.score / 1000);
-          coins += (e.isBoss ? 50 : 2) * coinMultiplier; 
+          coins += (e.isBoss ? 60 : 3) * coinMultiplier; // 👈 سکه بیشتر
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
             SND.play('bigExplosion');
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
           } else {
             SND.play('explosion');
-            if (Math.random() < 0.01) spawnPowerup(e.x, e.y);
+            if (Math.random() < 0.02) { // 👈 شانس افتادن آیتم ۲ درصد
+              spawnPowerup(e.x, e.y);
+            }
           }
           saveGameData(); 
         }
@@ -1123,7 +1136,7 @@ function update(dt){
 function triggerGameOver() {
   isDead = true; SND.play('gameOver');
   const achievedScore = S.score;
-  const bonusCoins = Math.floor(achievedScore / 10);
+  const bonusCoins = Math.floor(achievedScore / 8); // 👈 پاداش سکه بیشتر
   if(achievedScore > 0) {
     totalScore += achievedScore; coins += bonusCoins; saveGameData(); 
     localStorage.setItem('shooter_current_score', 0); 
@@ -1201,7 +1214,6 @@ function draw(){
         // چشمک نمیزنه
     } else {
         const skin = getSkinById(equippedSkin);
-        
         const fl = 11 + Math.random()*9;
         const g = ctx.createLinearGradient(p.x, p.y+10, p.x, p.y+10+fl);
         g.addColorStop(0, skin.glow + 'aa');
@@ -1223,92 +1235,4 @@ function draw(){
 
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
-  ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
-  let currentMultiplier = 1 + Math.floor(S.score / 1000);
-  if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138); }
-  if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138); }
-  ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
-}
-
-/* ═══════════════ رتبه‌بندی ═══════════════ */
-async function getScores(){
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
-    if (res.ok) return await res.json();
-  } catch(e) {}
-  return [];
-}
-
-async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
-  if(newTotalScore <= 0) return;
-  const syncIcon = document.getElementById('syncIndicator');
-  if (syncIcon) syncIcon.classList.add('syncing');
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar })
-    });
-    if (!res.ok && !isSilent) {
-        const errorData = await res.text();
-        alert("خطا در ذخیره امتیاز:\n" + errorData);
-    }
-  } catch(e) {
-    if (!isSilent) alert("خطای شبکه در ذخیره امتیاز:\n" + e.message);
-  }
-  if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
-}
-
-async function renderRank(){
-  const list = document.getElementById('rankList');
-  list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
-  const scores = await getScores();
-  if(scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
-  list.innerHTML = scores.map((s, i) => {
-    let avatarHtml = '';
-    if (typeof s.avatar === 'number') {
-      const av = getAvatarById(s.avatar);
-      avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
-    } else avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
-    return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
-  }).join('');
-}
-
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.onclick = async () => {
-    SND.init(); SND.play('uiClick');
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
-    document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
-    document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    if(tab === 'shop') renderShop();
-    else if(tab === 'rank'){ await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false); renderRank(); }
-  };
-});
-
-document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
-
-let last = 0;
-function loop(ts){
-  const dt = last ? Math.min(ts - last, 50) : 16;
-  last = ts;
-  const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
-                 !document.getElementById('profilePanel').classList.contains('show') &&
-                 !document.getElementById('shopPanel').classList.contains('show');
-  if(onGame){ update(dt); draw(); }
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-renderShop();
-</script>
-</body>
-</html>
+  ctx.fill
