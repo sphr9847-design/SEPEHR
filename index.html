@@ -98,14 +98,28 @@
     border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
-  /* ═══════════ پروفایل (دیزاین جدید و جمع‌وجور) ═══════════ */
+  /* ═══════════ پروفایل (دیزاین جدید: راست و چپ) ═══════════ */
+  .profile-top-section {
+    display: flex;
+    gap: 12px;
+    max-width: 400px;
+    margin: 0 auto 15px auto;
+    align-items: stretch;
+  }
+
+  /* کارت پروفایل (سمت راست) */
   .profile-card {
-    max-width: 340px; margin: 0 auto 15px auto; padding: 15px 15px;
+    flex: 1;
+    padding: 12px 10px;
     background: linear-gradient(145deg, rgba(0,255,255,0.08), rgba(4,6,15,0.9));
     border: 1px solid rgba(0, 255, 255, 0.4);
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2), inset 0 0 15px rgba(0,255,255,0.05);
-    border-radius: 18px; text-align: center; position: relative; overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.15), inset 0 0 15px rgba(0,255,255,0.05);
+    border-radius: 15px; 
+    text-align: center; 
+    position: relative; 
+    overflow: hidden;
     backdrop-filter: blur(10px);
+    margin: 0;
   }
   .profile-card::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
@@ -115,18 +129,53 @@
   .profile-card:hover::before { left: 150%; }
   
   .preview-avatar { 
-    width: 65px; height: 65px; margin: 0 auto 8px auto; 
+    width: 50px; height: 50px; margin: 0 auto 5px auto; 
     display: flex; align-items: center; justify-content: center; 
     transition: transform 0.3s; 
   }
-  .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 12px currentColor); }
-  .preview-name { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
-  .preview-title { font-size: 10px; color: #0ff; margin-top: 3px; opacity: 0.9; letter-spacing: 2px; }
+  .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px currentColor); }
+  .preview-name { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+  .preview-title { font-size: 8px; color: #0ff; margin-top: 2px; opacity: 0.9; letter-spacing: 1px; }
   
   .preview-total { 
-    margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,255,255,0.15); 
-    font-size: 14px; color: #ffd700; font-weight: 700; 
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,255,255,0.15); 
+    font-size: 12px; color: #ffd700; font-weight: 700; 
   }
+
+  /* پخش آهنگ (سمت چپ - دیزاین یاقوتی) */
+  .music-player { 
+    flex: 1;
+    padding: 12px 10px; 
+    background: linear-gradient(145deg, rgba(128, 11, 27, 0.7), rgba(20, 0, 4, 0.9));
+    border: 1px solid rgba(255, 92, 138, 0.4); 
+    border-radius: 15px;
+    box-shadow: inset 0 0 15px rgba(255, 92, 138, 0.1);
+    text-align: center;
+    transition: box-shadow 0.3s, border-color 0.3s;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .music-player:hover { box-shadow: 0 0 20px rgba(255, 92, 138, 0.2), inset 0 0 20px rgba(255, 92, 138, 0.15); border-color: rgba(255, 92, 138, 0.7); }
+  .music-player label { font-size: 11px; color: #ffb3b3; display: block; margin-bottom: 8px; font-weight: 700; }
+  
+  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 8px; }
+  .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .file-upload-btn {
+    border: 1px dashed #ff5c8a; color: #ffb3b3; padding: 8px;
+    border-radius: 8px; display: block; font-size: 11px;
+    background: rgba(255, 92, 138, 0.1); transition: 0.3s;
+  }
+  .file-upload-wrapper:hover .file-upload-btn { background: rgba(255, 92, 138, 0.25); }
+  
+  .music-controls { display: flex; gap: 6px; }
+  .music-controls button {
+    flex: 1; padding: 8px; border-radius: 8px; font-family: inherit;
+    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 12px;
+  }
+  #playBgmBtn { background: linear-gradient(90deg, #ff5c8a, #800b1b); color: #fff; box-shadow: 0 0 10px rgba(255, 92, 138, 0.4); }
+  #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255, 92, 138, 0.2); }
 
   .form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
@@ -148,10 +197,23 @@
   .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.2);transform:scale(1.05); box-shadow: 0 0 12px rgba(0,255,255,0.5);}
   .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
   
-  .save-btn{display:block;width:100%;max-width:340px;margin:15px auto;padding:12px;
-    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:10px;
-    font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;transition: 0.3s;
-    box-shadow: 0 4px 15px rgba(0,255,255,0.3);}
+  /* دکمه ذخیره (کوچیک و بالاتر) */
+  .save-btn{
+    display:block;
+    width: fit-content;
+    padding:8px 30px;
+    margin: 5px auto 15px auto;
+    background:linear-gradient(90deg, #00d2ff, #0ff);
+    color:#04060f;
+    border:none;
+    border-radius:30px;
+    font-size:14px;
+    font-weight:900;
+    cursor:pointer;
+    font-family:inherit;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,255,255,0.3);
+  }
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
@@ -288,35 +350,6 @@
     border-radius:40px;cursor:pointer;font-family:inherit;font-weight: 700;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
 
-  /* ═══════════ موزیک پلیر ═══════════ */
-  .music-player { 
-    max-width: 340px; margin: 12px auto; padding: 15px; 
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
-    border: 1px solid rgba(0,255,255,0.2); border-radius: 12px;
-    box-shadow: inset 0 0 15px rgba(0,255,255,0.05);
-    text-align: center;
-    transition: box-shadow 0.3s, border-color 0.3s;
-  }
-  .music-player:hover { box-shadow: 0 0 25px rgba(0,255,255,0.15), inset 0 0 20px rgba(0,255,255,0.08); border-color: rgba(0,255,255,0.4); }
-  .music-player label { font-size: 13px; color: #0ff; display: block; margin-bottom: 10px; font-weight: 700; }
-  
-  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 10px; }
-  .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .file-upload-btn {
-    border: 1px dashed #0ff; color: #0ff; padding: 10px;
-    border-radius: 8px; display: block; font-size: 13px;
-    background: rgba(0,255,255,0.05); transition: 0.3s;
-  }
-  .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); }
-  
-  .music-controls { display: flex; gap: 8px; }
-  .music-controls button {
-    flex: 1; padding: 10px; border-radius: 8px; font-family: inherit;
-    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 13px;
-  }
-  #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
-  #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
-
   /* ═══════════ نشانگر سیو ═══════════ */
   #syncIndicator {
     position: fixed; bottom: 20px; left: 20px;
@@ -365,17 +398,38 @@
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
   
-  <div class="profile-card">
-    <div class="preview-avatar" id="previewAvatar"></div>
-    <div class="preview-name" id="previewName">در حال بارگذاری...</div>
-    <div class="preview-title">SPACE COMMANDER</div>
-    <div class="preview-total">🌟 مجموع امتیازات: <span id="totalScoreVal">0</span></div>
+  <!-- بخش بالایی: پروفایل سمت راست، موزیک سمت چپ -->
+  <div class="profile-top-section">
+    
+    <!-- کارت پروفایل (کوچیک شده - سمت راست) -->
+    <div class="profile-card">
+      <div class="preview-avatar" id="previewAvatar"></div>
+      <div class="preview-name" id="previewName">در حال بارگذاری...</div>
+      <div class="preview-title">SPACE COMMANDER</div>
+      <div class="preview-total">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
+    </div>
+
+    <!-- پخش آهنگ (دیزاین یاقوتی - سمت چپ) -->
+    <div class="music-player">
+      <label>🎵 موزیک دلخواه:</label>
+      <div class="file-upload-wrapper">
+        <div class="file-upload-btn">📂 انتخاب آهنگ</div>
+        <input type="file" id="bgmUpload" accept="audio/*">
+      </div>
+      <div class="music-controls">
+        <button id="playBgmBtn">▶️</button>
+        <button id="pauseBgmBtn">⏸️</button>
+      </div>
+    </div>
+    
   </div>
 
+  <!-- بقیه المان‌ها که پایین قرار می‌گیرن -->
   <div class="form-group">
     <label>اسم شما (نام فرمانده):</label>
     <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
   </div>
+  
   <div class="form-group">
     <label>انتخاب آواتار (نشان فرماندهی):</label>
     <div class="avatar-grid" id="avatarGrid"></div>
@@ -386,18 +440,7 @@
     <div class="icon"></div>
   </div>
   
-  <div class="music-player">
-    <label>🎵 پخش آهنگ دلخواه از گوشی:</label>
-    <div class="file-upload-wrapper">
-      <div class="file-upload-btn">📂 برای انتخاب آهنگ کلیک کنید</div>
-      <input type="file" id="bgmUpload" accept="audio/*">
-    </div>
-    <div class="music-controls">
-      <button id="playBgmBtn">▶️ پخش</button>
-      <button id="pauseBgmBtn">⏸️ توقف</button>
-    </div>
-  </div>
-
+  <!-- دکمه ذخیره (کوچیک و بالاتر) -->
   <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل</button>
 </div>
 
