@@ -185,7 +185,7 @@
   .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
   
   .save-btn{
-    display:block; width: fit-content; padding:8px 30px; margin: 5px auto 15px auto;
+    display:block; width: fit-content; padding:8px 30px; margin: 5px auto 10px auto;
     background:linear-gradient(90deg, #00d2ff, #0ff); color:#04060f; border:none;
     border-radius:30px; font-size:14px; font-weight:900; cursor:pointer;
     font-family:inherit; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,255,255,0.3);
@@ -193,13 +193,21 @@
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
+  /* باکس کد بازیابی */
+  .recovery-box {
+    max-width: 340px; margin: 10px auto; padding: 10px;
+    background: rgba(255, 215, 0, 0.05); border: 1px dashed #ffd700;
+    border-radius: 10px; text-align: center; color: #ffd700; font-size: 13px;
+  }
+  .recovery-box strong { font-size: 16px; letter-spacing: 1px; color: #fff; display: block; margin-top: 5px; }
+
   .restore-btn {
     display: block; width: fit-content; padding: 8px 30px; margin: 0 auto 15px auto;
-    background: transparent; border: 1px solid #ffd700; color: #ffd700;
+    background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a;
     border-radius: 30px; font-size: 13px; font-weight: 900; cursor: pointer;
-    font-family: inherit; transition: 0.3s; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1);
+    font-family: inherit; transition: 0.3s; box-shadow: inset 0 0 10px rgba(255, 92, 138, 0.1);
   }
-  .restore-btn:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  .restore-btn:hover { background: rgba(255, 92, 138, 0.1); box-shadow: 0 0 15px rgba(255, 92, 138, 0.4); }
 
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
@@ -432,10 +440,17 @@
     <span>🔊 افکت‌های صوتی</span>
     <div class="icon"></div>
   </div>
+
+  <!-- نمایش کد بازیابی -->
+  <div class="recovery-box">
+    کد بازیابی اختصاصی شما:
+    <strong id="recoveryCodeDisplay">در حال تولید...</strong>
+    <small style="display:block; margin-top:5px; font-size:10px; opacity:0.8;">(این کد را جای امنی ذخیره کنید. برای انتقال اکانت به آن نیاز دارید)</small>
+  </div>
   
   <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل (سیو ابری)</button>
   
-  <!-- دکمه جدید برای بازیابی اکانت در دستگاه دیگر -->
+  <!-- دکمه بازیابی اکانت -->
   <button class="restore-btn" onclick="restoreAccount()">🔄 بازیابی از دستگاه دیگر</button>
 </div>
 
@@ -573,9 +588,18 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-/* ═══════════════ ذخیره‌سازی خودکار ═══════════════ */
+/* ═══════════════ ذخیره‌سازی و کد بازیابی ═══════════════ */
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
+
+// تابع تولید کد بازیابی تصادفی
+function generateRecoveryCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = 'SEPI-';
+    for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return code;
+}
+
 let profile = { name: defaultName, avatar: 1 };
 let coins = 0;
 let ownedWeapons = [1];
@@ -584,6 +608,7 @@ let ownedSkins = [1];
 let equippedSkin = 1;
 let weaponLevels = {};
 let totalScore = 0;
+let recoveryCode = generateRecoveryCode(); // ساخت کد در اولین ورود
 
 function loadGameData() {
   try {
@@ -598,20 +623,9 @@ function loadGameData() {
       if (typeof d.equippedSkin === 'number') equippedSkin = d.equippedSkin;
       if (d.weaponLevels) weaponLevels = d.weaponLevels;
       if (typeof d.totalScore === 'number') totalScore = d.totalScore;
+      if (d.recoveryCode) recoveryCode = d.recoveryCode; // لود کردن کد بازیابی قبلی
       return;
     }
-    const oldProf = localStorage.getItem('shooter_profile');
-    if (oldProf) profile = JSON.parse(oldProf);
-    const oldCoins = localStorage.getItem('shooter_coins');
-    if (oldCoins) coins = parseInt(oldCoins);
-    const oldWeapons = localStorage.getItem('shooter_weapons');
-    if (oldWeapons) ownedWeapons = JSON.parse(oldWeapons);
-    const oldEquipped = localStorage.getItem('shooter_equipped');
-    if (oldEquipped) equippedWeapon = parseInt(oldEquipped);
-    const oldLevels = localStorage.getItem('shooter_weapon_levels');
-    if (oldLevels) weaponLevels = JSON.parse(oldLevels);
-    const oldTotal = localStorage.getItem('shooter_total_score');
-    if (oldTotal) totalScore = parseInt(oldTotal);
   } catch(e) {}
 }
 
@@ -619,18 +633,10 @@ function saveGameData() {
   try {
     const data = {
       v: 3, profile, coins, ownedWeapons, equippedWeapon,
-      ownedSkins, equippedSkin, weaponLevels, totalScore,
+      ownedSkins, equippedSkin, weaponLevels, totalScore, recoveryCode,
       savedAt: Date.now()
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    localStorage.setItem('shooter_coins', coins);
-    localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
-    localStorage.setItem('shooter_equipped', equippedWeapon);
-    localStorage.setItem('shooter_profile', JSON.stringify(profile));
-    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels));
-    localStorage.setItem('shooter_total_score', totalScore);
-    localStorage.setItem('shooter_skins', JSON.stringify(ownedSkins));
-    localStorage.setItem('shooter_equipped_skin', equippedSkin);
   } catch(e) {}
 }
 
@@ -655,12 +661,6 @@ function getSkinById(id) {
   return SKINS.find(s => s.id === id) || SKINS[0];
 }
 
-let saveTimeout = null;
-function saveData() {
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(saveGameData, 300);
-}
-
 /* ═══════════════ منطق پروفایل و اعلان ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
@@ -675,6 +675,9 @@ function renderProfileUI() {
   document.getElementById('previewAvatar').style.color = av.color;
   document.getElementById('previewName').textContent = profile.name;
   document.getElementById('totalScoreVal').textContent = totalScore;
+  
+  // نمایش کد بازیابی
+  document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
 
   const grid = document.getElementById('avatarGrid');
   grid.innerHTML = AVATARS.map(a => 
@@ -718,7 +721,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const isTaken = currentScores.some(s => s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId);
   
   if(isTaken) {
-      showToast('❌ این اسم قبلا انتخاب شده است. (از دکمه بازیابی استفاده کنید)');
+      showToast('❌ این اسم قبلا انتخاب شده است.');
       btn.textContent = 'ذخیره پروفایل (سیو ابری)';
       btn.disabled = false;
       return;
@@ -727,7 +730,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
   saveGameData();
-  await saveScoreToLeaderboard(totalScore); // این تابع حالا کل اطلاعات را هم میفرستد
+  await saveScoreToLeaderboard(totalScore);
 
   if (oldName !== newName) {
       showToast(`✨ اسم شما به «${newName}» تغییر یافت و سیو شد!`);
@@ -740,11 +743,14 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   document.querySelector('.tab[data-tab="game"]').click();
 };
 
-// 🔄 تابع جدید برای بازیابی اکانت در دستگاه دیگر
+// 🔄 تابع بازیابی با کد امنیتی
 window.restoreAccount = async () => {
-    const nameToRestore = prompt("نام فرمانده‌ای که قبلاً در دستگاه دیگر ساختی را وارد کن:");
+    const nameToRestore = prompt("نام فرمانده‌ای که قبلاً ساختی را وارد کن:");
     if (!nameToRestore) return;
     
+    const codeToRestore = prompt("کد بازیابی (Recovery Code) خود را وارد کن (مثلا SEPI-1234):");
+    if (!codeToRestore) return;
+
     showToast("⏳ در حال جستجوی اکانت...");
     
     try {
@@ -755,6 +761,13 @@ window.restoreAccount = async () => {
         
         if (data && data.length > 0 && data[0].save_data) {
             const remoteSave = data[0].save_data;
+            
+            // چک کردن کد بازیابی برای امنیت
+            if (remoteSave.recoveryCode !== codeToRestore) {
+                showToast("❌ کد بازیابی اشتباه است! دسترسی رد شد.");
+                return;
+            }
+
             const remoteId = data[0].dev_id;
             
             // اعمال اطلاعات روی دستگاه فعلی
@@ -766,6 +779,7 @@ window.restoreAccount = async () => {
             equippedSkin = remoteSave.equippedSkin || 1;
             weaponLevels = remoteSave.weaponLevels || {};
             totalScore = remoteSave.totalScore || 0;
+            recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
             
             // تغییر deviceId به آی‌دی اصلی اکانت
             deviceId = remoteId;
@@ -777,7 +791,7 @@ window.restoreAccount = async () => {
             setTimeout(() => { location.reload(); }, 1500);
             
         } else {
-            showToast("❌ اکانتی با این نام پیدا نشد (یا هنوز سیو ابری نشده است).");
+            showToast("❌ اکانتی با این نام پیدا نشد.");
         }
     } catch (e) {
         showToast("❌ خطای شبکه در بازیابی اکانت.");
@@ -1376,7 +1390,6 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   const syncIcon = document.getElementById('syncIndicator');
   if (syncIcon) syncIcon.classList.add('syncing');
   try {
-    // اینجا کل اطلاعات بازی به عنوان save_data به دیتابیس فرستاده میشود
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: {
@@ -1390,7 +1403,7 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
           name: profile.name, 
           score: newTotalScore, 
           avatar: profile.avatar,
-          save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, weaponLevels, totalScore }
+          save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, weaponLevels, totalScore, recoveryCode }
       })
     });
     if (!res.ok && !isSilent) {
