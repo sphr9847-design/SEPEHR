@@ -922,13 +922,14 @@ function drawSkinPreview(container, skinId) {
   const c = canvas.getContext('2d');
   const sk = getSkinById(skinId);
   c.translate(50, 50);
-  drawShipShape(c, sk, 1.5);
+  
+  // ضریب مقیاس به 1.1 کاهش یافت تا سفینه با حاشیه مناسب در کادر دیده شود
+  drawShipShape(c, sk, 1.1); 
   
   container.innerHTML = '';
   container.appendChild(canvas);
 }
 
-/* ═══════════════ رسم سفینه‌های جدید و باکیفیت ═══════════════ */
 function drawShipShape(c, skin, scale) {
   scale = scale || 1;
   c.save();
@@ -946,12 +947,10 @@ function drawShipShape(c, skin, scale) {
     return g;
   };
 
-  // سایه عمومی برای همه سفینه‌ها
   c.shadowBlur = 10;
   c.shadowColor = skin.glow;
 
   if (t === 'interceptor') {
-    // بال‌های تیز قرمز
     c.fillStyle = getMetalGrad(0, -20, 0, 30, '#ff1a1a', '#800000', '#ff4d4d');
     c.beginPath();
     c.moveTo(0, -5);
@@ -959,96 +958,79 @@ function drawShipShape(c, skin, scale) {
     c.lineTo(-20, 25); c.lineTo(-50, 25); c.lineTo(-45, 15);
     c.closePath(); c.fill();
     
-    // نوارهای نئونی روی بال
     c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath();
     c.moveTo(15, 18); c.lineTo(35, 22); c.moveTo(-15, 18); c.lineTo(-35, 22); c.stroke();
 
-    // بدنه فلزی سفید
     c.fillStyle = getMetalGrad(0, -30, 0, 20, '#ffffff', '#aaaaaa', '#555555');
     c.beginPath();
     c.moveTo(0, -35); c.lineTo(12, -5); c.lineTo(15, 15); c.lineTo(5, 25);
     c.lineTo(-5, 25); c.lineTo(-15, 15); c.lineTo(-12, -5);
     c.closePath(); c.fill();
     
-    // کابین
     c.shadowBlur = 15; c.shadowColor = '#00ffff';
     c.fillStyle = '#00ffff';
     c.beginPath(); c.ellipse(0, -15, 4, 10, 0, 0, Math.PI*2); c.fill();
 
   } else if (t === 'falcon') {
-    // بال‌های شاهینی آبی
     c.fillStyle = getMetalGrad(0, 0, 0, 30, '#002244', '#00d2ff', '#00ffcc');
     c.beginPath();
     c.moveTo(0, -15); c.lineTo(40, 5); c.lineTo(55, 25); c.lineTo(25, 20); c.lineTo(0, 30);
     c.lineTo(-25, 20); c.lineTo(-55, 25); c.lineTo(-40, 5);
     c.closePath(); c.fill();
 
-    // بدنه تیره
     c.fillStyle = getMetalGrad(0, -30, 0, 20, '#333333', '#111111', '#000000');
     c.beginPath();
     c.moveTo(0, -40); c.lineTo(10, 0); c.lineTo(15, 20); c.lineTo(0, 25); c.lineTo(-15, 20); c.lineTo(-10, 0);
     c.closePath(); c.fill();
-    c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke(); // خطوط دور بدنه
+    c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
 
-    // کابین
     c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc';
     c.beginPath(); c.ellipse(0, -20, 3, 8, 0, 0, Math.PI*2); c.fill();
     
-    // موتورها
     c.fillStyle = '#00d2ff';
     c.beginPath(); c.arc(-8, 20, 5, 0, Math.PI*2); c.fill();
     c.beginPath(); c.arc(8, 20, 5, 0, Math.PI*2); c.fill();
 
   } else if (t === 'phantom') {
-    // بال‌های شبح
     c.fillStyle = getMetalGrad(0, -20, 0, 30, '#440066', '#2a0033', '#11001a');
     c.beginPath();
     c.moveTo(0, -20); c.lineTo(20, 0); c.lineTo(45, 10); c.lineTo(20, 25); c.lineTo(0, 15);
     c.lineTo(-20, 25); c.lineTo(-45, 10); c.lineTo(-20, 0);
     c.closePath(); c.fill();
     
-    // خطوط نئونی
     c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8';
     c.beginPath();
     c.moveTo(-20, 0); c.lineTo(-10, 10); c.moveTo(20, 0); c.lineTo(10, 10);
     c.moveTo(0, -20); c.lineTo(0, 15); c.stroke();
 
-    // بدنه مرکزی
     c.fillStyle = getMetalGrad(0, -30, 0, 20, '#1a0033', '#000000');
     c.beginPath();
     c.moveTo(0, -35); c.lineTo(8, -5); c.lineTo(5, 15); c.lineTo(-5, 15); c.lineTo(-8, -5);
     c.closePath(); c.fill();
 
-    // هسته درخشان
     c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0, -5, 4, 0, Math.PI*2); c.fill();
 
   } else if (t === 'aegis') {
-    // بال‌های سنگین زره‌پوش
     c.fillStyle = getMetalGrad(0, 0, 0, 30, '#cc9900', '#ffd700', '#997a00');
     c.beginPath();
     c.moveTo(0, -10); c.lineTo(40, -5); c.lineTo(55, 15); c.lineTo(30, 25); c.lineTo(0, 20);
     c.lineTo(-30, 25); c.lineTo(-55, 15); c.lineTo(-40, -5);
     c.closePath(); c.fill();
     
-    // خطوط زره
     c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath();
     c.moveTo(15, 0); c.lineTo(30, 10); c.moveTo(-15, 0); c.lineTo(-30, 10); c.stroke();
 
-    // بدنه اصلی
     c.fillStyle = getMetalGrad(0, -30, 0, 20, '#dddddd', '#777777');
     c.beginPath();
     c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(12, 20); c.lineTo(0, 25); c.lineTo(-12, 20); c.lineTo(-15, -5);
     c.closePath(); c.fill();
     
-    // توپ‌های سنگین
     c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00';
     c.fillRect(-18, -5, 5, 15); c.fillRect(13, -5, 5, 15);
 
-    // کابین
     c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0, -15, 4, 6, 0, 0, Math.PI*2); c.fill();
 
   } else if (t === 'crystal') {
-    // بال‌های کریستالی
     c.fillStyle = getMetalGrad(0, -20, 0, 30, '#ffffff', '#7df9ff', '#00d2ff');
     c.beginPath();
     c.moveTo(0, -30);
@@ -1059,13 +1041,11 @@ function drawShipShape(c, skin, scale) {
     
     c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
 
-    // بدنه
     c.fillStyle = getMetalGrad(0, -35, 0, 20, '#e0ffff', '#7df9ff');
     c.beginPath();
     c.moveTo(0, -40); c.lineTo(10, -5); c.lineTo(5, 20); c.lineTo(-5, 20); c.lineTo(-10, -5);
     c.closePath(); c.fill();
     
-    // درخشش هسته
     c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff';
     c.beginPath(); c.arc(0, -10, 6, 0, Math.PI*2); c.fill();
   }
