@@ -12,22 +12,22 @@
   html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
   
-  /* بوم اصلی بازی */
   #c { display:block; position:fixed; inset:0; touch-action:none; }
   
-  /* ═══════════ اعلان خرید ═══════════ */
-  #purchaseToast {
+  /* ═══════════ اعلان یاقوتی (برای همه رویدادها) ═══════════ */
+  #toastNotification {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
     background: linear-gradient(135deg, #800b1b, #3e0006);
-    color: #ffe6e6; padding: 16px 32px; border-radius: 20px;
+    color: #ffe6e6; padding: 14px 28px; border-radius: 20px;
     font-size: 15px; font-weight: 700;
     box-shadow: 0 10px 30px rgba(62, 0, 6, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 100, 100, 0.2);
-    z-index: 1000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    z-index: 2000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0; pointer-events: none; text-align: center; white-space: nowrap;
     text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+    max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
   }
-  #purchaseToast.show { top: 20px; opacity: 1; }
+  #toastNotification.show { top: 20px; opacity: 1; }
 
   /* ═══════════ تب‌ها ═══════════ */
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
@@ -37,9 +37,6 @@
     color:#5a7d8f;font-size:14px;font-weight:600;
     cursor:pointer;transition:.3s;font-family:inherit;position:relative}
   .tab.active{color:#7df9ff;text-shadow:0 0 10px rgba(0,255,255,.5)}
-  .tab:active{background:rgba(0,255,255,.05)}
-  
-  /* انیمیشن خط نئونی زیر تب فعال */
   .tab::after {
     content: ''; position: absolute; bottom: 0; left: 50%;
     width: 0; height: 3px;
@@ -101,83 +98,86 @@
     border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
-  /* ═══════════ پروفایل ═══════════ */
+  /* ═══════════ پروفایل (دیزاین جدید و جمع‌وجور) ═══════════ */
   .profile-card {
-    max-width: 400px; margin: 0 auto 25px auto; padding: 25px 20px;
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(0,255,255,0.05);
-    border-radius: 20px; text-align: center; position: relative; overflow: hidden;
+    max-width: 340px; margin: 0 auto 15px auto; padding: 15px 15px;
+    background: linear-gradient(145deg, rgba(0,255,255,0.08), rgba(4,6,15,0.9));
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2), inset 0 0 15px rgba(0,255,255,0.05);
+    border-radius: 18px; text-align: center; position: relative; overflow: hidden;
     backdrop-filter: blur(10px);
-    animation: floatCard 4s ease-in-out infinite;
-  }
-  @keyframes floatCard {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
   }
   .profile-card::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
     transform: skewX(-25deg); transition: 0.5s;
   }
   .profile-card:hover::before { left: 150%; }
-  .preview-avatar { width: 90px; height: 90px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
-  .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 15px currentColor); }
-  .preview-name { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-  .preview-title { font-size: 12px; color: #0ff; margin-top: 5px; opacity: 0.8; letter-spacing: 2px; }
   
-  .preview-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,255,255,0.2); font-size: 16px; color: #ffd700; font-weight: 700; }
+  .preview-avatar { 
+    width: 65px; height: 65px; margin: 0 auto 8px auto; 
+    display: flex; align-items: center; justify-content: center; 
+    transition: transform 0.3s; 
+  }
+  .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 12px currentColor); }
+  .preview-name { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+  .preview-title { font-size: 10px; color: #0ff; margin-top: 3px; opacity: 0.9; letter-spacing: 2px; }
+  
+  .preview-total { 
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,255,255,0.15); 
+    font-size: 14px; color: #ffd700; font-weight: 700; 
+  }
 
-  .form-group{margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
-  .form-group label{display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;font-weight:600}
-  .form-group input[type="text"]{width:100%;padding:14px;border-radius:12px;
-    background:rgba(0,0,0,0.4);border:1px solid rgba(0,255,255,0.2);
-    color:#fff;font-family:inherit;font-size:16px;outline:none;transition: 0.3s;
+  .form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
+  .form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
+  .form-group input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;
+    background:rgba(0,0,0,0.5);border:1px solid rgba(0,255,255,0.25);
+    color:#fff;font-family:inherit;font-size:14px;outline:none;transition: 0.3s;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
-  .form-group input[type="text"]:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.3), inset 0 2px 5px rgba(0,0,0,0.5);}
+  .form-group input[type="text"]:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.4), inset 0 2px 5px rgba(0,0,0,0.5);}
   
-  .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(60px, 1fr));gap:12px}
+  .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(45px, 1fr));gap:8px; max-width: 340px; margin: 0 auto;}
   .avatar-btn{
-    background:rgba(255,255,255,0.03);border:2px solid transparent;
-    border-radius:15px;padding:10px;cursor:pointer;transition:.3s;
-    display: flex; align-items: center; justify-content: center; height: 70px;
+    background:rgba(255,255,255,0.03);border:1px solid transparent;
+    border-radius:10px;padding:6px;cursor:pointer;
+    display: flex; align-items: center; justify-content: center; height: 48px;
     transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
   }
   .avatar-btn svg { width: 100%; height: 100%; transition: 0.3s; }
-  .avatar-btn:hover { background:rgba(0,255,255,0.1); transform: translateY(-3px) scale(1.08);}
-  .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.15);transform:scale(1.1); box-shadow: 0 0 15px rgba(0,255,255,0.4);}
-  .avatar-btn.selected svg { filter: drop-shadow(0 0 10px currentColor); }
+  .avatar-btn:hover { background:rgba(0,255,255,0.12); transform: translateY(-2px); border-color: rgba(0,255,255,0.4);}
+  .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.2);transform:scale(1.05); box-shadow: 0 0 12px rgba(0,255,255,0.5);}
+  .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
   
-  .save-btn{display:block;width:100%;max-width:400px;margin:25px auto;padding:15px;
-    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:12px;
-    font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;transition: 0.3s;
-    box-shadow: 0 5px 15px rgba(0,255,255,0.3);}
-  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.5); }
+  .save-btn{display:block;width:100%;max-width:340px;margin:15px auto;padding:12px;
+    background:linear-gradient(90deg, #00d2ff, #0ff);color:#04060f;border:none;border-radius:10px;
+    font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,255,255,0.3);}
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  /* سوئیچ صدا */
+  /* سوئیچ صدا (کوچیک‌تر) */
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
-    max-width: 400px; margin: 15px auto; padding: 15px 20px;
+    max-width: 340px; margin: 10px auto; padding: 12px 16px;
     background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(0,0,0,0.4));
     border: 1px solid rgba(0,255,255,0.2);
-    border-radius: 15px;
+    border-radius: 12px;
     cursor: pointer; transition: 0.3s;
   }
   .sound-toggle:hover { border-color: rgba(0,255,255,0.4); background: linear-gradient(145deg, rgba(0,255,255,0.1), rgba(0,0,0,0.4)); }
-  .sound-toggle span { color: #fff; font-weight: 700; font-size: 15px; }
+  .sound-toggle span { color: #fff; font-weight: 700; font-size: 14px; }
   .sound-toggle .icon {
-    width: 50px; height: 28px; border-radius: 14px;
+    width: 44px; height: 24px; border-radius: 12px;
     background: #333; position: relative; transition: 0.3s;
   }
   .sound-toggle .icon::after {
     content: ''; position: absolute;
-    width: 22px; height: 22px; border-radius: 50%;
+    width: 18px; height: 18px; border-radius: 50%;
     background: #666; top: 3px; left: 3px;
     transition: 0.3s;
   }
-  .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.9); }
-  .sound-toggle.on .icon::after { left: 25px; background: #04060f; }
+  .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.7); }
+  .sound-toggle.on .icon::after { left: 23px; background: #04060f; }
 
   /* ═══════════ فروشگاه ═══════════ */
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
@@ -290,29 +290,29 @@
 
   /* ═══════════ موزیک پلیر ═══════════ */
   .music-player { 
-    max-width: 400px; margin: 20px auto; padding: 20px; 
+    max-width: 340px; margin: 12px auto; padding: 15px; 
     background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
-    border: 1px solid rgba(0,255,255,0.2); border-radius: 15px;
-    box-shadow: inset 0 0 20px rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.2); border-radius: 12px;
+    box-shadow: inset 0 0 15px rgba(0,255,255,0.05);
     text-align: center;
     transition: box-shadow 0.3s, border-color 0.3s;
   }
   .music-player:hover { box-shadow: 0 0 25px rgba(0,255,255,0.15), inset 0 0 20px rgba(0,255,255,0.08); border-color: rgba(0,255,255,0.4); }
-  .music-player label { font-size: 15px; color: #0ff; display: block; margin-bottom: 15px; font-weight: 700; }
+  .music-player label { font-size: 13px; color: #0ff; display: block; margin-bottom: 10px; font-weight: 700; }
   
-  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 15px; }
+  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 10px; }
   .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
   .file-upload-btn {
-    border: 1px dashed #0ff; color: #0ff; padding: 15px;
-    border-radius: 10px; display: block; font-size: 14px;
+    border: 1px dashed #0ff; color: #0ff; padding: 10px;
+    border-radius: 8px; display: block; font-size: 13px;
     background: rgba(0,255,255,0.05); transition: 0.3s;
   }
   .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); }
   
-  .music-controls { display: flex; gap: 10px; }
+  .music-controls { display: flex; gap: 8px; }
   .music-controls button {
-    flex: 1; padding: 12px; border-radius: 10px; font-family: inherit;
-    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 15px;
+    flex: 1; padding: 10px; border-radius: 8px; font-family: inherit;
+    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 13px;
   }
   #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
@@ -329,7 +329,7 @@
 </style>
 </head>
 <body>
-<div id="purchaseToast">
+<div id="toastNotification">
   <span id="toastText">خرید موفق!</span>
 </div>
 
@@ -623,7 +623,7 @@ function saveData() {
   saveTimeout = setTimeout(saveGameData, 300);
 }
 
-/* ═══════════════ منطق پروفایل ═══════════════ */
+/* ═══════════════ منطق پروفایل و اعلان ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
 function getAvatarById(id) {
@@ -647,6 +647,17 @@ function renderProfileUI() {
   st.classList.toggle('on', SND.enabled);
 }
 
+// تابع نمایش اعلان
+function showToast(msg) {
+  const toast = document.getElementById('toastNotification');
+  document.getElementById('toastText').textContent = msg;
+  toast.classList.remove('show');
+  void toast.offsetWidth; 
+  toast.classList.add('show');
+  clearTimeout(toast.hideTimer);
+  toast.hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
 window.updatePreview = () => {
   const val = document.getElementById('nameInput').value.trim();
@@ -656,22 +667,38 @@ window.updatePreview = () => {
 document.getElementById('saveProfileBtn').onclick = async () => {
   const newName = document.getElementById('nameInput').value.trim();
   const btn = document.getElementById('saveProfileBtn');
-  if(!newName) { alert('لطفا یک اسم وارد کنید.'); return; }
+  
+  if(!newName) { 
+      showToast('❌ لطفا یک اسم وارد کنید.'); 
+      return; 
+  }
+  
   SND.play('uiClick');
   btn.textContent = 'در حال بررسی...';
   btn.disabled = true;
+
   const currentScores = await getScores();
   const isTaken = currentScores.some(s => s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId);
+  
   if(isTaken) {
-      alert('❌ این اسم قبلا توسط بازیکن دیگری انتخاب شده است.');
+      showToast('❌ این اسم قبلا انتخاب شده است.');
       btn.textContent = 'ذخیره پروفایل';
       btn.disabled = false;
       return;
   }
+
+  const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
   saveGameData();
   await saveScoreToLeaderboard(totalScore);
-  alert('پروفایل با موفقیت ذخیره شد! 🎉');
+
+  // نمایش اعلان بر اساس تغییرات
+  if (oldName !== newName) {
+      showToast(`✨ اسم شما به «${newName}» تغییر یافت!`);
+  } else {
+      showToast('✅ پروفایل با موفقیت ذخیره شد!');
+  }
+
   btn.textContent = 'ذخیره پروفایل';
   btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
@@ -858,21 +885,12 @@ function drawShipShape(c, skin, scale) {
   c.restore();
 }
 
-function showPurchaseToast(msg) {
-  const toast = document.getElementById('purchaseToast');
-  document.getElementById('toastText').textContent = msg;
-  toast.classList.remove('show');
-  void toast.offsetWidth; 
-  toast.classList.add('show');
-  setTimeout(() => { toast.classList.remove('show'); }, 3000);
-}
-
 window.buyWeapon = (id) => {
   SND.init();
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
     coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop();
-    showPurchaseToast(`سلاح «${w.name}» خریداری شد!`);
+    showToast(`🔫 سلاح «${w.name}» خریداری شد!`);
     SND.play('purchase');
   }
 };
@@ -884,7 +902,7 @@ window.upgradeWeapon = (id) => {
     const cost = Math.floor(200 * Math.pow(1.5, lvl));
     if (coins >= cost) {
         coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop();
-        showPurchaseToast(`سلاح «${w.name}» به لول ${lvl+1} ارتقا یافت!`);
+        showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`);
         SND.play('upgrade');
     }
 };
@@ -899,7 +917,7 @@ window.buySkin = (id) => {
   const sk = getSkinById(id);
   if (coins >= sk.cost && !ownedSkins.includes(id)) {
     coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop();
-    showPurchaseToast(`اسکین «${sk.name}» خریداری شد!`);
+    showToast(`🚀 اسکین «${sk.name}» خریداری شد!`);
     SND.play('purchase');
   }
 };
