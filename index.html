@@ -193,13 +193,25 @@
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  /* باکس کد بازیابی */
+  /* باکس کد بازیابی با دکمه کپی */
   .recovery-box {
     max-width: 340px; margin: 10px auto; padding: 10px;
     background: rgba(255, 215, 0, 0.05); border: 1px dashed #ffd700;
     border-radius: 10px; text-align: center; color: #ffd700; font-size: 13px;
   }
-  .recovery-box strong { font-size: 16px; letter-spacing: 1px; color: #fff; display: block; margin-top: 5px; }
+  .recovery-code-container {
+    display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 5px;
+  }
+  .recovery-code-container strong {
+    font-size: 16px; letter-spacing: 1px; color: #fff;
+  }
+  .copy-btn {
+    background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px;
+    padding: 5px; cursor: pointer; color: #ffd700; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .copy-btn:hover { background: rgba(255, 215, 0, 0.3); box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); transform: scale(1.05); }
+  .copy-btn svg { width: 16px; height: 16px; }
 
   .restore-btn {
     display: block; width: fit-content; padding: 8px 30px; margin: 0 auto 15px auto;
@@ -441,10 +453,18 @@
     <div class="icon"></div>
   </div>
 
-  <!-- نمایش کد بازیابی -->
+  <!-- نمایش کد بازیابی با دکمه کپی -->
   <div class="recovery-box">
     کد بازیابی اختصاصی شما:
-    <strong id="recoveryCodeDisplay">در حال تولید...</strong>
+    <div class="recovery-code-container">
+      <strong id="recoveryCodeDisplay">در حال تولید...</strong>
+      <button class="copy-btn" onclick="copyRecoveryCode()" title="کپی کد">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      </button>
+    </div>
     <small style="display:block; margin-top:5px; font-size:10px; opacity:0.8;">(این کد را جای امنی ذخیره کنید. برای انتقال اکانت به آن نیاز دارید)</small>
   </div>
   
@@ -592,7 +612,6 @@ const AVATARS = [
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 
-// تابع تولید کد بازیابی تصادفی
 function generateRecoveryCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = 'SEPI-';
@@ -608,7 +627,7 @@ let ownedSkins = [1];
 let equippedSkin = 1;
 let weaponLevels = {};
 let totalScore = 0;
-let recoveryCode = generateRecoveryCode(); // ساخت کد در اولین ورود
+let recoveryCode = generateRecoveryCode(); 
 
 function loadGameData() {
   try {
@@ -623,7 +642,7 @@ function loadGameData() {
       if (typeof d.equippedSkin === 'number') equippedSkin = d.equippedSkin;
       if (d.weaponLevels) weaponLevels = d.weaponLevels;
       if (typeof d.totalScore === 'number') totalScore = d.totalScore;
-      if (d.recoveryCode) recoveryCode = d.recoveryCode; // لود کردن کد بازیابی قبلی
+      if (d.recoveryCode) recoveryCode = d.recoveryCode;
       return;
     }
   } catch(e) {}
@@ -675,8 +694,6 @@ function renderProfileUI() {
   document.getElementById('previewAvatar').style.color = av.color;
   document.getElementById('previewName').textContent = profile.name;
   document.getElementById('totalScoreVal').textContent = totalScore;
-  
-  // نمایش کد بازیابی
   document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
 
   const grid = document.getElementById('avatarGrid');
@@ -697,6 +714,17 @@ function showToast(msg) {
   clearTimeout(toast.hideTimer);
   toast.hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
+
+window.copyRecoveryCode = () => {
+    const code = document.getElementById('recoveryCodeDisplay').textContent;
+    if(code === 'در حال تولید...') return;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('📋 کد بازیابی کپی شد!');
+        SND.play('uiClick');
+    }).catch(err => {
+        showToast('❌ خطا در کپی کردن کد.');
+    });
+};
 
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
 window.updatePreview = () => {
@@ -743,7 +771,6 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   document.querySelector('.tab[data-tab="game"]').click();
 };
 
-// 🔄 تابع بازیابی با کد امنیتی
 window.restoreAccount = async () => {
     const nameToRestore = prompt("نام فرمانده‌ای که قبلاً ساختی را وارد کن:");
     if (!nameToRestore) return;
@@ -762,7 +789,6 @@ window.restoreAccount = async () => {
         if (data && data.length > 0 && data[0].save_data) {
             const remoteSave = data[0].save_data;
             
-            // چک کردن کد بازیابی برای امنیت
             if (remoteSave.recoveryCode !== codeToRestore) {
                 showToast("❌ کد بازیابی اشتباه است! دسترسی رد شد.");
                 return;
@@ -770,7 +796,6 @@ window.restoreAccount = async () => {
 
             const remoteId = data[0].dev_id;
             
-            // اعمال اطلاعات روی دستگاه فعلی
             profile = remoteSave.profile || { name: data[0].name, avatar: data[0].avatar };
             coins = remoteSave.coins || 0;
             ownedWeapons = remoteSave.ownedWeapons || [1];
@@ -781,11 +806,9 @@ window.restoreAccount = async () => {
             totalScore = remoteSave.totalScore || 0;
             recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
             
-            // تغییر deviceId به آی‌دی اصلی اکانت
             deviceId = remoteId;
             localStorage.setItem('shooter_device_id', deviceId);
             
-            // ذخیره در حافظه محلی و رفرش کردن صفحه
             saveGameData();
             showToast("✅ اکانت با موفقیت بازیابی شد! در حال رفرش...");
             setTimeout(() => { location.reload(); }, 1500);
@@ -905,39 +928,150 @@ function drawSkinPreview(container, skinId) {
   container.appendChild(canvas);
 }
 
+/* ═══════════════ رسم سفینه‌های جدید و باکیفیت ═══════════════ */
 function drawShipShape(c, skin, scale) {
   scale = scale || 1;
   c.save();
   c.scale(scale, scale);
+  
   const t = skin.type;
-  c.lineJoin = 'round'; c.lineCap = 'round';
-  const getMetalGrad = (x0, y0, x1, y1, c1, c2) => { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, c1); g.addColorStop(1, c2); return g; };
+  c.lineJoin = 'round'; 
+  c.lineCap = 'round';
+  
+  const getMetalGrad = (x0, y0, x1, y1, c1, c2, c3) => {
+    const g = c.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, c1);
+    if(c3) { g.addColorStop(0.5, c2); g.addColorStop(1, c3); }
+    else { g.addColorStop(1, c2); }
+    return g;
+  };
+
+  // سایه عمومی برای همه سفینه‌ها
+  c.shadowBlur = 10;
+  c.shadowColor = skin.glow;
 
   if (t === 'interceptor') {
-    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#550000', '#ff0000');
-    c.beginPath(); c.moveTo(0, -10); c.lineTo(35, 15); c.lineTo(45, 25); c.lineTo(15, 20); c.lineTo(0, 30); c.lineTo(-15, 20); c.lineTo(-45, 25); c.lineTo(-35, 15); c.closePath(); c.fill();
-    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#ffffff', '#888888');
-    c.beginPath(); c.moveTo(0, -30); c.lineTo(10, -5); c.lineTo(12, 15); c.lineTo(5, 25); c.lineTo(-5, 25); c.lineTo(-12, 15); c.lineTo(-10, -5); c.closePath(); c.fill(); c.strokeStyle='#ccc'; c.lineWidth=1; c.stroke();
-    c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0, -10, 4, 8, 0, 0, Math.PI*2); c.fill();
-    c.fillStyle = '#ff8800'; c.shadowBlur = 15; c.shadowColor = '#ff4400'; c.beginPath(); c.arc(-10, 22, 4, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(10, 22, 4, 0, Math.PI*2); c.fill();
+    // بال‌های تیز قرمز
+    c.fillStyle = getMetalGrad(0, -20, 0, 30, '#ff1a1a', '#800000', '#ff4d4d');
+    c.beginPath();
+    c.moveTo(0, -5);
+    c.lineTo(45, 15); c.lineTo(50, 25); c.lineTo(20, 25); c.lineTo(0, 35);
+    c.lineTo(-20, 25); c.lineTo(-50, 25); c.lineTo(-45, 15);
+    c.closePath(); c.fill();
+    
+    // نوارهای نئونی روی بال
+    c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath();
+    c.moveTo(15, 18); c.lineTo(35, 22); c.moveTo(-15, 18); c.lineTo(-35, 22); c.stroke();
+
+    // بدنه فلزی سفید
+    c.fillStyle = getMetalGrad(0, -30, 0, 20, '#ffffff', '#aaaaaa', '#555555');
+    c.beginPath();
+    c.moveTo(0, -35); c.lineTo(12, -5); c.lineTo(15, 15); c.lineTo(5, 25);
+    c.lineTo(-5, 25); c.lineTo(-15, 15); c.lineTo(-12, -5);
+    c.closePath(); c.fill();
+    
+    // کابین
+    c.shadowBlur = 15; c.shadowColor = '#00ffff';
+    c.fillStyle = '#00ffff';
+    c.beginPath(); c.ellipse(0, -15, 4, 10, 0, 0, Math.PI*2); c.fill();
+
   } else if (t === 'falcon') {
-    c.fillStyle = getMetalGrad(0, -20, 0, 20, '#003344', '#00ffcc'); c.beginPath(); c.moveTo(0, -20); c.lineTo(40, 5); c.lineTo(50, 20); c.lineTo(20, 10); c.lineTo(0, 15); c.lineTo(-20, 10); c.lineTo(-50, 20); c.lineTo(-40, 5); c.closePath(); c.fill();
-    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#333333', '#111111'); c.beginPath(); c.moveTo(0, -35); c.lineTo(8, 5); c.lineTo(15, 20); c.lineTo(0, 15); c.lineTo(-15, 20); c.lineTo(-8, 5); c.closePath(); c.fill(); c.strokeStyle='#00ffcc'; c.lineWidth=1.5; c.stroke();
-    c.fillStyle = '#ffffff'; c.beginPath(); c.ellipse(0, -15, 3, 6, 0, 0, Math.PI*2); c.fill();
-    c.fillStyle = '#00ffcc'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.arc(0, 18, 5, 0, Math.PI*2); c.fill();
+    // بال‌های شاهینی آبی
+    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#002244', '#00d2ff', '#00ffcc');
+    c.beginPath();
+    c.moveTo(0, -15); c.lineTo(40, 5); c.lineTo(55, 25); c.lineTo(25, 20); c.lineTo(0, 30);
+    c.lineTo(-25, 20); c.lineTo(-55, 25); c.lineTo(-40, 5);
+    c.closePath(); c.fill();
+
+    // بدنه تیره
+    c.fillStyle = getMetalGrad(0, -30, 0, 20, '#333333', '#111111', '#000000');
+    c.beginPath();
+    c.moveTo(0, -40); c.lineTo(10, 0); c.lineTo(15, 20); c.lineTo(0, 25); c.lineTo(-15, 20); c.lineTo(-10, 0);
+    c.closePath(); c.fill();
+    c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke(); // خطوط دور بدنه
+
+    // کابین
+    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc';
+    c.beginPath(); c.ellipse(0, -20, 3, 8, 0, 0, Math.PI*2); c.fill();
+    
+    // موتورها
+    c.fillStyle = '#00d2ff';
+    c.beginPath(); c.arc(-8, 20, 5, 0, Math.PI*2); c.fill();
+    c.beginPath(); c.arc(8, 20, 5, 0, Math.PI*2); c.fill();
+
   } else if (t === 'phantom') {
-    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#2a0033', '#660099'); c.beginPath(); c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(25, 15); c.lineTo(10, 25); c.lineTo(0, 15); c.lineTo(-10, 25); c.lineTo(-25, 15); c.lineTo(-15, -5); c.closePath(); c.fill();
-    c.fillStyle = '#d68cff'; c.beginPath(); c.moveTo(-15, -5); c.lineTo(-40, -15); c.lineTo(-20, 15); c.closePath(); c.fill(); c.beginPath(); c.moveTo(15, -5); c.lineTo(40, -15); c.lineTo(20, 15); c.closePath(); c.fill();
-    c.fillStyle = '#ff4fd8'; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.arc(0, 0, 4, 0, Math.PI*2); c.fill();
+    // بال‌های شبح
+    c.fillStyle = getMetalGrad(0, -20, 0, 30, '#440066', '#2a0033', '#11001a');
+    c.beginPath();
+    c.moveTo(0, -20); c.lineTo(20, 0); c.lineTo(45, 10); c.lineTo(20, 25); c.lineTo(0, 15);
+    c.lineTo(-20, 25); c.lineTo(-45, 10); c.lineTo(-20, 0);
+    c.closePath(); c.fill();
+    
+    // خطوط نئونی
+    c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8';
+    c.beginPath();
+    c.moveTo(-20, 0); c.lineTo(-10, 10); c.moveTo(20, 0); c.lineTo(10, 10);
+    c.moveTo(0, -20); c.lineTo(0, 15); c.stroke();
+
+    // بدنه مرکزی
+    c.fillStyle = getMetalGrad(0, -30, 0, 20, '#1a0033', '#000000');
+    c.beginPath();
+    c.moveTo(0, -35); c.lineTo(8, -5); c.lineTo(5, 15); c.lineTo(-5, 15); c.lineTo(-8, -5);
+    c.closePath(); c.fill();
+
+    // هسته درخشان
+    c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0, -5, 4, 0, Math.PI*2); c.fill();
+
   } else if (t === 'aegis') {
-    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#997a00', '#ffd700'); c.beginPath(); c.moveTo(0, -15); c.lineTo(35, -5); c.lineTo(45, 15); c.lineTo(25, 25); c.lineTo(0, 15); c.lineTo(-25, 25); c.lineTo(-45, 15); c.lineTo(-35, -5); c.closePath(); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#aaaaaa', '#555555'); c.beginPath(); c.moveTo(0, -25); c.lineTo(12, 0); c.lineTo(10, 20); c.lineTo(0, 25); c.lineTo(-10, 20); c.lineTo(-12, 0); c.closePath(); c.fill();
-    c.fillStyle = '#ffaa00'; c.fillRect(-15, -10, 4, 15); c.fillRect(11, -10, 4, 15);
+    // بال‌های سنگین زره‌پوش
+    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#cc9900', '#ffd700', '#997a00');
+    c.beginPath();
+    c.moveTo(0, -10); c.lineTo(40, -5); c.lineTo(55, 15); c.lineTo(30, 25); c.lineTo(0, 20);
+    c.lineTo(-30, 25); c.lineTo(-55, 15); c.lineTo(-40, -5);
+    c.closePath(); c.fill();
+    
+    // خطوط زره
+    c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath();
+    c.moveTo(15, 0); c.lineTo(30, 10); c.moveTo(-15, 0); c.lineTo(-30, 10); c.stroke();
+
+    // بدنه اصلی
+    c.fillStyle = getMetalGrad(0, -30, 0, 20, '#dddddd', '#777777');
+    c.beginPath();
+    c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(12, 20); c.lineTo(0, 25); c.lineTo(-12, 20); c.lineTo(-15, -5);
+    c.closePath(); c.fill();
+    
+    // توپ‌های سنگین
+    c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00';
+    c.fillRect(-18, -5, 5, 15); c.fillRect(13, -5, 5, 15);
+
+    // کابین
+    c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0, -15, 4, 6, 0, 0, Math.PI*2); c.fill();
+
   } else if (t === 'crystal') {
-    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#ffffff', '#7df9ff'); c.beginPath(); c.moveTo(0, -35); c.lineTo(10, -10); c.lineTo(30, 0); c.lineTo(15, 10); c.lineTo(20, 25); c.lineTo(0, 15); c.lineTo(-20, 25); c.lineTo(-15, 10); c.lineTo(-30, 0); c.lineTo(-10, -10); c.closePath(); c.fill(); c.strokeStyle = '#00d2ff'; c.lineWidth = 1.5; c.stroke();
-    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#7df9ff'; c.beginPath(); c.ellipse(0, -5, 4, 10, 0, 0, Math.PI*2); c.fill();
+    // بال‌های کریستالی
+    c.fillStyle = getMetalGrad(0, -20, 0, 30, '#ffffff', '#7df9ff', '#00d2ff');
+    c.beginPath();
+    c.moveTo(0, -30);
+    c.lineTo(15, -10); c.lineTo(40, -5); c.lineTo(20, 15); c.lineTo(25, 25);
+    c.lineTo(0, 15);
+    c.lineTo(-25, 25); c.lineTo(-20, 15); c.lineTo(-40, -5); c.lineTo(-15, -10);
+    c.closePath(); c.fill();
+    
+    c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
+
+    // بدنه
+    c.fillStyle = getMetalGrad(0, -35, 0, 20, '#e0ffff', '#7df9ff');
+    c.beginPath();
+    c.moveTo(0, -40); c.lineTo(10, -5); c.lineTo(5, 20); c.lineTo(-5, 20); c.lineTo(-10, -5);
+    c.closePath(); c.fill();
+    
+    // درخشش هسته
+    c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff';
+    c.beginPath(); c.arc(0, -10, 6, 0, Math.PI*2); c.fill();
   }
-  c.shadowBlur = 0; c.restore();
+
+  c.shadowBlur = 0;
+  c.restore();
 }
 
 window.buyWeapon = (id) => {
