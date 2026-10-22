@@ -29,7 +29,7 @@
   }
   #toastNotification.show { top: 20px; opacity: 1; }
 
-  /* ═══════════ تب‌ها (با آیکون‌های جدید) ═══════════ */
+  /* ═══════════ تب‌ها ═══════════ */
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
     background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
@@ -96,14 +96,8 @@
   #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f;}
   #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f;}
   
-  #rankList .avatar-svg { 
-    width: 28px; height: 28px; margin-right: 10px; 
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  #rankList .avatar-svg svg { 
-    width: 28px !important; height: 28px !important; max-width: 28px; max-height: 28px;
-    filter: drop-shadow(0 0 5px currentColor); 
-  }
+  #rankList .avatar-svg { width: 28px; height: 28px; margin-right: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #rankList .avatar-svg svg { width: 28px !important; height: 28px !important; max-width: 28px; max-height: 28px; filter: drop-shadow(0 0 5px currentColor); }
   #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
 
@@ -113,9 +107,7 @@
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
   /* ═══════════ پروفایل ═══════════ */
-  .profile-top-section {
-    display: flex; gap: 12px; max-width: 400px; margin: 0 auto 15px auto; align-items: stretch;
-  }
+  .profile-top-section { display: flex; gap: 12px; max-width: 400px; margin: 0 auto 15px auto; align-items: stretch; }
 
   .profile-card {
     flex: 1; padding: 12px 10px;
@@ -256,7 +248,7 @@
   .w-price, .s-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
   .skin-preview {
-    width: 55px; height: 55px; border-radius: 12px;
+    width: 65px; height: 65px; border-radius: 12px;
     background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
     margin-left: 10px; overflow: hidden;
@@ -345,25 +337,18 @@
 </div>
 
 <div id="tabs">
-  <!-- تب بازی با آیکون دسته بازی -->
   <button class="tab active" data-tab="game">
     <svg viewBox="0 0 24 24"><path d="M6 12h4m-2-2v4m7-1h.01M18 10h.01M7 18h10a4 4 0 0 0 4-4V8a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4z"/></svg>
     بازی
   </button>
-  
-  <!-- تب فروشگاه با آیکون کیسه خرید -->
   <button class="tab" data-tab="shop">
     <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     فروشگاه
   </button>
-  
-  <!-- تب رتبه‌ها با آیکون جام -->
   <button class="tab" data-tab="rank">
     <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1-10 0V4M7 4H4v2a3 3 0 0 0 3 3h0M17 4h3v2a3 3 0 0 1-3 3h0"/></svg>
     رتبه‌ها
   </button>
-  
-  <!-- تب پروفایل با آیکون کاربر -->
   <button class="tab" data-tab="profile">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     پروفایل
@@ -532,13 +517,13 @@ const SND = {
   }
 };
 
-/* ═══════════════ اسکین‌ها ═══════════════ */
+/* ═══════════════ اسکین‌های جدید (واقعی و فلزی) ═══════════════ */
 const SKINS = [
-  { id: 1, name: "لژیون", cost: 0, color: "#a8ffd0", glow: "#7df9ff", type: "default" },
-  { id: 2, name: "فانتوم نئونی", cost: 500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
-  { id: 3, name: "سایه سرخ", cost: 1500, color: "#ff5c7a", glow: "#800b1b", type: "shadow" },
-  { id: 4, name: "ستاره طلایی", cost: 3000, color: "#ffd700", glow: "#ff9f43", type: "star" },
-  { id: 5, name: "کریستال کهکشانی", cost: 6000, color: "#7df9ff", glow: "#00d2ff", type: "crystal" }
+  { id: 1, name: "بال قرمز", cost: 0, color: "#ff4d4d", glow: "#ff0000", type: "interceptor" },
+  { id: 2, name: "شاهین کهکشانی", cost: 1000, color: "#00ffcc", glow: "#00d2ff", type: "falcon" },
+  { id: 3, name: "شبح بنفش", cost: 2500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
+  { id: 4, name: "سپر طلایی", cost: 5000, color: "#ffd700", glow: "#ffaa00", type: "aegis" },
+  { id: 5, name: "ستاره کریستالی", cost: 10000, color: "#e0ffff", glow: "#7df9ff", type: "crystal" }
 ];
 
 const WEAPONS = [
@@ -851,76 +836,137 @@ function drawSkinPreview(container, skinId) {
   container.appendChild(canvas);
 }
 
+/* ═══════════════ رسم سفینه‌های جدید و واقعی ═══════════════ */
 function drawShipShape(c, skin, scale) {
   scale = scale || 1;
   c.save();
   c.scale(scale, scale);
   
-  c.strokeStyle = skin.color;
-  c.fillStyle = 'rgba(4, 8, 20, 0.75)';
-  c.lineWidth = 2.2 / scale;
+  const t = skin.type;
+  
+  // تنظیمات کلی
   c.lineJoin = 'round';
-  c.shadowBlur = 18;
-  c.shadowColor = skin.glow;
+  c.lineCap = 'round';
   
-  c.beginPath();
-  switch(skin.type) {
-    case 'default':
-      c.moveTo(0, -22); c.lineTo(8, -8); c.lineTo(22, 8); c.lineTo(10, 14);
-      c.lineTo(4, 10); c.lineTo(2, 16); c.lineTo(0, 12); c.lineTo(-2, 16);
-      c.lineTo(-4, 10); c.lineTo(-10, 14); c.lineTo(-22, 8); c.lineTo(-8, -8);
-      break;
-    case 'phantom':
-      c.moveTo(0, -26); c.lineTo(6, -10); c.lineTo(24, 12); c.lineTo(8, 6);
-      c.lineTo(4, 18); c.lineTo(-4, 18); c.lineTo(-8, 6); c.lineTo(-24, 12);
-      c.lineTo(-6, -10);
-      break;
-    case 'shadow':
-      c.moveTo(0, -20); c.lineTo(4, -14); c.lineTo(16, -16); c.lineTo(26, 6);
-      c.lineTo(18, 10); c.lineTo(10, 18); c.lineTo(0, 14); c.lineTo(-10, 18);
-      c.lineTo(-18, 10); c.lineTo(-26, 6); c.lineTo(-16, -16); c.lineTo(-4, -14);
-      break;
-    case 'star':
-      for(let i=0;i<16;i++){
-        const r = i%2===0 ? 24 : 9;
-        const a = i * Math.PI/8 - Math.PI/2;
-        const x = Math.cos(a)*r, y = Math.sin(a)*r;
-        i===0 ? c.moveTo(x,y) : c.lineTo(x,y);
-      }
-      break;
-    case 'crystal':
-      c.moveTo(0, -24); c.lineTo(10, -12); c.lineTo(14, 4); c.lineTo(8, 16);
-      c.lineTo(0, 20); c.lineTo(-8, 16); c.lineTo(-14, 4); c.lineTo(-10, -12);
-      break;
+  // تابع کمکی برای ساخت گرادیانت فلزی
+  const getMetalGrad = (x0, y0, x1, y1, c1, c2) => {
+    const g = c.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, c1);
+    g.addColorStop(1, c2);
+    return g;
+  };
+
+  if (t === 'interceptor') {
+    // 1. بال قرمز
+    // بال‌های عقب
+    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#550000', '#ff0000');
+    c.beginPath();
+    c.moveTo(0, -10);
+    c.lineTo(35, 15); c.lineTo(45, 25); c.lineTo(15, 20);
+    c.lineTo(0, 30);
+    c.lineTo(-15, 20); c.lineTo(-45, 25); c.lineTo(-35, 15);
+    c.closePath(); c.fill();
+    
+    // بدنه اصلی (سفید/نقره‌ای)
+    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#ffffff', '#888888');
+    c.beginPath();
+    c.moveTo(0, -30); c.lineTo(10, -5); c.lineTo(12, 15); c.lineTo(5, 25);
+    c.lineTo(-5, 25); c.lineTo(-12, 15); c.lineTo(-10, -5);
+    c.closePath(); c.fill(); c.strokeStyle='#ccc'; c.lineWidth=1; c.stroke();
+
+    // کابین
+    c.fillStyle = '#00ffff';
+    c.beginPath(); c.ellipse(0, -10, 4, 8, 0, 0, Math.PI*2); c.fill();
+    
+    // جزئیات موتورها
+    c.fillStyle = '#ff8800';
+    c.shadowBlur = 15; c.shadowColor = '#ff4400';
+    c.beginPath(); c.arc(-10, 22, 4, 0, Math.PI*2); c.fill();
+    c.beginPath(); c.arc(10, 22, 4, 0, Math.PI*2); c.fill();
+
+  } else if (t === 'falcon') {
+    // 2. شاهین کهکشانی
+    // بال‌ها
+    c.fillStyle = getMetalGrad(0, -20, 0, 20, '#003344', '#00ffcc');
+    c.beginPath();
+    c.moveTo(0, -20); c.lineTo(40, 5); c.lineTo(50, 20); c.lineTo(20, 10); c.lineTo(0, 15);
+    c.lineTo(-20, 10); c.lineTo(-50, 20); c.lineTo(-40, 5);
+    c.closePath(); c.fill();
+    
+    // بدنه
+    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#333333', '#111111');
+    c.beginPath();
+    c.moveTo(0, -35); c.lineTo(8, 5); c.lineTo(15, 20); c.lineTo(0, 15); c.lineTo(-15, 20); c.lineTo(-8, 5);
+    c.closePath(); c.fill(); c.strokeStyle='#00ffcc'; c.lineWidth=1.5; c.stroke();
+
+    // کابین
+    c.fillStyle = '#ffffff';
+    c.beginPath(); c.ellipse(0, -15, 3, 6, 0, 0, Math.PI*2); c.fill();
+    
+    // موتور
+    c.fillStyle = '#00ffcc';
+    c.shadowBlur = 20; c.shadowColor = '#00ffcc';
+    c.beginPath(); c.arc(0, 18, 5, 0, Math.PI*2); c.fill();
+
+  } else if (t === 'phantom') {
+    // 3. شبح بنفش
+    // بدنه زاویه دار
+    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#2a0033', '#660099');
+    c.beginPath();
+    c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(25, 15); c.lineTo(10, 25); c.lineTo(0, 15);
+    c.lineTo(-10, 25); c.lineTo(-25, 15); c.lineTo(-15, -5);
+    c.closePath(); c.fill();
+    
+    // بال‌های تیز
+    c.fillStyle = '#d68cff';
+    c.beginPath();
+    c.moveTo(-15, -5); c.lineTo(-40, -15); c.lineTo(-20, 15); c.closePath(); c.fill();
+    c.beginPath();
+    c.moveTo(15, -5); c.lineTo(40, -15); c.lineTo(20, 15); c.closePath(); c.fill();
+
+    // نور مرکزی
+    c.fillStyle = '#ff4fd8';
+    c.shadowBlur = 15; c.shadowColor = '#ff4fd8';
+    c.beginPath(); c.arc(0, 0, 4, 0, Math.PI*2); c.fill();
+
+  } else if (t === 'aegis') {
+    // 4. سپر طلایی (سنگین)
+    // بال‌های بزرگ
+    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#997a00', '#ffd700');
+    c.beginPath();
+    c.moveTo(0, -15); c.lineTo(35, -5); c.lineTo(45, 15); c.lineTo(25, 25); c.lineTo(0, 15);
+    c.lineTo(-25, 25); c.lineTo(-45, 15); c.lineTo(-35, -5);
+    c.closePath(); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1; c.stroke();
+    
+    // بدنه مرکزی
+    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#aaaaaa', '#555555');
+    c.beginPath();
+    c.moveTo(0, -25); c.lineTo(12, 0); c.lineTo(10, 20); c.lineTo(0, 25); c.lineTo(-10, 20); c.lineTo(-12, 0);
+    c.closePath(); c.fill();
+    
+    // سلاح‌ها
+    c.fillStyle = '#ffaa00';
+    c.fillRect(-15, -10, 4, 15);
+    c.fillRect(11, -10, 4, 15);
+
+  } else if (t === 'crystal') {
+    // 5. کریستال
+    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#ffffff', '#7df9ff');
+    c.beginPath();
+    c.moveTo(0, -35);
+    c.lineTo(10, -10); c.lineTo(30, 0); c.lineTo(15, 10); c.lineTo(20, 25);
+    c.lineTo(0, 15);
+    c.lineTo(-20, 25); c.lineTo(-15, 10); c.lineTo(-30, 0); c.lineTo(-10, -10);
+    c.closePath(); c.fill();
+    
+    c.strokeStyle = '#00d2ff'; c.lineWidth = 1.5; c.stroke();
+    
+    // درخشش
+    c.fillStyle = '#ffffff';
+    c.shadowBlur = 20; c.shadowColor = '#7df9ff';
+    c.beginPath(); c.ellipse(0, -5, 4, 10, 0, 0, Math.PI*2); c.fill();
   }
-  c.closePath();
-  c.fill();
-  c.stroke();
-  
-  c.shadowBlur = 10;
-  c.strokeStyle = skin.glow;
-  c.lineWidth = 1.2 / scale;
-  c.beginPath();
-  switch(skin.type) {
-    case 'default': c.moveTo(0, -16); c.lineTo(0, 8); c.moveTo(-6, -2); c.lineTo(6, -2); break;
-    case 'phantom': c.moveTo(0, -20); c.lineTo(0, 12); c.moveTo(-10, 4); c.lineTo(10, 4); break;
-    case 'shadow': c.moveTo(0, -14); c.lineTo(0, 10); c.moveTo(-10, -2); c.lineTo(10, -2); c.moveTo(-14, 6); c.lineTo(14, 6); break;
-    case 'star': c.arc(0, 0, 5, 0, Math.PI*2); break;
-    case 'crystal': c.moveTo(0, -18); c.lineTo(0, 14); c.moveTo(-6, -4); c.lineTo(6, -4); c.moveTo(-8, 4); c.lineTo(8, 4); break;
-  }
-  c.stroke();
-  
-  c.shadowBlur = 25;
-  c.fillStyle = skin.glow;
-  c.beginPath();
-  switch(skin.type) {
-    case 'default': c.ellipse(0, -6, 2.5, 5, 0, 0, Math.PI*2); break;
-    case 'phantom': c.ellipse(0, -8, 3, 5, 0, 0, Math.PI*2); break;
-    case 'shadow': c.arc(0, -4, 3.5, 0, Math.PI*2); break;
-    case 'star': c.arc(0, 0, 5, 0, Math.PI*2); break;
-    case 'crystal': c.arc(0, 0, 4, 0, Math.PI*2); break;
-  }
-  c.fill();
+
   c.shadowBlur = 0;
   c.restore();
 }
