@@ -88,21 +88,12 @@
   #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f;}
   #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f;}
   
-  /* قفل کردن سایز آواتارها که بزرگ نشن */
   #rankList .avatar-svg { 
-    width: 28px; 
-    height: 28px; 
-    margin-right: 10px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-shrink: 0;
+    width: 28px; height: 28px; margin-right: 10px; 
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   #rankList .avatar-svg svg { 
-    width: 28px !important; 
-    height: 28px !important; 
-    max-width: 28px;
-    max-height: 28px;
+    width: 28px !important; height: 28px !important; max-width: 28px; max-height: 28px;
     filter: drop-shadow(0 0 5px currentColor); 
   }
   #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -122,7 +113,6 @@
     align-items: stretch;
   }
 
-  /* کارت پروفایل (سمت راست) */
   .profile-card {
     flex: 1;
     padding: 12px 10px;
@@ -175,22 +165,33 @@
   .music-player:hover { box-shadow: 0 0 20px rgba(0,255,255,0.15), inset 0 0 20px rgba(0,255,255,0.08); border-color: rgba(0,255,255,0.4); }
   .music-player label { font-size: 11px; color: #0ff; display: block; margin-bottom: 8px; font-weight: 700; }
   
-  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 8px; }
+  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 10px; }
   .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .file-upload-btn {
-    border: 1px dashed #0ff; color: #0ff; padding: 8px;
-    border-radius: 8px; display: block; font-size: 11px;
-    background: rgba(0,255,255,0.05); transition: 0.3s;
-  }
-  .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); }
   
-  .music-controls { display: flex; gap: 6px; }
-  .music-controls button {
-    flex: 1; padding: 8px; border-radius: 8px; font-family: inherit;
-    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 12px;
+  /* استایل جدید دکمه انتخاب آهنگ */
+  .file-upload-btn {
+    border: 1px dashed #0ff; color: #0ff; padding: 10px 8px;
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 12px; font-weight: 700; background: rgba(0,255,255,0.05); transition: 0.3s;
   }
-  #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
+  .file-upload-btn svg { width: 16px; height: 16px; }
+  .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); box-shadow: 0 0 10px rgba(0,255,255,0.2); }
+  
+  .music-controls { display: flex; gap: 8px; }
+  
+  /* استایل جدید دکمه‌های پخش و توقف */
+  .music-controls button {
+    flex: 1; padding: 10px; border-radius: 10px; font-family: inherit;
+    font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .music-controls button svg { width: 18px; height: 18px; }
+  
+  #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #04060f; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
+  #playBgmBtn:hover { box-shadow: 0 0 15px rgba(0,255,204,0.6); transform: translateY(-2px); }
+  
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
+  #pauseBgmBtn:hover { background: rgba(255,92,138,0.1); transform: translateY(-2px); }
 
   .form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
@@ -212,7 +213,6 @@
   .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.2);transform:scale(1.05); box-shadow: 0 0 12px rgba(0,255,255,0.5);}
   .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
   
-  /* دکمه ذخیره (کوچیک و بالاتر) */
   .save-btn{
     display:block;
     width: fit-content;
@@ -232,7 +232,6 @@
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  /* سوئیچ صدا (کوچیک‌تر) */
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
     max-width: 340px; margin: 10px auto; padding: 12px 16px;
@@ -424,12 +423,24 @@
     <div class="music-player">
       <label>🎵 موزیک دلخواه:</label>
       <div class="file-upload-wrapper">
-        <div class="file-upload-btn">📂 انتخاب آهنگ</div>
+        <div class="file-upload-btn">
+          <!-- آیکون SVG پوشه -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          انتخاب آهنگ
+        </div>
         <input type="file" id="bgmUpload" accept="audio/*">
       </div>
       <div class="music-controls">
-        <button id="playBgmBtn">▶️</button>
-        <button id="pauseBgmBtn">⏸️</button>
+        <button id="playBgmBtn">
+          <!-- آیکون SVG پخش -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button id="pauseBgmBtn">
+          <!-- آیکون SVG توقف -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
       </div>
     </div>
   </div>
