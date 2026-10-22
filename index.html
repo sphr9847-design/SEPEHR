@@ -1235,7 +1235,7 @@ let bossWarningTimer = 0;
 
 const dangerOverlay = document.getElementById('dangerOverlay');
 const bossWarning = document.getElementById('bossWarning');
-const TOP_UI_HEIGHT = 60; // ارتفاع منوها + حاشیه امن
+const TOP_UI_HEIGHT = 60; 
 
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
@@ -1244,7 +1244,7 @@ function reset(){
     bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [], 
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0,
-    miniShips: [], miniShipTimer: 0, miniShipCool: 0 // متغیرهای مینی سفینه
+    miniShips: [], miniShipTimer: 0, miniShipCool: 0
   };
   currentBossIndex = Math.floor(savedScore / 1000);
   nextBossScore = (currentBossIndex + 1) * 1000;
@@ -1333,7 +1333,6 @@ function bossShoot(boss, pattern) {
 
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
-  // افزایش سرعت کهکشان‌ها بر اساس امتیاز
   const speedMultiplier = 1 + (S.score / 1500);
   const diffHp = Math.min(Math.floor(S.score / 2000), 2);
   const rockBaseHp = 2 + Math.floor(S.score / 300);
@@ -1449,15 +1448,13 @@ function update(dt){
     S.miniShipTimer -= dt;
     S.miniShipCool -= dt;
     
-    // شلیک مینی‌سفینه‌ها
     if (S.miniShipCool <= 0) {
-      S.miniShipCool = 250; // سرعت شلیک
+      S.miniShipCool = 250; 
       for (let ms of S.miniShips) {
         S.bullets.push({ x: ms.x, y: ms.y - 10, vx: 0, vy: -1.8, dmg: 1, color: '#ffd700', size: 3 });
       }
     }
     
-    // حرکت مینی‌سفینه‌ها (دنبال کردن بازیکن)
     for (let ms of S.miniShips) {
       const targetX = p.x + ms.offsetX;
       const targetY = p.y + ms.offsetY + Math.sin(S.t * 0.01 + ms.phase) * 8;
@@ -1531,8 +1528,7 @@ function update(dt){
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
             SND.play('bigExplosion');
             
-            // جایزه مینی سفینه!
-            S.miniShipTimer = 40000; // 40 ثانیه
+            S.miniShipTimer = 40000; 
             S.miniShipCool = 0; 
             S.miniShips = [
                 { x: S.player.x - 40, y: S.player.y + 20, offsetX: -45, offsetY: 15, phase: 0 },
@@ -1783,12 +1779,10 @@ function draw(){
       ctx.save();
       ctx.translate(ms.x, ms.y);
       
-      // سایه نئونی طلایی
       ctx.shadowBlur = 10;
       ctx.shadowColor = '#ffd700';
       
-      // بدنه مینی سفینه (الماس شکل تیز)
-      ctx.fillStyle = '#111'; // بدنه تیره برای کنتراست
+      ctx.fillStyle = '#111';
       ctx.beginPath();
       ctx.moveTo(0, -12);
       ctx.lineTo(8, 5);
@@ -1797,12 +1791,10 @@ function draw(){
       ctx.closePath();
       ctx.fill();
       
-      // لبه‌های نئونی
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 1.5;
       ctx.stroke();
       
-      // هسته درخشان
       ctx.fillStyle = '#fff';
       ctx.shadowBlur = 15;
       ctx.beginPath();
@@ -1820,7 +1812,7 @@ function draw(){
       const barWidth = Math.min(W * 0.8, 400);
       const barHeight = 12;
       const barX = (W - barWidth) / 2;
-      const barY = 60; // زیر تب ها
+      const barY = 60; 
       
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.beginPath();
@@ -1853,7 +1845,6 @@ function draw(){
   let lineY = currentMultiplier > 1 ? 166 : 138;
   if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); lineY += 28; }
   
-  // نمایش تایمر مینی سفینه
   if (S.miniShipTimer > 0) { 
     ctx.fillStyle = '#ffd700'; 
     ctx.fillText('🛸 مینی سفینه: ' + Math.ceil(S.miniShipTimer/1000) + 's', 18, lineY); 
@@ -1951,4 +1942,21 @@ document.querySelectorAll('.tab').forEach(btn => {
   };
 });
 
-document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.
+document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
+
+let last = 0;
+function loop(ts){
+  const dt = last ? Math.min(ts - last, 50) : 16;
+  last = ts;
+  const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
+                 !document.getElementById('profilePanel').classList.contains('show') &&
+                 !document.getElementById('shopPanel').classList.contains('show');
+  if(onGame){ update(dt); draw(); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+renderShop();
+</script>
+</body>
+</html>
