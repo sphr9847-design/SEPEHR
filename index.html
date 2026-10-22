@@ -117,22 +117,38 @@
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
   
-  .weapon-card{
+  /* 👇 کارت‌های فروشگاه (سلاح و اسکین) */
+  .shop-tabs { display: flex; gap: 10px; max-width: 500px; margin: 0 auto 20px; }
+  .shop-tab { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(0,255,255,0.2);
+    background: rgba(0,255,255,0.05); color: #7df9ff; font-family: inherit; font-weight: 700;
+    cursor: pointer; transition: 0.3s; }
+  .shop-tab.active { background: #0ff; color: #04060f; box-shadow: 0 0 20px rgba(0,255,255,0.4); }
+
+  .weapon-card, .skin-card{
     display:flex;align-items:center;justify-content:space-between;
     background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.6));
     border:1px solid rgba(0,255,255,.15);
     padding:15px 20px;border-radius:15px;transition:.3s;
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   }
-  .weapon-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.1); border-color: rgba(0,255,255,0.4); }
-  .weapon-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.6)); }
-  .weapon-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
+  .weapon-card:hover, .skin-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,255,255,0.1); border-color: rgba(0,255,255,0.4); }
+  .weapon-card.owned, .skin-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.6)); }
+  .weapon-card.equipped, .skin-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
   
-  .w-info h3{font-size:17px;margin-bottom:5px;color:#fff; font-weight: 700;}
-  .w-info p{font-size:13px;color:#8bb5c9; font-weight: 400;}
-  .w-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .w-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
+  .w-info h3, .s-info h3{font-size:17px;margin-bottom:5px;color:#fff; font-weight: 700;}
+  .w-info p, .s-info p{font-size:13px;color:#8bb5c9; font-weight: 400;}
+  .w-action, .s-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .w-price, .s-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
+  /* 👇 پیش‌نمایش اسکین در فروشگاه */
+  .skin-preview {
+    width: 50px; height: 50px; border-radius: 12px;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-left: 10px;
+  }
+  .skin-preview canvas { width: 100%; height: 100%; }
+
   .w-btn{
     padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
     font-family:inherit;font-weight:700;font-size:13px;transition:.3s;
@@ -176,7 +192,19 @@
     transform:none; border:1px solid #333; text-shadow: none;
   }
 
-  /* 👇 دکمه کنترل صدا */
+  /* 👇 دکمه‌های سیو و بازیابی */
+  .save-controls { display: flex; gap: 10px; max-width: 400px; margin: 15px auto; }
+  .save-controls button {
+    flex: 1; padding: 12px; border-radius: 12px;
+    font-family: inherit; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: 0.3s; border: none;
+  }
+  #manualSaveBtn { background: linear-gradient(135deg, #0ff, #00d2ff); color: #04060f; }
+  #manualSaveBtn:active { transform: scale(0.95); }
+  #restoreBtn { background: transparent; border: 1px solid rgba(255,200,100,0.4); color: #ffc864; }
+  #restoreBtn:active { transform: scale(0.95); background: rgba(255,200,100,0.1); }
+
+  /* 👇 دکمه صدا */
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
     max-width: 400px; margin: 15px auto; padding: 15px 20px;
@@ -269,8 +297,14 @@
 <canvas id="c"></canvas>
 
 <div id="shopPanel" class="panel">
-  <h2>🛒 فروشگاه سلاح</h2>
+  <h2>🛒 فروشگاه</h2>
   <div class="shop-header">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
+  
+  <div class="shop-tabs">
+    <button class="shop-tab active" onclick="switchShopTab('weapons', this)">🔫 سلاح‌ها</button>
+    <button class="shop-tab" onclick="switchShopTab('skins', this)">🚀 اسکین سفینه</button>
+  </div>
+  
   <div class="shop-list" id="shopList"></div>
 </div>
 
@@ -297,6 +331,12 @@
   <div class="form-group">
     <label>انتخاب آواتار (نشان فرماندهی):</label>
     <div class="avatar-grid" id="avatarGrid"></div>
+  </div>
+  
+  <!-- 👇 دکمه‌های سیو و بازیابی -->
+  <div class="save-controls">
+    <button id="manualSaveBtn">💾 ذخیره پیشرفت</button>
+    <button id="restoreBtn">🔄 بازیابی</button>
   </div>
   
   <!-- 👇 کلید صدا -->
@@ -342,17 +382,12 @@ if (!deviceId) {
     localStorage.setItem('shooter_device_id', deviceId);
 }
 
-/* ═══════════════ سیستم صدا با Web Audio API ═══════════════ */
+/* ═══════════════ سیستم صدا ═══════════════ */
 const SND = {
-  ctx: null,
-  masterGain: null,
+  ctx: null, masterGain: null,
   enabled: localStorage.getItem('shooter_sound') !== 'false',
-  
   init() {
-    if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      return;
-    }
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AC();
@@ -361,15 +396,11 @@ const SND = {
       this.masterGain.connect(this.ctx.destination);
     } catch(e) {}
   },
-  
   setEnabled(v) {
     this.enabled = v;
     localStorage.setItem('shooter_sound', v ? 'true' : 'false');
-    if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime);
-    }
+    if (this.masterGain && this.ctx) this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime);
   },
-  
   sweep(type, f0, f1, dur, vol, delay) {
     if (!this.ctx) return;
     const t = this.ctx.currentTime + (delay || 0);
@@ -380,12 +411,9 @@ const SND = {
     osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
     gain.gain.setValueAtTime(vol, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    osc.connect(gain);
-    gain.connect(this.masterGain);
-    osc.start(t);
-    osc.stop(t + dur + 0.02);
+    osc.connect(gain); gain.connect(this.masterGain);
+    osc.start(t); osc.stop(t + dur + 0.02);
   },
-  
   noise(dur, vol, filterFreq) {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
@@ -393,70 +421,42 @@ const SND = {
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-    
-    const src = this.ctx.createBufferSource();
-    src.buffer = buffer;
-    
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'lowpass';
+    const src = this.ctx.createBufferSource(); src.buffer = buffer;
+    const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass';
     filter.frequency.setValueAtTime(filterFreq || 2000, t);
     filter.frequency.exponentialRampToValueAtTime(200, t + dur);
-    
     const gain = this.ctx.createGain();
     gain.gain.setValueAtTime(vol, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    
-    src.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.masterGain);
-    src.start(t);
-    src.stop(t + dur);
+    src.connect(filter); filter.connect(gain); gain.connect(this.masterGain);
+    src.start(t); src.stop(t + dur);
   },
-  
   play(name) {
     if (!this.ctx || !this.enabled) return;
     switch(name) {
-      case 'shoot':
-        this.sweep('square', 800, 200, 0.06, 0.04);
-        break;
-      case 'explosion':
-        this.noise(0.25, 0.12, 1500);
-        this.sweep('sine', 150, 40, 0.2, 0.08);
-        break;
-      case 'bigExplosion':
-        this.noise(0.5, 0.25, 2000);
-        this.sweep('sine', 100, 25, 0.5, 0.18);
-        break;
-      case 'playerHit':
-        this.sweep('sawtooth', 200, 50, 0.35, 0.18);
-        this.noise(0.15, 0.12, 3000);
-        break;
-      case 'powerup':
-        [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05));
-        break;
-      case 'purchase':
-        [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06));
-        break;
-      case 'upgrade':
-        [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05));
-        break;
-      case 'bossWarn':
-        for (let i = 0; i < 3; i++) {
-          this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28);
-        }
-        break;
-      case 'bossShoot':
-        this.sweep('square', 300, 100, 0.12, 0.05);
-        break;
-      case 'gameOver':
-        [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15));
-        break;
-      case 'uiClick':
-        this.sweep('square', 600, 800, 0.04, 0.025);
-        break;
+      case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break;
+      case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break;
+      case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break;
+      case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break;
+      case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break;
+      case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break;
+      case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break;
+      case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break;
+      case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break;
+      case 'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break;
+      case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break;
     }
   }
 };
+
+/* ═══════════════ اسکین‌های سفینه ═══════════════ */
+const SKINS = [
+  { id: 1, name: "لژیون", cost: 0, color: "#a8ffd0", glow: "#7df9ff", type: "default" },
+  { id: 2, name: "فانتوم نئونی", cost: 500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
+  { id: 3, name: "سایه سرخ", cost: 1500, color: "#ff5c7a", glow: "#800b1b", type: "shadow" },
+  { id: 4, name: "ستاره طلایی", cost: 3000, color: "#ffd700", glow: "#ff9f43", type: "star" },
+  { id: 5, name: "کریستال کهکشانی", cost: 6000, color: "#7df9ff", glow: "#00d2ff", type: "crystal" }
+];
 
 /* ═══════════════ دیتای بازی ═══════════════ */
 const WEAPONS = [
@@ -476,15 +476,11 @@ const DROP_WEAPONS = [];
 const dropColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ff8800", "#ff0088", "#88ff00", "#0088ff"];
 for(let i=1; i<=50; i++) {
   DROP_WEAPONS.push({
-    id: 'drop_' + i,
-    name: 'قدرت ویژه ' + i,
+    id: 'drop_' + i, name: 'قدرت ویژه ' + i,
     color: dropColors[i % dropColors.length],
-    dmg: Math.floor(Math.random() * 3) + 2,
-    cd: Math.floor(Math.random() * 40) + 20,
-    size: Math.floor(Math.random() * 8) + 4,
-    count: Math.floor(Math.random() * 4) + 1,
-    spread: Math.floor(Math.random() * 45),
-    isDrop: true
+    dmg: Math.floor(Math.random() * 3) + 2, cd: Math.floor(Math.random() * 40) + 20,
+    size: Math.floor(Math.random() * 8) + 4, count: Math.floor(Math.random() * 4) + 1,
+    spread: Math.floor(Math.random() * 45), isDrop: true
   });
 }
 
@@ -499,56 +495,98 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
+/* ═══════════════ مدیریت ذخیره‌سازی (بهبود یافته) ═══════════════ */
+const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
-
 let profile = { name: defaultName, avatar: 1 };
-let coins = parseInt(localStorage.getItem('shooter_coins') || '0');
-let ownedWeapons = JSON.parse(localStorage.getItem('shooter_weapons') || '[1]');
-let equippedWeapon = parseInt(localStorage.getItem('shooter_equipped') || '1');
-let localScores = JSON.parse(localStorage.getItem('shooter_local_ranks') || '[]');
-let totalScore = parseInt(localStorage.getItem('shooter_total_score') || '0');
+let coins = 0;
+let ownedWeapons = [1];
+let equippedWeapon = 1;
+let ownedSkins = [1];
+let equippedSkin = 1;
+let weaponLevels = {};
+let totalScore = 0;
 
-let weaponLevels = JSON.parse(localStorage.getItem('shooter_weapon_levels') || '{}');
-
-try {
-  const savedProf = localStorage.getItem('shooter_profile');
-  if(savedProf) {
-    profile = JSON.parse(savedProf);
-    if (typeof profile.avatar !== 'number') profile.avatar = 1;
+function loadGameData() {
+  try {
+    // اول از کلید جدید
+    let raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.profile) profile = d.profile;
+      if (typeof d.coins === 'number') coins = d.coins;
+      if (Array.isArray(d.ownedWeapons)) ownedWeapons = d.ownedWeapons;
+      if (typeof d.equippedWeapon === 'number') equippedWeapon = d.equippedWeapon;
+      if (Array.isArray(d.ownedSkins)) ownedSkins = d.ownedSkins;
+      if (typeof d.equippedSkin === 'number') equippedSkin = d.equippedSkin;
+      if (d.weaponLevels) weaponLevels = d.weaponLevels;
+      if (typeof d.totalScore === 'number') totalScore = d.totalScore;
+      return;
+    }
+    // اگه کلید جدید نبود، از کلیدهای قدیمی بخون (مهاجرت)
+    const oldProf = localStorage.getItem('shooter_profile');
+    if (oldProf) profile = JSON.parse(oldProf);
+    const oldCoins = localStorage.getItem('shooter_coins');
+    if (oldCoins) coins = parseInt(oldCoins);
+    const oldWeapons = localStorage.getItem('shooter_weapons');
+    if (oldWeapons) ownedWeapons = JSON.parse(oldWeapons);
+    const oldEquipped = localStorage.getItem('shooter_equipped');
+    if (oldEquipped) equippedWeapon = parseInt(oldEquipped);
+    const oldLevels = localStorage.getItem('shooter_weapon_levels');
+    if (oldLevels) weaponLevels = JSON.parse(oldLevels);
+    const oldTotal = localStorage.getItem('shooter_total_score');
+    if (oldTotal) totalScore = parseInt(oldTotal);
+  } catch(e) {
+    console.error('Load failed', e);
   }
-} catch(e) {}
+}
 
-if(profile.name === 'بازیکن ناشناس' || !profile.name) {
-    profile.name = defaultName;
+function saveGameData() {
+  try {
+    const data = {
+      v: 3,
+      profile, coins, ownedWeapons, equippedWeapon,
+      ownedSkins, equippedSkin, weaponLevels, totalScore,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    // پشتیبان در کلید قدیمی
+    localStorage.setItem('shooter_coins', coins);
+    localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
+    localStorage.setItem('shooter_equipped', equippedWeapon);
     localStorage.setItem('shooter_profile', JSON.stringify(profile));
+    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels));
+    localStorage.setItem('shooter_total_score', totalScore);
+    localStorage.setItem('shooter_skins', JSON.stringify(ownedSkins));
+    localStorage.setItem('shooter_equipped_skin', equippedSkin);
+  } catch(e) {
+    console.error('Save failed', e);
+  }
+}
+
+loadGameData();
+
+if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) {
+    profile = { name: defaultName, avatar: 1 };
+    saveGameData();
+}
+
+function getSkinById(id) {
+  return SKINS.find(s => s.id === id) || SKINS[0];
 }
 
 let saveTimeout = null;
 function saveData() {
   clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    localStorage.setItem('shooter_coins', coins);
-    localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
-    localStorage.setItem('shooter_equipped', equippedWeapon);
-    localStorage.setItem('shooter_total_score', totalScore);
-    localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); 
-    if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
-  }, 500);
+  saveTimeout = setTimeout(saveGameData, 300);
 }
 
 window.addEventListener('beforeunload', () => {
-  localStorage.setItem('shooter_coins', coins);
-  localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
-  localStorage.setItem('shooter_equipped', equippedWeapon);
-  localStorage.setItem('shooter_total_score', totalScore);
-  localStorage.setItem('shooter_weapon_levels', JSON.stringify(weaponLevels)); 
-  if(!isDead && S) localStorage.setItem('shooter_current_score', S.score);
-  
-  if(!isDead && S && S.score > 0) {
-    saveScoreToLeaderboard(totalScore + S.score, true);
-  }
+  saveGameData();
+  if(!isDead && S && S.score > 0) saveScoreToLeaderboard(totalScore + S.score, true);
 });
 
+/* ═══════════════ بقیه منطق بازی ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
 function getAvatarById(id) {
@@ -568,7 +606,6 @@ function renderProfileUI() {
     `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`
   ).join('');
   
-  // آپدیت وضعیت دکمه صدا
   const st = document.getElementById('soundToggle');
   st.classList.toggle('on', SND.enabled);
 }
@@ -582,38 +619,45 @@ window.updatePreview = () => {
 document.getElementById('saveProfileBtn').onclick = async () => {
   const newName = document.getElementById('nameInput').value.trim();
   const btn = document.getElementById('saveProfileBtn');
-  
   if(!newName) { alert('لطفا یک اسم وارد کنید.'); return; }
   SND.play('uiClick');
-
   btn.textContent = 'در حال بررسی...';
   btn.disabled = true;
-
   const currentScores = await getScores();
-  
-  const isTaken = currentScores.some(s => 
-      s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId
-  );
-
+  const isTaken = currentScores.some(s => s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId);
   if(isTaken) {
       alert('❌ این اسم قبلا توسط بازیکن دیگری انتخاب شده است.');
       btn.textContent = 'ذخیره پروفایل';
       btn.disabled = false;
       return;
   }
-
   profile = { name: newName, avatar: selectedAvatarId };
-  localStorage.setItem('shooter_profile', JSON.stringify(profile));
-  
+  saveData();
   await saveScoreToLeaderboard(totalScore);
-
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
   btn.textContent = 'ذخیره پروفایل';
   btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
 };
 
-// 👇 دکمه قطع/وصل صدا
+// 👇 دکمه ذخیره دستی
+document.getElementById('manualSaveBtn').onclick = () => {
+  saveGameData();
+  SND.play('purchase');
+  alert('✅ پیشرفت شما با موفقیت ذخیره شد!\n💰 سکه: ' + coins + '\n🚀 اسکین: ' + getSkinById(equippedSkin).name);
+};
+
+// 👇 دکمه بازیابی
+document.getElementById('restoreBtn').onclick = () => {
+  if(confirm('آیا می‌خواهید پیشرفت ذخیره‌شده را بازیابی کنید؟')) {
+    loadGameData();
+    renderProfileUI();
+    renderShop();
+    SND.play('powerup');
+    alert('✅ پیشرفت شما بازیابی شد!\n💰 سکه: ' + coins);
+  }
+};
+
 document.getElementById('soundToggle').addEventListener('click', () => {
   SND.init();
   SND.setEnabled(!SND.enabled);
@@ -626,48 +670,144 @@ renderProfileUI();
 let bgmAudio = new Audio();
 document.getElementById('bgmUpload').addEventListener('change', function(e) {
   const file = e.target.files[0];
-  if (file) {
-    bgmAudio.src = URL.createObjectURL(file);
-    bgmAudio.play();
-  }
+  if (file) { bgmAudio.src = URL.createObjectURL(file); bgmAudio.play(); }
 });
 document.getElementById('playBgmBtn').onclick = () => bgmAudio.play();
 document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
 
+/* ═══════════════ فروشگاه ═══════════════ */
+let currentShopTab = 'weapons';
+
+function switchShopTab(tab, btn) {
+  SND.play('uiClick');
+  currentShopTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShop();
+}
+
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   const list = document.getElementById('shopList');
-  list.innerHTML = WEAPONS.map(w => {
-    const isOwned = ownedWeapons.includes(w.id);
-    const isEquipped = equippedWeapon === w.id;
-    
-    const lvl = weaponLevels[w.id] || 0;
-    const actualDmg = w.dmg + (lvl * 2);
-    const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
-    
-    let actionHtml = '';
-    if (isEquipped) {
-      actionHtml = '<button class="w-btn btn-equipped">مجهز شده</button>';
-    } else if (isOwned) {
-      actionHtml = '<button class="w-btn btn-equip" onclick="equipWeapon(' + w.id + ')">مجهز کردن</button>';
-    } else {
-      const canAfford = coins >= w.cost;
-      actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buyWeapon(' + w.id + ')">خرید</button>';
-    }
+  
+  if (currentShopTab === 'weapons') {
+    list.innerHTML = WEAPONS.map(w => {
+      const isOwned = ownedWeapons.includes(w.id);
+      const isEquipped = equippedWeapon === w.id;
+      const lvl = weaponLevels[w.id] || 0;
+      const actualDmg = w.dmg + (lvl * 2);
+      const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
+      
+      let actionHtml = '';
+      if (isEquipped) actionHtml = '<button class="w-btn btn-equipped">مجهز شده</button>';
+      else if (isOwned) actionHtml = '<button class="w-btn btn-equip" onclick="equipWeapon(' + w.id + ')">مجهز کردن</button>';
+      else {
+        const canAfford = coins >= w.cost;
+        actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buyWeapon(' + w.id + ')">خرید</button>';
+      }
 
-    let upgradeHtml = '';
-    if (isOwned) {
-        const canAffordUpgrade = coins >= upgradeCost;
-        upgradeHtml = `<button class="w-btn btn-upgrade" ${!canAffordUpgrade ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>`;
-    }
+      let upgradeHtml = '';
+      if (isOwned) {
+          const canAffordUpgrade = coins >= upgradeCost;
+          upgradeHtml = `<button class="w-btn btn-upgrade" ${!canAffordUpgrade ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>`;
+      }
+      
+      return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
+        '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + actualDmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
+        '<div class="w-action">' + (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml + upgradeHtml + '</div></div>';
+    }).join('');
+  } else {
+    // 👇 اسکین‌ها
+    list.innerHTML = SKINS.map(sk => {
+      const isOwned = ownedSkins.includes(sk.id);
+      const isEquipped = equippedSkin === sk.id;
+      
+      let actionHtml = '';
+      if (isEquipped) actionHtml = '<button class="w-btn btn-equipped">مجهز شده</button>';
+      else if (isOwned) actionHtml = '<button class="w-btn btn-equip" onclick="equipSkin(' + sk.id + ')">مجهز کردن</button>';
+      else {
+        const canAfford = coins >= sk.cost;
+        actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buySkin(' + sk.id + ')">خرید</button>';
+      }
+
+      // ساخت پیش‌نمایش با Canvas
+      return '<div class="skin-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
+        '<div class="s-info"><h3>' + sk.name + '</h3><p>ظاهر سفینه</p></div>' +
+        '<div style="display:flex;align-items:center;">' +
+          '<div class="skin-preview" data-skin="' + sk.id + '"></div>' +
+          '<div class="s-action">' + (isOwned ? '' : '<div class="s-price">💰 ' + sk.cost + '</div>') + actionHtml + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
     
-    return '<div class="weapon-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
-      '<div class="w-info"><h3>' + w.name + '</h3><p>دمیج: ' + actualDmg + ' | تعداد تیر: ' + w.count + '</p></div>' +
-      '<div class="w-action">' + 
-        (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + 
-        actionHtml + upgradeHtml + 
-      '</div></div>';
-  }).join('');
+    // رسم پیش‌نمایش اسکین‌ها بعد از رندر DOM
+    setTimeout(() => {
+      document.querySelectorAll('.skin-preview').forEach(el => {
+        const skinId = parseInt(el.dataset.skin);
+        drawSkinPreview(el, skinId);
+      });
+    }, 50);
+  }
+}
+
+// رسم پیش‌نمایش اسکین روی Canvas کوچک
+function drawSkinPreview(container, skinId) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 100; canvas.height = 100;
+  const c = canvas.getContext('2d');
+  const sk = getSkinById(skinId);
+  
+  c.translate(50, 50);
+  drawShipShape(c, sk);
+  
+  container.innerHTML = '';
+  container.appendChild(canvas);
+}
+
+// شکل سفینه بر اساس نوع اسکین
+function drawShipShape(c, skin) {
+  c.strokeStyle = skin.color;
+  c.fillStyle = 'rgba(0,0,0,0.5)';
+  c.lineWidth = 3;
+  c.shadowBlur = 15;
+  c.shadowColor = skin.glow;
+  
+  c.beginPath();
+  switch(skin.type) {
+    case 'default':
+      c.moveTo(0, -32); c.lineTo(22, 22); c.lineTo(12, 26); c.lineTo(0, 14); c.lineTo(-12, 26); c.lineTo(-22, 22);
+      break;
+    case 'phantom':
+      c.moveTo(0, -36); c.lineTo(10, -14); c.lineTo(24, 6); c.lineTo(8, 10); c.lineTo(0, 28);
+      c.lineTo(-8, 10); c.lineTo(-24, 6); c.lineTo(-10, -14);
+      break;
+    case 'shadow':
+      c.moveTo(0, -32); c.lineTo(26, 16); c.lineTo(16, 22); c.lineTo(6, 12); c.lineTo(-6, 12);
+      c.lineTo(-16, 22); c.lineTo(-26, 16);
+      break;
+    case 'star':
+      for(let i=0;i<10;i++){
+        const r = i%2===0 ? 28 : 12;
+        const a = i * Math.PI/5 - Math.PI/2;
+        const x = Math.cos(a)*r, y = Math.sin(a)*r;
+        i===0 ? c.moveTo(x,y) : c.lineTo(x,y);
+      }
+      break;
+    case 'crystal':
+      c.moveTo(0, -34); c.lineTo(20, -10); c.lineTo(20, 14); c.lineTo(0, 26); c.lineTo(-20, 14); c.lineTo(-20, -10);
+      break;
+  }
+  c.closePath();
+  c.fill();
+  c.stroke();
+  
+  // هسته (نقطه مرکزی)
+  c.beginPath();
+  c.fillStyle = skin.glow;
+  c.shadowBlur = 20;
+  c.arc(0, 0, 5, 0, Math.PI*2);
+  c.fill();
+  c.shadowBlur = 0;
 }
 
 function showPurchaseToast(msg) {
@@ -683,12 +823,8 @@ window.buyWeapon = (id) => {
   SND.init();
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
-    coins -= w.cost; 
-    ownedWeapons.push(id); 
-    equippedWeapon = id; 
-    saveData(); 
-    renderShop();
-    showPurchaseToast(`سلاح «${w.name}» با موفقیت خریداری شد!`);
+    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveData(); renderShop();
+    showPurchaseToast(`سلاح «${w.name}» خریداری شد!`);
     SND.play('purchase');
   }
 };
@@ -698,26 +834,34 @@ window.upgradeWeapon = (id) => {
     const w = WEAPONS.find(x => x.id === id);
     const lvl = weaponLevels[id] || 0;
     const cost = Math.floor(200 * Math.pow(1.5, lvl));
-    
     if (coins >= cost) {
-        coins -= cost;
-        weaponLevels[id] = lvl + 1;
-        saveData();
-        renderShop();
-        
-        const newLvl = lvl + 1;
-        const newDmg = w.dmg + (newLvl * 2);
-        showPurchaseToast(`سلاح «${w.name}» به لول ${newLvl} ارتقا یافت! (دمیج: ${newDmg})`);
+        coins -= cost; weaponLevels[id] = lvl + 1; saveData(); renderShop();
+        showPurchaseToast(`سلاح «${w.name}» به لول ${lvl+1} ارتقا یافت!`);
         SND.play('upgrade');
     }
 };
 
 window.equipWeapon = (id) => {
-  SND.init();
-  SND.play('uiClick');
+  SND.init(); SND.play('uiClick');
   if (ownedWeapons.includes(id)) { equippedWeapon = id; saveData(); renderShop(); }
 };
 
+window.buySkin = (id) => {
+  SND.init();
+  const sk = getSkinById(id);
+  if (coins >= sk.cost && !ownedSkins.includes(id)) {
+    coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveData(); renderShop();
+    showPurchaseToast(`اسکین «${sk.name}» خریداری شد!`);
+    SND.play('purchase');
+  }
+};
+
+window.equipSkin = (id) => {
+  SND.init(); SND.play('uiClick');
+  if (ownedSkins.includes(id)) { equippedSkin = id; saveData(); renderShop(); }
+};
+
+/* ═══════════════ منطق بازی (خلاصه) ═══════════════ */
 function resize(){
   W = innerWidth; H = innerHeight;
   cvs.width = W; cvs.height = H;
@@ -733,25 +877,17 @@ let isBossActive = false;
 
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
-  
   S = {
     player: {x: W/2, y: H - 90, r: 3, inv: 0}, 
-    bullets: [], enemies: [], parts: [], stars: [], powerups: [],
-    ebullets: [], 
+    bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [], 
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0
   };
-  
   currentBossIndex = Math.floor(savedScore / 1000);
   nextBossScore = (currentBossIndex + 1) * 1000;
-  
-  isBossActive = false;
-  isDead = false;
+  isBossActive = false; isDead = false;
   document.getElementById('gameOver').style.display = 'none';
-
-  for(let i = 0; i < 40; i++){
-    S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
-  }
+  for(let i = 0; i < 40; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
 }
 reset();
 
@@ -770,39 +906,19 @@ addEventListener('keyup', e => {
   if(e.key === ' ') keys.fire = false;
 });
 
-cvs.addEventListener('touchstart', e => { 
-  e.preventDefault(); 
-  SND.init();
-  touching = true; 
-  const t = e.touches[0]; 
-  if(t) touchX = t.clientX; 
-}, {passive:false});
+cvs.addEventListener('touchstart', e => { e.preventDefault(); SND.init(); touching = true; const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
 cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
 cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; }, {passive:false});
-
 cvs.addEventListener('mousedown', () => { SND.init(); keys.fire = true; });
 addEventListener('mouseup', () => keys.fire = false);
 cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
 
 function fire(){
-  let w;
-  let isTemp = false;
-  
-  if (S.tempWeapon) {
-      w = S.tempWeapon;
-      isTemp = true;
-  } else {
-      w = WEAPONS.find(x => x.id === equippedWeapon);
-  }
-  
+  let w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
+  let isTemp = !!S.tempWeapon;
   S.cool = w.cd;
-
   let dmg = w.dmg;
-  if (!isTemp) {
-      const lvl = weaponLevels[w.id] || 0;
-      dmg += lvl * 2;
-  }
-
+  if (!isTemp) dmg += (weaponLevels[w.id] || 0) * 2;
   for(let i = 0; i < w.count; i++){
     let angle = 0;
     if(w.count > 1){
@@ -812,7 +928,6 @@ function fire(){
     const speed = 1.6;
     S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: dmg, color: w.color, size: w.size });
   }
-  
   SND.play('shoot');
 }
 
@@ -820,38 +935,18 @@ function bossShoot(boss, pattern) {
   SND.play('bossShoot');
   const speed = 0.2 + currentBossIndex * 0.05; 
   const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x);
-  
   if (pattern === 'aimed') {
-    S.ebullets.push({
-      x: boss.x, y: boss.y + 20,
-      vx: Math.cos(angleToPlayer) * speed,
-      vy: Math.sin(angleToPlayer) * speed,
-      r: 8, color: '#ff4fd8'
-    });
-  } 
-  else if (pattern === 'spread') {
-    const count = 3; 
-    for (let i = 0; i < count; i++) {
+    S.ebullets.push({ x: boss.x, y: boss.y + 20, vx: Math.cos(angleToPlayer) * speed, vy: Math.sin(angleToPlayer) * speed, r: 8, color: '#ff4fd8' });
+  } else if (pattern === 'spread') {
+    for (let i = 0; i < 3; i++) {
       const spreadAngle = angleToPlayer + (i - 1) * 0.3; 
-      S.ebullets.push({
-        x: boss.x, y: boss.y + 20,
-        vx: Math.cos(spreadAngle) * speed,
-        vy: Math.sin(spreadAngle) * speed,
-        r: 6, color: '#ffd166'
-      });
+      S.ebullets.push({ x: boss.x, y: boss.y + 20, vx: Math.cos(spreadAngle) * speed, vy: Math.sin(spreadAngle) * speed, r: 6, color: '#ffd166' });
     }
-  }
-  else if (pattern === 'radial') {
-    const count = 6; 
+  } else if (pattern === 'radial') {
     const baseAngle = S.t * 0.02;
-    for (let i = 0; i < count; i++) {
-      const angle = baseAngle + (i / count) * Math.PI * 2;
-      S.ebullets.push({
-        x: boss.x, y: boss.y,
-        vx: Math.cos(angle) * speed * 0.8,
-        vy: Math.sin(angle) * speed * 0.8,
-        r: 6, color: '#7df9ff'
-      });
+    for (let i = 0; i < 6; i++) {
+      const angle = baseAngle + (i / 6) * Math.PI * 2;
+      S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(angle) * speed * 0.8, vy: Math.sin(angle) * speed * 0.8, r: 6, color: '#7df9ff' });
     }
   }
 }
@@ -860,47 +955,29 @@ function spawnEnemy(){
   const r = 11 + Math.random()*9;
   const diffSpeed = Math.min(S.score / 500, 1); 
   const diffHp = Math.min(S.score / 1000, 3);   
-
   const rockBaseHp = 3 + Math.floor(S.score / 100) * 3;
-
   const enemy = {
     x: 30 + Math.random()*(W - 60), y: -30, r,
     vy: 0.16 + Math.random()*0.10 + diffSpeed*0.25,
     vx: (Math.random() - 0.5) * 0.12,
     hue: 330 + Math.random()*50, rot: Math.random()*6.28, rv: (Math.random() - 0.5) * 0.005,
-    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp),
-    isBoss: false
+    hp: (r > 17 ? 3 : 2) + Math.floor(diffHp), isBoss: false
   };
-
-  if (Math.random() < 0.3) { 
-      enemy.type = 'rock';
-      enemy.hp = rockBaseHp;
-      enemy.r = 20 + Math.random()*10;
-  }
-
+  if (Math.random() < 0.3) { enemy.type = 'rock'; enemy.hp = rockBaseHp; enemy.r = 20 + Math.random()*10; }
   S.enemies.push(enemy);
 }
 
 function spawnBoss(){
   const hp = 200 + (currentBossIndex * 300);
-  
   SND.play('bossWarn');
-  
   S.enemies.push({
-    x: W/2, y: -150, r: 65, 
-    vy: 0.05, vx: 0.15, 
-    hue: 280, rot: 0, rv: 0.01,
-    hp: hp, 
-    maxHp: hp, 
-    isBoss: true,
-    shootT: 4000, 
-    patternIdx: 0
+    x: W/2, y: -150, r: 65, vy: 0.05, vx: 0.15, hue: 280, rot: 0, rv: 0.01,
+    hp: hp, maxHp: hp, isBoss: true, shootT: 4000, patternIdx: 0
   });
 }
 
-function spawnPowerup(x, y, isBossDrop) {
-  let w = DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)];
-  S.powerups.push({ x: x, y: y, vy: 0.5, weapon: w, r: 12, rot: 0 });
+function spawnPowerup(x, y) {
+  S.powerups.push({ x, y, vy: 0.5, weapon: DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)], r: 12, rot: 0 });
 }
 
 function boom(x, y, hue, n){
@@ -924,20 +1001,13 @@ setInterval(autoSync, 15000);
 
 function update(dt){
   if(S.lives <= 0) return;
-
   S.t++;
   if(S.t % 120 === 0) saveData();
-
-  if (S.tempWeaponTime > 0) {
-    S.tempWeaponTime -= dt;
-    if (S.tempWeaponTime <= 0) S.tempWeapon = null;
-  }
-  
+  if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
   if (S.score >= nextBossScore && !isBossActive) {
-    spawnBoss();
-    isBossActive = true;
+    spawnBoss(); isBossActive = true;
     S.enemies = S.enemies.filter(e => e.isBoss);
   }
 
@@ -947,9 +1017,7 @@ function update(dt){
   const sp = 0.9 * dt;
   if(keys.left)  p.x -= sp;
   if(keys.right) p.x += sp;
-  if(touchX !== null){ 
-    const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); 
-  }
+  if(touchX !== null){ const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); }
   p.x = Math.max(22, Math.min(W - 22, p.x));
 
   S.cool -= dt;
@@ -958,57 +1026,36 @@ function update(dt){
 
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    if (!isBossActive) {
-        spawnEnemy();
-        S.spawnT = Math.max(280, 820 - S.score * 1.2);
-    } else {
-        S.spawnT = 1000; 
-    }
+    if (!isBossActive) { spawnEnemy(); S.spawnT = Math.max(280, 820 - S.score * 1.2); }
+    else S.spawnT = 1000; 
   }
 
   for(let i = S.enemies.length - 1; i >= 0; i--){
     const e = S.enemies[i];
     e.y += e.vy * dt; e.x += e.vx * dt; e.rot += e.rv * dt;
-    
     if(e.isBoss) {
       if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
       if (e.y > 120) e.y = 120; 
-
       if (e.y >= 120) {
           e.shootT -= dt;
           if (e.shootT <= 0) {
             e.shootT = Math.max(3000, 5000 - currentBossIndex * 200);
-            const patterns = ['aimed', 'spread', 'radial'];
-            bossShoot(e, patterns[e.patternIdx % patterns.length]);
+            bossShoot(e, ['aimed', 'spread', 'radial'][e.patternIdx % 3]);
             e.patternIdx++;
           }
       }
-    } else {
-        if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
-    }
+    } else if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
   }
 
   for(let i = S.ebullets.length - 1; i >= 0; i--) {
     const eb = S.ebullets[i];
-    eb.x += eb.vx * dt;
-    eb.y += eb.vy * dt;
-    
-    if (eb.x < -20 || eb.x > W + 20 || eb.y < -20 || eb.y > H + 20) {
-      S.ebullets.splice(i, 1);
-      continue;
-    }
-    
+    eb.x += eb.vx * dt; eb.y += eb.vy * dt;
+    if (eb.x < -20 || eb.x > W + 20 || eb.y < -20 || eb.y > H + 20) { S.ebullets.splice(i, 1); continue; }
     if (S.lives > 0 && S.player.inv <= 0) {
-      const dx = eb.x - S.player.x;
-      const dy = eb.y - S.player.y;
-      const rr = eb.r + S.player.r + 3;
+      const dx = eb.x - S.player.x, dy = eb.y - S.player.y, rr = eb.r + S.player.r + 3;
       if (dx*dx + dy*dy < rr*rr) {
-        S.ebullets.splice(i, 1);
-        S.lives--;
-        S.shake = 220;
-        S.player.inv = 1500; 
-        boom(S.player.x, S.player.y, 0, 15);
-        SND.play('playerHit');
+        S.ebullets.splice(i, 1); S.lives--; S.shake = 220; S.player.inv = 1500; 
+        boom(S.player.x, S.player.y, 0, 15); SND.play('playerHit');
         if(S.lives <= 0) triggerGameOver();
       }
     }
@@ -1023,24 +1070,16 @@ function update(dt){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
-          S.enemies.splice(j, 1); 
-          S.score += e.isBoss ? 500 : 10; 
-          
+          S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10; 
           let coinMultiplier = 1 + Math.floor(S.score / 1000);
-          let coinReward = e.isBoss ? 50 : 2;
-          coins += coinReward * coinMultiplier; 
-          
+          coins += (e.isBoss ? 50 : 2) * coinMultiplier; 
           if (e.isBoss) {
-            isBossActive = false; 
-            currentBossIndex++; 
-            nextBossScore = (currentBossIndex + 1) * 1000;
+            isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
             SND.play('bigExplosion');
-            if (Math.random() < 0.5) spawnPowerup(e.x, e.y, true);
+            if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
           } else {
             SND.play('explosion');
-            if (Math.random() < 0.01) {
-              spawnPowerup(e.x, e.y, false);
-            }
+            if (Math.random() < 0.01) spawnPowerup(e.x, e.y);
           }
           saveData(); 
         }
@@ -1052,14 +1091,11 @@ function update(dt){
   for(let j = S.enemies.length - 1; j >= 0; j--){
     const e = S.enemies[j];
     const dx = p.x - e.x, dy = p.y - e.y;
-    if(dx*dx + dy*dy < (e.r + p.r)**2){
-      if (S.player.inv <= 0) {
-          boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
-          S.player.inv = 1500; 
-          SND.play('playerHit');
-          if(e.isBoss) isBossActive = false;
-          if(S.lives <= 0) triggerGameOver();
-      }
+    if(dx*dx + dy*dy < (e.r + p.r)**2 && S.player.inv <= 0) {
+      boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
+      S.player.inv = 1500; SND.play('playerHit');
+      if(e.isBoss) isBossActive = false;
+      if(S.lives <= 0) triggerGameOver();
       break;
     }
   }
@@ -1070,9 +1106,7 @@ function update(dt){
     const dx = p.x - pu.x, dy = p.y - pu.y;
     if(dx*dx + dy*dy < (pu.r + p.r + 15)**2){
       S.tempWeapon = pu.weapon; S.tempWeaponTime = 10000;
-      S.powerups.splice(i, 1); boom(pu.x, pu.y, 180, 15);
-      SND.play('powerup');
-      continue;
+      S.powerups.splice(i, 1); boom(pu.x, pu.y, 180, 15); SND.play('powerup'); continue;
     }
     if(pu.y > H + 50) S.powerups.splice(i, 1);
   }
@@ -1091,18 +1125,13 @@ function update(dt){
 }
 
 function triggerGameOver() {
-  isDead = true;
-  SND.play('gameOver');
+  isDead = true; SND.play('gameOver');
   const achievedScore = S.score;
   const bonusCoins = Math.floor(achievedScore / 10);
-  
   if(achievedScore > 0) {
-    totalScore += achievedScore; 
-    coins += bonusCoins; 
-    saveData(); 
+    totalScore += achievedScore; coins += bonusCoins; saveData(); 
     localStorage.setItem('shooter_current_score', 0); 
     saveScoreToLeaderboard(totalScore); 
-    
     document.getElementById('finalScoreVal').textContent = achievedScore;
     document.getElementById('bonusCoins').textContent = '💰 پاداش سکه: +' + bonusCoins;
     document.getElementById('bonusCoins').style.display = 'block';
@@ -1111,27 +1140,21 @@ function triggerGameOver() {
     document.getElementById('finalScoreVal').textContent = 0;
     document.getElementById('bonusCoins').style.display = 'none';
   }
-  
   document.getElementById('gameOver').style.display = 'flex';
 }
 
 function draw(){
   const sh = S.shake > 0 ? (Math.random() - 0.5) * S.shake * 0.03 : 0;
   ctx.setTransform(1, 0, 0, 1, sh, sh);
-  
-  ctx.fillStyle = 'rgba(4,6,15,0.5)'; 
-  ctx.fillRect(-10, -10, W + 20, H + 20);
-
+  ctx.fillStyle = 'rgba(4,6,15,0.5)'; ctx.fillRect(-10, -10, W + 20, H + 20);
   ctx.fillStyle = '#8fd8ff';
   for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); }
   ctx.globalAlpha = 1;
-
   for(const q of S.parts){
     ctx.globalAlpha = Math.max(q.life, 0); ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)';
     ctx.beginPath(); ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28); ctx.fill();
   }
   ctx.globalAlpha = 1;
-
   for(const pu of S.powerups) {
     ctx.save(); ctx.translate(pu.x, pu.y); ctx.rotate(pu.rot);
     ctx.fillStyle = pu.weapon.color; ctx.shadowBlur = 15; ctx.shadowColor = pu.weapon.color;
@@ -1139,31 +1162,20 @@ function draw(){
     ctx.closePath(); ctx.fill(); ctx.restore();
   }
   ctx.shadowBlur = 0;
-
   for(const eb of S.ebullets) {
-    ctx.fillStyle = eb.color;
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = eb.color;
-    ctx.beginPath();
-    ctx.arc(eb.x, eb.y, eb.r, 0, 6.28);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(eb.x, eb.y, eb.r * 0.5, 0, 6.28);
-    ctx.fill();
+    ctx.fillStyle = eb.color; ctx.shadowBlur = 15; ctx.shadowColor = eb.color;
+    ctx.beginPath(); ctx.arc(eb.x, eb.y, eb.r, 0, 6.28); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(eb.x, eb.y, eb.r * 0.5, 0, 6.28); ctx.fill();
   }
   ctx.shadowBlur = 0;
-
   for(const b of S.bullets) {
     ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fill();
     ctx.globalAlpha = 0.5; ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10); ctx.globalAlpha = 1;
   }
-
   for(const e of S.enemies){
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
     ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)';
     ctx.lineWidth = e.isBoss ? 5 : 2; ctx.beginPath();
-    
     if (e.isBoss) {
        for(let k=0; k<10; k++){
           const r2 = k%2===0 ? e.r : e.r/2;
@@ -1192,50 +1204,86 @@ function draw(){
     if (p.inv > 0 && Math.floor(S.t * 0.1) % 2 === 0) {
         // چشمک نمیزنه
     } else {
-        ctx.fillStyle = '#a8ffd0'; ctx.beginPath();
-        ctx.moveTo(p.x, p.y - 20); ctx.lineTo(p.x - 14, p.y + 12); ctx.lineTo(p.x, p.y + 6); ctx.lineTo(p.x + 14, p.y + 12);
-        ctx.closePath(); ctx.fill();
-        ctx.fillStyle = 'hsla(' + (30 + Math.random()*20) + ',100%,65%,.85)'; ctx.beginPath();
-        ctx.moveTo(p.x - 5, p.y + 10); ctx.lineTo(p.x, p.y + 16 + Math.random()*10); ctx.lineTo(p.x + 5, p.y + 10);
-        ctx.closePath(); ctx.fill();
+        // 👇 رسم سفینه با اسکین انتخابی
+        const skin = getSkinById(equippedSkin);
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.strokeStyle = skin.color;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.lineWidth = 1.6;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = skin.glow;
+        
+        ctx.beginPath();
+        switch(skin.type) {
+          case 'default':
+            ctx.moveTo(0, -20); ctx.lineTo(14, 12); ctx.lineTo(7, 16); ctx.lineTo(0, 8); ctx.lineTo(-7, 16); ctx.lineTo(-14, 12);
+            break;
+          case 'phantom':
+            ctx.moveTo(0, -22); ctx.lineTo(6, -8); ctx.lineTo(15, 4); ctx.lineTo(5, 6); ctx.lineTo(0, 17);
+            ctx.lineTo(-5, 6); ctx.lineTo(-15, 4); ctx.lineTo(-6, -8);
+            break;
+          case 'shadow':
+            ctx.moveTo(0, -20); ctx.lineTo(16, 10); ctx.lineTo(10, 14); ctx.lineTo(4, 8); ctx.lineTo(-4, 8);
+            ctx.lineTo(-10, 14); ctx.lineTo(-16, 10);
+            break;
+          case 'star':
+            for(let i=0;i<10;i++){
+              const r = i%2===0 ? 18 : 8;
+              const a = i * Math.PI/5 - Math.PI/2;
+              const x = Math.cos(a)*r, y = Math.sin(a)*r;
+              i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+            }
+            break;
+          case 'crystal':
+            ctx.moveTo(0, -22); ctx.lineTo(13, -7); ctx.lineTo(13, 9); ctx.lineTo(0, 17); ctx.lineTo(-13, 9); ctx.lineTo(-13, -7);
+            break;
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // هسته درخشان
+        ctx.fillStyle = skin.glow;
+        ctx.shadowBlur = 15;
+        ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+        
+        // افکت آتش موتور (همه اسکین‌ها)
+        const fl = 11 + Math.random()*9;
+        const g = ctx.createLinearGradient(p.x, p.y+10, p.x, p.y+10+fl);
+        g.addColorStop(0, skin.glow + 'aa');
+        g.addColorStop(1, skin.glow + '00');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(p.x-5, p.y+10); ctx.lineTo(p.x, p.y+10+fl); ctx.lineTo(p.x+5, p.y+10); ctx.closePath(); ctx.fill();
     }
   }
 
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
-  
   let currentMultiplier = 1 + Math.floor(S.score / 1000);
-  if (currentMultiplier > 1) {
-      ctx.fillStyle = '#00ffcc';
-      ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138);
-  }
-
-  if (S.tempWeapon) {
-      ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138);
-  }
-
+  if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138); }
+  if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138); }
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
+/* ═══════════════ رتبه‌بندی ═══════════════ */
 async function getScores(){
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
-    if (res.ok) {
-        return await res.json();
-    }
+    if (res.ok) return await res.json();
   } catch(e) {}
   return [];
 }
 
 async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(newTotalScore <= 0) return;
-  
   const syncIcon = document.getElementById('syncIndicator');
   if (syncIcon) syncIcon.classList.add('syncing');
-
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
@@ -1245,77 +1293,47 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
-      body: JSON.stringify({ 
-        dev_id: deviceId, 
-        name: profile.name, 
-        score: newTotalScore, 
-        avatar: profile.avatar 
-      })
+      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar })
     });
-    
-    if (!res.ok) {
+    if (!res.ok && !isSilent) {
         const errorData = await res.text();
-        if (!isSilent) alert("خطا در ذخیره امتیاز:\n" + errorData);
-        console.log("خطای سوپابیس:", errorData);
+        alert("خطا در ذخیره امتیاز:\n" + errorData);
     }
   } catch(e) {
     if (!isSilent) alert("خطای شبکه در ذخیره امتیاز:\n" + e.message);
   }
-
   if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
 }
 
 async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
-  
   const scores = await getScores();
-  
-  if(scores.length === 0){
-    list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>';
-    return;
-  }
-  
+  if(scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
     if (typeof s.avatar === 'number') {
       const av = getAvatarById(s.avatar);
       avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
-    } else {
-      avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
-    }
-    return '<li>' +
-      '<span class="pos">' + (i+1) + '</span>' + avatarHtml +
-      '<span class="name">' + (s.name || 'ناشناس') + '</span>' +
-      '<span class="sc">' + s.score + '</span>' +
-    '</li>';
+    } else avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
+    return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
   }).join('');
 }
 
 document.querySelectorAll('.tab').forEach(btn => {
   btn.onclick = async () => {
-    SND.init();
-    SND.play('uiClick');
+    SND.init(); SND.play('uiClick');
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    
-    if(tab === 'shop') { 
-        renderShop(); 
-    } else if(tab === 'rank'){ 
-        await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false);
-        renderRank(); 
-    }
+    if(tab === 'shop') renderShop();
+    else if(tab === 'rank'){ await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false); renderRank(); }
   };
 });
 
-document.getElementById('restartBtn').onclick = () => {
-  SND.play('uiClick');
-  reset();
-  document.querySelector('.tab[data-tab="game"]').click();
-};
+document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
 
 let last = 0;
 function loop(ts){
@@ -1328,6 +1346,9 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+
+// رندر اولیه فروشگاه
+renderShop();
 </script>
 </body>
 </html>
