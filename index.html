@@ -193,6 +193,14 @@
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
+  .restore-btn {
+    display: block; width: fit-content; padding: 8px 30px; margin: 0 auto 15px auto;
+    background: transparent; border: 1px solid #ffd700; color: #ffd700;
+    border-radius: 30px; font-size: 13px; font-weight: 900; cursor: pointer;
+    font-family: inherit; transition: 0.3s; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1);
+  }
+  .restore-btn:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
     max-width: 340px; margin: 10px auto; padding: 12px 16px;
@@ -425,7 +433,10 @@
     <div class="icon"></div>
   </div>
   
-  <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل</button>
+  <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل (سیو ابری)</button>
+  
+  <!-- دکمه جدید برای بازیابی اکانت در دستگاه دیگر -->
+  <button class="restore-btn" onclick="restoreAccount()">🔄 بازیابی از دستگاه دیگر</button>
 </div>
 
 <div id="gameOver">
@@ -517,7 +528,7 @@ const SND = {
   }
 };
 
-/* ═══════════════ اسکین‌های جدید (واقعی و فلزی) ═══════════════ */
+/* ═══════════════ اسکین‌ها ═══════════════ */
 const SKINS = [
   { id: 1, name: "بال قرمز", cost: 0, color: "#ff4d4d", glow: "#ff0000", type: "interceptor" },
   { id: 2, name: "شاهین کهکشانی", cost: 1000, color: "#00ffcc", glow: "#00d2ff", type: "falcon" },
@@ -707,8 +718,8 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const isTaken = currentScores.some(s => s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId);
   
   if(isTaken) {
-      showToast('❌ این اسم قبلا انتخاب شده است.');
-      btn.textContent = 'ذخیره پروفایل';
+      showToast('❌ این اسم قبلا انتخاب شده است. (از دکمه بازیابی استفاده کنید)');
+      btn.textContent = 'ذخیره پروفایل (سیو ابری)';
       btn.disabled = false;
       return;
   }
@@ -716,17 +727,61 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
   saveGameData();
-  await saveScoreToLeaderboard(totalScore);
+  await saveScoreToLeaderboard(totalScore); // این تابع حالا کل اطلاعات را هم میفرستد
 
   if (oldName !== newName) {
-      showToast(`✨ اسم شما به «${newName}» تغییر یافت!`);
+      showToast(`✨ اسم شما به «${newName}» تغییر یافت و سیو شد!`);
   } else {
-      showToast('✅ پروفایل با موفقیت ذخیره شد!');
+      showToast('✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
   }
 
-  btn.textContent = 'ذخیره پروفایل';
+  btn.textContent = 'ذخیره پروفایل (سیو ابری)';
   btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
+};
+
+// 🔄 تابع جدید برای بازیابی اکانت در دستگاه دیگر
+window.restoreAccount = async () => {
+    const nameToRestore = prompt("نام فرمانده‌ای که قبلاً در دستگاه دیگر ساختی را وارد کن:");
+    if (!nameToRestore) return;
+    
+    showToast("⏳ در حال جستجوی اکانت...");
+    
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        
+        if (data && data.length > 0 && data[0].save_data) {
+            const remoteSave = data[0].save_data;
+            const remoteId = data[0].dev_id;
+            
+            // اعمال اطلاعات روی دستگاه فعلی
+            profile = remoteSave.profile || { name: data[0].name, avatar: data[0].avatar };
+            coins = remoteSave.coins || 0;
+            ownedWeapons = remoteSave.ownedWeapons || [1];
+            equippedWeapon = remoteSave.equippedWeapon || 1;
+            ownedSkins = remoteSave.ownedSkins || [1];
+            equippedSkin = remoteSave.equippedSkin || 1;
+            weaponLevels = remoteSave.weaponLevels || {};
+            totalScore = remoteSave.totalScore || 0;
+            
+            // تغییر deviceId به آی‌دی اصلی اکانت
+            deviceId = remoteId;
+            localStorage.setItem('shooter_device_id', deviceId);
+            
+            // ذخیره در حافظه محلی و رفرش کردن صفحه
+            saveGameData();
+            showToast("✅ اکانت با موفقیت بازیابی شد! در حال رفرش...");
+            setTimeout(() => { location.reload(); }, 1500);
+            
+        } else {
+            showToast("❌ اکانتی با این نام پیدا نشد (یا هنوز سیو ابری نشده است).");
+        }
+    } catch (e) {
+        showToast("❌ خطای شبکه در بازیابی اکانت.");
+    }
 };
 
 document.getElementById('soundToggle').addEventListener('click', () => {
@@ -836,146 +891,46 @@ function drawSkinPreview(container, skinId) {
   container.appendChild(canvas);
 }
 
-/* ═══════════════ رسم سفینه‌های جدید و واقعی ═══════════════ */
 function drawShipShape(c, skin, scale) {
   scale = scale || 1;
   c.save();
   c.scale(scale, scale);
-  
   const t = skin.type;
-  
-  // تنظیمات کلی
-  c.lineJoin = 'round';
-  c.lineCap = 'round';
-  
-  // تابع کمکی برای ساخت گرادیانت فلزی
-  const getMetalGrad = (x0, y0, x1, y1, c1, c2) => {
-    const g = c.createLinearGradient(x0, y0, x1, y1);
-    g.addColorStop(0, c1);
-    g.addColorStop(1, c2);
-    return g;
-  };
+  c.lineJoin = 'round'; c.lineCap = 'round';
+  const getMetalGrad = (x0, y0, x1, y1, c1, c2) => { const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, c1); g.addColorStop(1, c2); return g; };
 
   if (t === 'interceptor') {
-    // 1. بال قرمز
-    // بال‌های عقب
     c.fillStyle = getMetalGrad(0, -30, 0, 30, '#550000', '#ff0000');
-    c.beginPath();
-    c.moveTo(0, -10);
-    c.lineTo(35, 15); c.lineTo(45, 25); c.lineTo(15, 20);
-    c.lineTo(0, 30);
-    c.lineTo(-15, 20); c.lineTo(-45, 25); c.lineTo(-35, 15);
-    c.closePath(); c.fill();
-    
-    // بدنه اصلی (سفید/نقره‌ای)
+    c.beginPath(); c.moveTo(0, -10); c.lineTo(35, 15); c.lineTo(45, 25); c.lineTo(15, 20); c.lineTo(0, 30); c.lineTo(-15, 20); c.lineTo(-45, 25); c.lineTo(-35, 15); c.closePath(); c.fill();
     c.fillStyle = getMetalGrad(0, -25, 0, 25, '#ffffff', '#888888');
-    c.beginPath();
-    c.moveTo(0, -30); c.lineTo(10, -5); c.lineTo(12, 15); c.lineTo(5, 25);
-    c.lineTo(-5, 25); c.lineTo(-12, 15); c.lineTo(-10, -5);
-    c.closePath(); c.fill(); c.strokeStyle='#ccc'; c.lineWidth=1; c.stroke();
-
-    // کابین
-    c.fillStyle = '#00ffff';
-    c.beginPath(); c.ellipse(0, -10, 4, 8, 0, 0, Math.PI*2); c.fill();
-    
-    // جزئیات موتورها
-    c.fillStyle = '#ff8800';
-    c.shadowBlur = 15; c.shadowColor = '#ff4400';
-    c.beginPath(); c.arc(-10, 22, 4, 0, Math.PI*2); c.fill();
-    c.beginPath(); c.arc(10, 22, 4, 0, Math.PI*2); c.fill();
-
+    c.beginPath(); c.moveTo(0, -30); c.lineTo(10, -5); c.lineTo(12, 15); c.lineTo(5, 25); c.lineTo(-5, 25); c.lineTo(-12, 15); c.lineTo(-10, -5); c.closePath(); c.fill(); c.strokeStyle='#ccc'; c.lineWidth=1; c.stroke();
+    c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0, -10, 4, 8, 0, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#ff8800'; c.shadowBlur = 15; c.shadowColor = '#ff4400'; c.beginPath(); c.arc(-10, 22, 4, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(10, 22, 4, 0, Math.PI*2); c.fill();
   } else if (t === 'falcon') {
-    // 2. شاهین کهکشانی
-    // بال‌ها
-    c.fillStyle = getMetalGrad(0, -20, 0, 20, '#003344', '#00ffcc');
-    c.beginPath();
-    c.moveTo(0, -20); c.lineTo(40, 5); c.lineTo(50, 20); c.lineTo(20, 10); c.lineTo(0, 15);
-    c.lineTo(-20, 10); c.lineTo(-50, 20); c.lineTo(-40, 5);
-    c.closePath(); c.fill();
-    
-    // بدنه
-    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#333333', '#111111');
-    c.beginPath();
-    c.moveTo(0, -35); c.lineTo(8, 5); c.lineTo(15, 20); c.lineTo(0, 15); c.lineTo(-15, 20); c.lineTo(-8, 5);
-    c.closePath(); c.fill(); c.strokeStyle='#00ffcc'; c.lineWidth=1.5; c.stroke();
-
-    // کابین
-    c.fillStyle = '#ffffff';
-    c.beginPath(); c.ellipse(0, -15, 3, 6, 0, 0, Math.PI*2); c.fill();
-    
-    // موتور
-    c.fillStyle = '#00ffcc';
-    c.shadowBlur = 20; c.shadowColor = '#00ffcc';
-    c.beginPath(); c.arc(0, 18, 5, 0, Math.PI*2); c.fill();
-
+    c.fillStyle = getMetalGrad(0, -20, 0, 20, '#003344', '#00ffcc'); c.beginPath(); c.moveTo(0, -20); c.lineTo(40, 5); c.lineTo(50, 20); c.lineTo(20, 10); c.lineTo(0, 15); c.lineTo(-20, 10); c.lineTo(-50, 20); c.lineTo(-40, 5); c.closePath(); c.fill();
+    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#333333', '#111111'); c.beginPath(); c.moveTo(0, -35); c.lineTo(8, 5); c.lineTo(15, 20); c.lineTo(0, 15); c.lineTo(-15, 20); c.lineTo(-8, 5); c.closePath(); c.fill(); c.strokeStyle='#00ffcc'; c.lineWidth=1.5; c.stroke();
+    c.fillStyle = '#ffffff'; c.beginPath(); c.ellipse(0, -15, 3, 6, 0, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#00ffcc'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.arc(0, 18, 5, 0, Math.PI*2); c.fill();
   } else if (t === 'phantom') {
-    // 3. شبح بنفش
-    // بدنه زاویه دار
-    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#2a0033', '#660099');
-    c.beginPath();
-    c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(25, 15); c.lineTo(10, 25); c.lineTo(0, 15);
-    c.lineTo(-10, 25); c.lineTo(-25, 15); c.lineTo(-15, -5);
-    c.closePath(); c.fill();
-    
-    // بال‌های تیز
-    c.fillStyle = '#d68cff';
-    c.beginPath();
-    c.moveTo(-15, -5); c.lineTo(-40, -15); c.lineTo(-20, 15); c.closePath(); c.fill();
-    c.beginPath();
-    c.moveTo(15, -5); c.lineTo(40, -15); c.lineTo(20, 15); c.closePath(); c.fill();
-
-    // نور مرکزی
-    c.fillStyle = '#ff4fd8';
-    c.shadowBlur = 15; c.shadowColor = '#ff4fd8';
-    c.beginPath(); c.arc(0, 0, 4, 0, Math.PI*2); c.fill();
-
+    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#2a0033', '#660099'); c.beginPath(); c.moveTo(0, -30); c.lineTo(15, -5); c.lineTo(25, 15); c.lineTo(10, 25); c.lineTo(0, 15); c.lineTo(-10, 25); c.lineTo(-25, 15); c.lineTo(-15, -5); c.closePath(); c.fill();
+    c.fillStyle = '#d68cff'; c.beginPath(); c.moveTo(-15, -5); c.lineTo(-40, -15); c.lineTo(-20, 15); c.closePath(); c.fill(); c.beginPath(); c.moveTo(15, -5); c.lineTo(40, -15); c.lineTo(20, 15); c.closePath(); c.fill();
+    c.fillStyle = '#ff4fd8'; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.arc(0, 0, 4, 0, Math.PI*2); c.fill();
   } else if (t === 'aegis') {
-    // 4. سپر طلایی (سنگین)
-    // بال‌های بزرگ
-    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#997a00', '#ffd700');
-    c.beginPath();
-    c.moveTo(0, -15); c.lineTo(35, -5); c.lineTo(45, 15); c.lineTo(25, 25); c.lineTo(0, 15);
-    c.lineTo(-25, 25); c.lineTo(-45, 15); c.lineTo(-35, -5);
-    c.closePath(); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1; c.stroke();
-    
-    // بدنه مرکزی
-    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#aaaaaa', '#555555');
-    c.beginPath();
-    c.moveTo(0, -25); c.lineTo(12, 0); c.lineTo(10, 20); c.lineTo(0, 25); c.lineTo(-10, 20); c.lineTo(-12, 0);
-    c.closePath(); c.fill();
-    
-    // سلاح‌ها
-    c.fillStyle = '#ffaa00';
-    c.fillRect(-15, -10, 4, 15);
-    c.fillRect(11, -10, 4, 15);
-
+    c.fillStyle = getMetalGrad(0, 0, 0, 30, '#997a00', '#ffd700'); c.beginPath(); c.moveTo(0, -15); c.lineTo(35, -5); c.lineTo(45, 15); c.lineTo(25, 25); c.lineTo(0, 15); c.lineTo(-25, 25); c.lineTo(-45, 15); c.lineTo(-35, -5); c.closePath(); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = getMetalGrad(0, -25, 0, 25, '#aaaaaa', '#555555'); c.beginPath(); c.moveTo(0, -25); c.lineTo(12, 0); c.lineTo(10, 20); c.lineTo(0, 25); c.lineTo(-10, 20); c.lineTo(-12, 0); c.closePath(); c.fill();
+    c.fillStyle = '#ffaa00'; c.fillRect(-15, -10, 4, 15); c.fillRect(11, -10, 4, 15);
   } else if (t === 'crystal') {
-    // 5. کریستال
-    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#ffffff', '#7df9ff');
-    c.beginPath();
-    c.moveTo(0, -35);
-    c.lineTo(10, -10); c.lineTo(30, 0); c.lineTo(15, 10); c.lineTo(20, 25);
-    c.lineTo(0, 15);
-    c.lineTo(-20, 25); c.lineTo(-15, 10); c.lineTo(-30, 0); c.lineTo(-10, -10);
-    c.closePath(); c.fill();
-    
-    c.strokeStyle = '#00d2ff'; c.lineWidth = 1.5; c.stroke();
-    
-    // درخشش
-    c.fillStyle = '#ffffff';
-    c.shadowBlur = 20; c.shadowColor = '#7df9ff';
-    c.beginPath(); c.ellipse(0, -5, 4, 10, 0, 0, Math.PI*2); c.fill();
+    c.fillStyle = getMetalGrad(0, -30, 0, 30, '#ffffff', '#7df9ff'); c.beginPath(); c.moveTo(0, -35); c.lineTo(10, -10); c.lineTo(30, 0); c.lineTo(15, 10); c.lineTo(20, 25); c.lineTo(0, 15); c.lineTo(-20, 25); c.lineTo(-15, 10); c.lineTo(-30, 0); c.lineTo(-10, -10); c.closePath(); c.fill(); c.strokeStyle = '#00d2ff'; c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#7df9ff'; c.beginPath(); c.ellipse(0, -5, 4, 10, 0, 0, Math.PI*2); c.fill();
   }
-
-  c.shadowBlur = 0;
-  c.restore();
+  c.shadowBlur = 0; c.restore();
 }
 
 window.buyWeapon = (id) => {
   SND.init();
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
-    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop();
+    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true);
     showToast(`🔫 سلاح «${w.name}» خریداری شد!`);
     SND.play('purchase');
   }
@@ -987,7 +942,7 @@ window.upgradeWeapon = (id) => {
     const lvl = weaponLevels[id] || 0;
     const cost = Math.floor(200 * Math.pow(1.5, lvl));
     if (coins >= cost) {
-        coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop();
+        coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true);
         showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`);
         SND.play('upgrade');
     }
@@ -995,14 +950,14 @@ window.upgradeWeapon = (id) => {
 
 window.equipWeapon = (id) => {
   SND.init(); SND.play('uiClick');
-  if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); }
+  if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); }
 };
 
 window.buySkin = (id) => {
   SND.init();
   const sk = getSkinById(id);
   if (coins >= sk.cost && !ownedSkins.includes(id)) {
-    coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop();
+    coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true);
     showToast(`🚀 اسکین «${sk.name}» خریداری شد!`);
     SND.play('purchase');
   }
@@ -1010,7 +965,7 @@ window.buySkin = (id) => {
 
 window.equipSkin = (id) => {
   SND.init(); SND.play('uiClick');
-  if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); }
+  if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); }
 };
 
 /* ═══════════════ منطق بازی ═══════════════ */
@@ -1403,7 +1358,7 @@ function draw(){
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
-/* ═══════════════ رتبه‌بندی ═══════════════ */
+/* ═══════════════ رتبه‌بندی و ذخیره ابری ═══════════════ */
 async function getScores(){
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
@@ -1421,6 +1376,7 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   const syncIcon = document.getElementById('syncIndicator');
   if (syncIcon) syncIcon.classList.add('syncing');
   try {
+    // اینجا کل اطلاعات بازی به عنوان save_data به دیتابیس فرستاده میشود
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: {
@@ -1429,7 +1385,13 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
-      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar })
+      body: JSON.stringify({ 
+          dev_id: deviceId, 
+          name: profile.name, 
+          score: newTotalScore, 
+          avatar: profile.avatar,
+          save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, weaponLevels, totalScore }
+      })
     });
     if (!res.ok && !isSilent) {
         const errorData = await res.text();
