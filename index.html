@@ -1158,6 +1158,8 @@ let S, isDead = false;
 let currentBossIndex = 0;
 let nextBossScore = 1000;
 let isBossActive = false;
+let isBossWarningActive = false;
+let bossWarningTimer = 0;
 
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
@@ -1170,6 +1172,7 @@ function reset(){
   currentBossIndex = Math.floor(savedScore / 1000);
   nextBossScore = (currentBossIndex + 1) * 1000;
   isBossActive = false; isDead = false;
+  isBossWarningActive = false; bossWarningTimer = 0;
   document.getElementById('gameOver').style.display = 'none';
   for(let i = 0; i < 40; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
 }
@@ -1271,14 +1274,13 @@ function spawnEnemy(){
 function spawnBoss(){
   const bossLvl = currentBossIndex;
   const hp = 200 + (bossLvl * 400); 
-  SND.play('bossWarn');
   S.enemies.push({
     x: W/2, y: -150, 
     r: 60 + bossLvl * 5, 
-    vy: 2 + bossLvl * 0.5, // ورود بسیار سریع
+    vy: 2 + bossLvl * 0.5, 
     vx: 0.15 + bossLvl * 0.02, 
     hue: 280, rot: 0, rv: 0.01,
-    hp: hp, maxHp: hp, isBoss: true, shootT: 0, patternIdx: 0 // شلیک فوری
+    hp: hp, maxHp: hp, isBoss: true, shootT: 0, patternIdx: 0 
   });
 }
 
@@ -1312,9 +1314,20 @@ function update(dt){
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
-  if (S.score >= nextBossScore && !isBossActive) {
-    spawnBoss(); isBossActive = true;
-    S.enemies = S.enemies.filter(e => e.isBoss);
+  if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) {
+    isBossWarningActive = true;
+    bossWarningTimer = 3000;
+    SND.play('bossWarn');
+  }
+
+  if (isBossWarningActive) {
+    bossWarningTimer -= dt;
+    if (bossWarningTimer <= 0) {
+      spawnBoss();
+      isBossActive = true;
+      isBossWarningActive = false;
+      S.enemies = S.enemies.filter(e => e.isBoss);
+    }
   }
 
   for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
@@ -1380,7 +1393,8 @@ function update(dt){
     for(let j = S.enemies.length - 1; j >= 0; j--){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
-      if(dx*dx + dy*dy < (e.r + 4)**2){
+      // فیکس باگ: دشمن باید وارد صفحه شده باشه که تیر بخوره
+      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > 0){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
@@ -1440,22 +1454,21 @@ function update(dt){
   S.bullets = S.bullets.filter(b => b.y > -20 && b.y < H + 20 && b.x > -20 && b.x < W + 20);
 }
 
-/* ═══════════════ طراحی گرافیکی غول‌های متفاوت ═══════════════ */
+/* ═══════════════ طراحی گرافیکی غول‌ها ═══════════════ */
 function drawBoss(c, e, bossLvl) {
   const r = e.r;
-  const lvl = bossLvl % 5; // 5 نوع متفاوت
+  const lvl = bossLvl % 5; 
   
   let col1, col2, glow;
-  if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; } // بنفش
-  else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; } // قرمز
-  else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; } // فیروزه‌ای
-  else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; } // طلایی
-  else { col1 = '#111111'; col2 = '#333333'; glow = '#ffffff'; } // سفید کیهانی
+  if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; } 
+  else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; } 
+  else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; } 
+  else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; } 
+  else { col1 = '#111111'; col2 = '#333333'; glow = '#ffffff'; } 
 
   c.shadowColor = glow;
   c.shadowBlur = 25;
 
-  // 1. سفینه مادر (بنفش) - چند ضلعی کشیده
   if (lvl === 0) {
     c.fillStyle = col1;
     c.beginPath();
@@ -1470,7 +1483,6 @@ function drawBoss(c, e, bossLvl) {
     c.moveTo(-r*0.6, -r*0.4); c.lineTo(r*0.6, -r*0.4); c.lineTo(r*0.8, r*0.4); c.lineTo(0, r*0.6); c.lineTo(-r*0.8, r*0.4);
     c.closePath(); c.fill();
   } 
-  // 2. داسی شکل (قرمز) - بال‌های تیز و توپ‌های کناری
   else if (lvl === 1) {
     c.fillStyle = col1;
     c.beginPath();
@@ -1488,7 +1500,6 @@ function drawBoss(c, e, bossLvl) {
     c.beginPath(); c.arc(-r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill();
     c.beginPath(); c.arc(r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill();
   }
-  // 3. قلعه پرنده (فیروزه‌ای) - مکعب زره‌پوش
   else if (lvl === 2) {
     c.fillStyle = col1;
     c.fillRect(-r*1.3, -r*0.8, r*2.6, r*1.6);
@@ -1498,14 +1509,12 @@ function drawBoss(c, e, bossLvl) {
     c.fillRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
     c.strokeStyle = '#fff'; c.lineWidth = 1; c.strokeRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
     
-    // 4 توپ گوشه
     c.fillStyle = glow;
     c.fillRect(-r*1.3, -r*0.8, r*0.4, r*0.4);
     c.fillRect(r*0.9, -r*0.8, r*0.4, r*0.4);
     c.fillRect(-r*1.3, r*0.4, r*0.4, r*0.4);
     c.fillRect(r*0.9, r*0.4, r*0.4, r*0.4);
   }
-  // 4. ستاره کهکشانی (طلایی) - چند لایه 8 پر
   else if (lvl === 3) {
     c.fillStyle = col1;
     c.beginPath();
@@ -1518,25 +1527,21 @@ function drawBoss(c, e, bossLvl) {
     c.closePath(); c.fill();
     c.strokeStyle = glow; c.lineWidth = 2; c.stroke();
     
-    // حلقه داخلی
     c.fillStyle = col2;
     c.beginPath(); c.arc(0, 0, r*0.7, 0, Math.PI*2); c.fill();
     c.strokeStyle = '#fff'; c.lineWidth = 1.5; c.stroke();
   }
-  // 5. چشم کیهانی (سفید/خاکستری) - دایره‌های مداری و یک چشم مرکزی
   else {
     c.fillStyle = col1;
     c.beginPath(); c.arc(0, 0, r*1.4, 0, Math.PI*2); c.fill();
     c.strokeStyle = glow; c.lineWidth = 3; c.stroke();
     
-    // حلقه چرخان
     c.fillStyle = col2;
     c.beginPath(); c.ellipse(0, 0, r*1.6, r*0.4, Math.PI/4, 0, Math.PI*2); c.fill();
     c.strokeStyle = glow; c.lineWidth = 1; c.stroke();
     c.beginPath(); c.ellipse(0, 0, r*1.6, r*0.4, -Math.PI/4, 0, Math.PI*2); c.fill();
     c.stroke();
 
-    // چشم مرکزی
     c.fillStyle = '#fff';
     c.beginPath(); c.ellipse(0, 0, r*0.5, r*0.3, 0, 0, Math.PI*2); c.fill();
     c.fillStyle = glow;
@@ -1609,16 +1614,6 @@ function draw(){
         }
         ctx.closePath(); ctx.fill(); ctx.stroke(); 
     }
-
-    if (e.isBoss) {
-        ctx.rotate(-e.rot); 
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(-e.r, -e.r - 35, e.r*2, 10);
-        ctx.fillStyle = 'red'; ctx.fillRect(-e.r, -e.r - 35, e.r*2, 10);
-        ctx.fillStyle = 'lime';
-        const hpPct = Math.max(0, e.hp / e.maxHp);
-        ctx.fillRect(-e.r, -e.r - 35, e.r*2 * hpPct, 10);
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.strokeRect(-e.r, -e.r - 35, e.r*2, 10);
-    }
     ctx.restore();
   }
 
@@ -1644,6 +1639,60 @@ function draw(){
         ctx.translate(p.x, p.y);
         drawShipShape(ctx, skin, 0.8);
         ctx.restore();
+    }
+  }
+
+  // هشدار آمدن غول
+  if (isBossWarningActive) {
+    const alpha = 0.1 + 0.05 * Math.sin(S.t / 10);
+    ctx.fillStyle = `rgba(128, 11, 27, ${alpha})`;
+    ctx.fillRect(0, 0, W, H);
+    
+    ctx.font = '900 24px Vazirmatn';
+    ctx.fillStyle = `rgba(255, 92, 138, ${0.5 + 0.5 * Math.sin(S.t / 5)})`;
+    ctx.textAlign = 'center';
+    ctx.fillText('⚠️ هشدار! غول در حال نزدیک شدن است ⚠️', W/2, H/2);
+  }
+
+  // نوار سلامتی غول در بالای صفحه
+  if (isBossActive) {
+    const boss = S.enemies.find(e => e.isBoss);
+    if (boss) {
+      const barWidth = Math.min(W * 0.8, 400);
+      const barHeight = 12;
+      const barX = (W - barWidth) / 2;
+      const barY = 60; // زیر تب ها
+      
+      // پس زمینه
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barWidth, barHeight, 6);
+      ctx.fill();
+      
+      // نوار خون
+      const hpPct = Math.max(0, boss.hp / boss.maxHp);
+      const grad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+      grad.addColorStop(0, '#ff5c8a');
+      grad.addColorStop(1, '#800b1b');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barWidth * hpPct, barHeight, 6);
+      ctx.fill();
+      
+      // حاشیه
+      ctx.strokeStyle = '#ff5c8a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barWidth, barHeight, 6);
+      ctx.stroke();
+      
+      // متن
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px Vazirmatn';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('جان غول', W/2, barY + barHeight/2);
+      ctx.textBaseline = 'alphabetic'; 
     }
   }
 
