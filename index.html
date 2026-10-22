@@ -98,7 +98,24 @@
     border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
 
-  /* ═══════════ پروفایل (دیزاین جدید: راست و چپ) ═══════════ */
+  /* ═══════════ پروفایل (تم کاملاً یاقوتی تیره) ═══════════ */
+  #profilePanel {
+    background: #0a0002; /* پس‌زمینه یاقوت تیره */
+    color: #ffb3b3;
+  }
+  
+  #profilePanel::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff5c8a, #800b1b);
+  }
+
+  #profilePanel .panel h2 {
+    background: linear-gradient(90deg, #ff5c8a 20%, #800b1b 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 15px rgba(255, 92, 138, 0.3);
+  }
+
   .profile-top-section {
     display: flex;
     gap: 12px;
@@ -111,9 +128,9 @@
   .profile-card {
     flex: 1;
     padding: 12px 10px;
-    background: linear-gradient(145deg, rgba(0,255,255,0.08), rgba(4,6,15,0.9));
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.15), inset 0 0 15px rgba(0,255,255,0.05);
+    background: linear-gradient(145deg, rgba(128, 11, 27, 0.8), rgba(20, 0, 4, 0.95));
+    border: 1px solid rgba(255, 92, 138, 0.5);
+    box-shadow: 0 0 25px rgba(255, 92, 138, 0.2), inset 0 0 15px rgba(255, 92, 138, 0.1);
     border-radius: 15px; 
     text-align: center; 
     position: relative; 
@@ -123,7 +140,7 @@
   }
   .profile-card::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
     transform: skewX(-25deg); transition: 0.5s;
   }
   .profile-card:hover::before { left: 150%; }
@@ -135,10 +152,10 @@
   }
   .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px currentColor); }
   .preview-name { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
-  .preview-title { font-size: 8px; color: #0ff; margin-top: 2px; opacity: 0.9; letter-spacing: 1px; }
+  .preview-title { font-size: 8px; color: #ff5c8a; margin-top: 2px; opacity: 0.9; letter-spacing: 1px; }
   
   .preview-total { 
-    margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,255,255,0.15); 
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255, 92, 138, 0.2); 
     font-size: 12px; color: #ffd700; font-weight: 700; 
   }
 
@@ -146,8 +163,8 @@
   .music-player { 
     flex: 1;
     padding: 12px 10px; 
-    background: linear-gradient(145deg, rgba(128, 11, 27, 0.7), rgba(20, 0, 4, 0.9));
-    border: 1px solid rgba(255, 92, 138, 0.4); 
+    background: linear-gradient(145deg, rgba(128, 11, 27, 0.8), rgba(20, 0, 4, 0.95));
+    border: 1px solid rgba(255, 92, 138, 0.5); 
     border-radius: 15px;
     box-shadow: inset 0 0 15px rgba(255, 92, 138, 0.1);
     text-align: center;
@@ -157,7 +174,7 @@
     flex-direction: column;
     justify-content: center;
   }
-  .music-player:hover { box-shadow: 0 0 20px rgba(255, 92, 138, 0.2), inset 0 0 20px rgba(255, 92, 138, 0.15); border-color: rgba(255, 92, 138, 0.7); }
+  .music-player:hover { box-shadow: 0 0 20px rgba(255, 92, 138, 0.3), inset 0 0 20px rgba(255, 92, 138, 0.15); border-color: rgba(255, 92, 138, 0.8); }
   .music-player label { font-size: 11px; color: #ffb3b3; display: block; margin-bottom: 8px; font-weight: 700; }
   
   .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 8px; }
@@ -177,34 +194,35 @@
   #playBgmBtn { background: linear-gradient(90deg, #ff5c8a, #800b1b); color: #fff; box-shadow: 0 0 10px rgba(255, 92, 138, 0.4); }
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255, 92, 138, 0.2); }
 
+  /* کادرها و آواتارها */
   .form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
-  .form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
+  .form-group label{display:block;margin-bottom:6px;color:#ffb3b3;font-size:13px;font-weight:600}
   .form-group input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;
-    background:rgba(0,0,0,0.5);border:1px solid rgba(0,255,255,0.25);
+    background:rgba(20, 0, 4, 0.6);border:1px solid rgba(255, 92, 138, 0.3);
     color:#fff;font-family:inherit;font-size:14px;outline:none;transition: 0.3s;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
-  .form-group input[type="text"]:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.4), inset 0 2px 5px rgba(0,0,0,0.5);}
+  .form-group input[type="text"]:focus{border-color:#ff5c8a; box-shadow: 0 0 15px rgba(255, 92, 138, 0.4), inset 0 2px 5px rgba(0,0,0,0.5);}
   
   .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(45px, 1fr));gap:8px; max-width: 340px; margin: 0 auto;}
   .avatar-btn{
-    background:rgba(255,255,255,0.03);border:1px solid transparent;
+    background:rgba(255, 92, 138, 0.05);border:1px solid transparent;
     border-radius:10px;padding:6px;cursor:pointer;
     display: flex; align-items: center; justify-content: center; height: 48px;
     transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
   }
   .avatar-btn svg { width: 100%; height: 100%; transition: 0.3s; }
-  .avatar-btn:hover { background:rgba(0,255,255,0.12); transform: translateY(-2px); border-color: rgba(0,255,255,0.4);}
-  .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.2);transform:scale(1.05); box-shadow: 0 0 12px rgba(0,255,255,0.5);}
+  .avatar-btn:hover { background:rgba(255, 92, 138, 0.15); transform: translateY(-2px); border-color: rgba(255, 92, 138, 0.5);}
+  .avatar-btn.selected{border-color:#ff5c8a;background:rgba(255, 92, 138, 0.25);transform:scale(1.05); box-shadow: 0 0 12px rgba(255, 92, 138, 0.6);}
   .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
   
-  /* دکمه ذخیره (کوچیک و بالاتر) */
+  /* دکمه ذخیره (یاقوتی) */
   .save-btn{
     display:block;
     width: fit-content;
     padding:8px 30px;
     margin: 5px auto 15px auto;
-    background:linear-gradient(90deg, #00d2ff, #0ff);
-    color:#04060f;
+    background:linear-gradient(90deg, #ff5c8a, #800b1b);
+    color:#fff;
     border:none;
     border-radius:30px;
     font-size:14px;
@@ -212,21 +230,21 @@
     cursor:pointer;
     font-family:inherit;
     transition: 0.3s;
-    box-shadow: 0 4px 15px rgba(0,255,255,0.3);
+    box-shadow: 0 4px 15px rgba(255, 92, 138, 0.4);
   }
-  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,255,255,0.5); }
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 92, 138, 0.6); }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
 
-  /* سوئیچ صدا (کوچیک‌تر) */
+  /* سوئیچ صدا (یاقوتی) */
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
     max-width: 340px; margin: 10px auto; padding: 12px 16px;
-    background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(0,0,0,0.4));
-    border: 1px solid rgba(0,255,255,0.2);
+    background: linear-gradient(145deg, rgba(128, 11, 27, 0.3), rgba(20, 0, 4, 0.6));
+    border: 1px solid rgba(255, 92, 138, 0.3);
     border-radius: 12px;
     cursor: pointer; transition: 0.3s;
   }
-  .sound-toggle:hover { border-color: rgba(0,255,255,0.4); background: linear-gradient(145deg, rgba(0,255,255,0.1), rgba(0,0,0,0.4)); }
+  .sound-toggle:hover { border-color: rgba(255, 92, 138, 0.6); background: linear-gradient(145deg, rgba(128, 11, 27, 0.5), rgba(20, 0, 4, 0.6)); }
   .sound-toggle span { color: #fff; font-weight: 700; font-size: 14px; }
   .sound-toggle .icon {
     width: 44px; height: 24px; border-radius: 12px;
@@ -238,10 +256,10 @@
     background: #666; top: 3px; left: 3px;
     transition: 0.3s;
   }
-  .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.7); }
-  .sound-toggle.on .icon::after { left: 23px; background: #04060f; }
+  .sound-toggle.on .icon { background: #ff5c8a; box-shadow: 0 0 15px rgba(255, 92, 138, 0.7); }
+  .sound-toggle.on .icon::after { left: 23px; background: #0a0002; }
 
-  /* ═══════════ فروشگاه ═══════════ */
+  /* ═══════════ فروشگاه (بدون تغییر) ═══════════ */
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
   
