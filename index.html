@@ -72,6 +72,47 @@
     border-radius: 3px;
   }
 
+  /* ═══════════ رتبه‌ها ═══════════ */
+  #rankList{list-style:none;max-width:400px;margin:0 auto;padding:0}
+  #rankList li{display:flex;align-items:center;
+    padding:12px 18px;margin-bottom:10px;
+    background:rgba(0,255,255,.05); border:1px solid rgba(0,255,255,.2);
+    border-radius:12px;font-size:16px; transition: transform 0.25s, background 0.25s, box-shadow 0.25s;}
+  #rankList li:hover { background: rgba(0,255,255,0.12); box-shadow: 0 0 15px rgba(0,255,255,0.15); transform: translateX(-5px); }
+  #rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
+  #rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px; text-align:center;}
+  #rankList .pos{width:28px;height:28px;border-radius:50%;
+    background:rgba(0,255,255,.1); display:flex;align-items:center;justify-content:center;
+    font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px; flex-shrink: 0;}
+  #rankList li:nth-child(1) .pos{background:gold;color:#04060f;box-shadow:0 0 10px gold;}
+  #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f;}
+  #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f;}
+  
+  /* قفل کردن سایز آواتارها که بزرگ نشن */
+  #rankList .avatar-svg { 
+    width: 28px; 
+    height: 28px; 
+    margin-right: 10px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-shrink: 0;
+  }
+  #rankList .avatar-svg svg { 
+    width: 28px !important; 
+    height: 28px !important; 
+    max-width: 28px;
+    max-height: 28px;
+    filter: drop-shadow(0 0 5px currentColor); 
+  }
+  #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
+
+  .refresh-btn { display: block; margin: 0 auto 15px auto; padding: 10px 20px; 
+    background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff; 
+    border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
+  .refresh-btn:hover { background: rgba(0,255,255,0.2); }
+
   /* ═══════════ پروفایل (تم آبی فیروزه‌ای) ═══════════ */
   .profile-top-section {
     display: flex;
@@ -372,10 +413,7 @@
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
   
-  <!-- بخش بالایی: پروفایل سمت راست، موزیک سمت چپ -->
   <div class="profile-top-section">
-    
-    <!-- کارت پروفایل (کوچیک شده - سمت راست) -->
     <div class="profile-card">
       <div class="preview-avatar" id="previewAvatar"></div>
       <div class="preview-name" id="previewName">در حال بارگذاری...</div>
@@ -383,7 +421,6 @@
       <div class="preview-total">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
     </div>
 
-    <!-- پخش آهنگ (دیزاین آبی فیروزه ای - سمت چپ) -->
     <div class="music-player">
       <label>🎵 موزیک دلخواه:</label>
       <div class="file-upload-wrapper">
@@ -395,10 +432,8 @@
         <button id="pauseBgmBtn">⏸️</button>
       </div>
     </div>
-    
   </div>
 
-  <!-- بقیه المان‌ها که پایین قرار می‌گیرن -->
   <div class="form-group">
     <label>اسم شما (نام فرمانده):</label>
     <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
@@ -414,7 +449,6 @@
     <div class="icon"></div>
   </div>
   
-  <!-- دکمه ذخیره (کوچیک و بالاتر) -->
   <button class="save-btn" id="saveProfileBtn">ذخیره پروفایل</button>
 </div>
 
@@ -664,7 +698,6 @@ function renderProfileUI() {
   st.classList.toggle('on', SND.enabled);
 }
 
-// تابع نمایش اعلان
 function showToast(msg) {
   const toast = document.getElementById('toastNotification');
   document.getElementById('toastText').textContent = msg;
@@ -709,7 +742,6 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   saveGameData();
   await saveScoreToLeaderboard(totalScore);
 
-  // نمایش اعلان بر اساس تغییرات
   if (oldName !== newName) {
       showToast(`✨ اسم شما به «${newName}» تغییر یافت!`);
   } else {
@@ -1341,12 +1373,14 @@ async function getScores(){
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
     if (res.ok) return await res.json();
-  } catch(e) {}
-  return [];
+    return { error: res.status };
+  } catch(e) {
+    return { error: e.message };
+  }
 }
 
 async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
-  if(newTotalScore <= 0) return;
+  if(newTotalScore <= 0 || isNaN(newTotalScore)) return;
   const syncIcon = document.getElementById('syncIndicator');
   if (syncIcon) syncIcon.classList.add('syncing');
   try {
@@ -1362,10 +1396,10 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
     });
     if (!res.ok && !isSilent) {
         const errorData = await res.text();
-        alert("خطا در ذخیره امتیاز:\n" + errorData);
+        console.error("Save Error:", errorData);
     }
   } catch(e) {
-    if (!isSilent) alert("خطای شبکه در ذخیره امتیاز:\n" + e.message);
+    if (!isSilent) console.error("Network Error:", e.message);
   }
   if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
 }
@@ -1374,13 +1408,22 @@ async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   const scores = await getScores();
-  if(scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
+  
+  if (scores.error) {
+    list.innerHTML = `<li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>`;
+    return;
+  }
+  
+  if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
+  
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
     if (typeof s.avatar === 'number') {
-      const av = getAvatarById(s.avatar);
+      const av = getAvatarById(s.avatar) || getAvatarById(1);
       avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
-    } else avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
+    } else {
+      avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`;
+    }
     return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
   }).join('');
 }
@@ -1393,8 +1436,16 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    if(tab === 'shop') renderShop();
-    else if(tab === 'rank'){ await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false); renderRank(); }
+    
+    if(tab === 'shop') {
+      renderShop();
+    } else if(tab === 'rank'){ 
+      let currentScore = S ? (S.score || 0) : 0;
+      if (currentScore > 0) {
+         await saveScoreToLeaderboard(totalScore + currentScore, true);
+      }
+      renderRank(); 
+    }
   };
 });
 
