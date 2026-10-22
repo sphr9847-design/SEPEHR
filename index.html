@@ -11,7 +11,9 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
-  canvas{display:block;position:fixed;inset:0;touch-action:none}
+  
+  /* 👇 اصلاح باگ: فقط بوم اصلی بازی تمام‌صفحه بشه */
+  #c { display:block; position:fixed; inset:0; touch-action:none; }
   
   #purchaseToast {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
@@ -145,7 +147,14 @@
     display: flex; align-items: center; justify-content: center;
     margin-left: 10px; overflow: hidden;
   }
-  .skin-preview canvas { width: 100%; height: 100%; }
+  /* 👇 استایل بوم کوچک پیش‌نمایش */
+  .skin-preview canvas { 
+    width: 100% !important; 
+    height: 100% !important; 
+    display: block; 
+    position: static !important; 
+    inset: auto !important;
+  }
 
   .w-btn{
     padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
@@ -427,7 +436,7 @@ const SND = {
   }
 };
 
-/* ═══════════════ اسکین‌های سفینه ═══════════════ */
+/* ═══════════════ اسکین‌ها ═══════════════ */
 const SKINS = [
   { id: 1, name: "لژیون", cost: 0, color: "#a8ffd0", glow: "#7df9ff", type: "default" },
   { id: 2, name: "فانتوم نئونی", cost: 500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
@@ -472,7 +481,7 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-/* ═══════════════ ذخیره‌سازی خودکار ═══════════════ */
+/* ═══════════════ ذخیره‌سازی ═══════════════ */
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 let profile = { name: defaultName, avatar: 1 };
@@ -499,7 +508,6 @@ function loadGameData() {
       if (typeof d.totalScore === 'number') totalScore = d.totalScore;
       return;
     }
-    // مهاجرت از کلیدهای قدیمی
     const oldProf = localStorage.getItem('shooter_profile');
     if (oldProf) profile = JSON.parse(oldProf);
     const oldCoins = localStorage.getItem('shooter_coins');
@@ -518,8 +526,7 @@ function loadGameData() {
 function saveGameData() {
   try {
     const data = {
-      v: 3,
-      profile, coins, ownedWeapons, equippedWeapon,
+      v: 3, profile, coins, ownedWeapons, equippedWeapon,
       ownedSkins, equippedSkin, weaponLevels, totalScore,
       savedAt: Date.now()
     };
@@ -535,7 +542,6 @@ function saveGameData() {
   } catch(e) {}
 }
 
-// 👈 بارگذاری خودکار در شروع
 loadGameData();
 
 if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) {
@@ -543,10 +549,8 @@ if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) {
     saveGameData();
 }
 
-// 👈 ذخیره خودکار هر ۱ ثانیه
 setInterval(() => { saveGameData(); }, 1000);
 
-// 👈 ذخیره فوری موقع خروج یا مخفی شدن تب
 window.addEventListener('beforeunload', () => {
   saveGameData();
   if(!isDead && S && S.score > 0) saveScoreToLeaderboard(totalScore + S.score, true);
@@ -565,7 +569,7 @@ function saveData() {
   saveTimeout = setTimeout(saveGameData, 300);
 }
 
-/* ═══════════════ بقیه منطق ═══════════════ */
+/* ═══════════════ منطق پروفایل ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
 function getAvatarById(id) {
@@ -709,13 +713,21 @@ function renderShop() {
 }
 
 function drawSkinPreview(container, skinId) {
+  // 👇 ساخت بوم جدید مخصوص پیش‌نمایش
   const canvas = document.createElement('canvas');
-  canvas.width = 100; canvas.height = 100;
-  canvas.style.width = '100%'; canvas.style.height = '100%';
+  canvas.width = 100; 
+  canvas.height = 100;
+  // با CSS استایل‌هاش رو محدود به کادر می‌کنیم
+  canvas.style.width = '100%'; 
+  canvas.style.height = '100%';
+  canvas.style.display = 'block';
+  canvas.style.position = 'static';
+  
   const c = canvas.getContext('2d');
   const sk = getSkinById(skinId);
   c.translate(50, 50);
   drawShipShape(c, sk, 1.5);
+  
   container.innerHTML = '';
   container.appendChild(canvas);
 }
@@ -735,43 +747,19 @@ function drawShipShape(c, skin, scale) {
   c.beginPath();
   switch(skin.type) {
     case 'default':
-      c.moveTo(0, -22);
-      c.lineTo(8, -8);
-      c.lineTo(22, 8);
-      c.lineTo(10, 14);
-      c.lineTo(4, 10);
-      c.lineTo(2, 16);
-      c.lineTo(0, 12);
-      c.lineTo(-2, 16);
-      c.lineTo(-4, 10);
-      c.lineTo(-10, 14);
-      c.lineTo(-22, 8);
-      c.lineTo(-8, -8);
+      c.moveTo(0, -22); c.lineTo(8, -8); c.lineTo(22, 8); c.lineTo(10, 14);
+      c.lineTo(4, 10); c.lineTo(2, 16); c.lineTo(0, 12); c.lineTo(-2, 16);
+      c.lineTo(-4, 10); c.lineTo(-10, 14); c.lineTo(-22, 8); c.lineTo(-8, -8);
       break;
     case 'phantom':
-      c.moveTo(0, -26);
-      c.lineTo(6, -10);
-      c.lineTo(24, 12);
-      c.lineTo(8, 6);
-      c.lineTo(4, 18);
-      c.lineTo(-4, 18);
-      c.lineTo(-8, 6);
-      c.lineTo(-24, 12);
+      c.moveTo(0, -26); c.lineTo(6, -10); c.lineTo(24, 12); c.lineTo(8, 6);
+      c.lineTo(4, 18); c.lineTo(-4, 18); c.lineTo(-8, 6); c.lineTo(-24, 12);
       c.lineTo(-6, -10);
       break;
     case 'shadow':
-      c.moveTo(0, -20);
-      c.lineTo(4, -14);
-      c.lineTo(16, -16);
-      c.lineTo(26, 6);
-      c.lineTo(18, 10);
-      c.lineTo(10, 18);
-      c.lineTo(0, 14);
-      c.lineTo(-10, 18);
-      c.lineTo(-18, 10);
-      c.lineTo(-26, 6);
-      c.lineTo(-16, -16);
-      c.lineTo(-4, -14);
+      c.moveTo(0, -20); c.lineTo(4, -14); c.lineTo(16, -16); c.lineTo(26, 6);
+      c.lineTo(18, 10); c.lineTo(10, 18); c.lineTo(0, 14); c.lineTo(-10, 18);
+      c.lineTo(-18, 10); c.lineTo(-26, 6); c.lineTo(-16, -16); c.lineTo(-4, -14);
       break;
     case 'star':
       for(let i=0;i<16;i++){
@@ -782,14 +770,8 @@ function drawShipShape(c, skin, scale) {
       }
       break;
     case 'crystal':
-      c.moveTo(0, -24);
-      c.lineTo(10, -12);
-      c.lineTo(14, 4);
-      c.lineTo(8, 16);
-      c.lineTo(0, 20);
-      c.lineTo(-8, 16);
-      c.lineTo(-14, 4);
-      c.lineTo(-10, -12);
+      c.moveTo(0, -24); c.lineTo(10, -12); c.lineTo(14, 4); c.lineTo(8, 16);
+      c.lineTo(0, 20); c.lineTo(-8, 16); c.lineTo(-14, 4); c.lineTo(-10, -12);
       break;
   }
   c.closePath();
@@ -801,27 +783,11 @@ function drawShipShape(c, skin, scale) {
   c.lineWidth = 1.2 / scale;
   c.beginPath();
   switch(skin.type) {
-    case 'default':
-      c.moveTo(0, -16); c.lineTo(0, 8);
-      c.moveTo(-6, -2); c.lineTo(6, -2);
-      break;
-    case 'phantom':
-      c.moveTo(0, -20); c.lineTo(0, 12);
-      c.moveTo(-10, 4); c.lineTo(10, 4);
-      break;
-    case 'shadow':
-      c.moveTo(0, -14); c.lineTo(0, 10);
-      c.moveTo(-10, -2); c.lineTo(10, -2);
-      c.moveTo(-14, 6); c.lineTo(14, 6);
-      break;
-    case 'star':
-      c.arc(0, 0, 5, 0, Math.PI*2);
-      break;
-    case 'crystal':
-      c.moveTo(0, -18); c.lineTo(0, 14);
-      c.moveTo(-6, -4); c.lineTo(6, -4);
-      c.moveTo(-8, 4); c.lineTo(8, 4);
-      break;
+    case 'default': c.moveTo(0, -16); c.lineTo(0, 8); c.moveTo(-6, -2); c.lineTo(6, -2); break;
+    case 'phantom': c.moveTo(0, -20); c.lineTo(0, 12); c.moveTo(-10, 4); c.lineTo(10, 4); break;
+    case 'shadow': c.moveTo(0, -14); c.lineTo(0, 10); c.moveTo(-10, -2); c.lineTo(10, -2); c.moveTo(-14, 6); c.lineTo(14, 6); break;
+    case 'star': c.arc(0, 0, 5, 0, Math.PI*2); break;
+    case 'crystal': c.moveTo(0, -18); c.lineTo(0, 14); c.moveTo(-6, -4); c.lineTo(6, -4); c.moveTo(-8, 4); c.lineTo(8, 4); break;
   }
   c.stroke();
   
@@ -836,7 +802,6 @@ function drawShipShape(c, skin, scale) {
     case 'crystal': c.arc(0, 0, 4, 0, Math.PI*2); break;
   }
   c.fill();
-  
   c.shadowBlur = 0;
   c.restore();
 }
@@ -1237,7 +1202,6 @@ function draw(){
     } else {
         const skin = getSkinById(equippedSkin);
         
-        // آتش موتور
         const fl = 11 + Math.random()*9;
         const g = ctx.createLinearGradient(p.x, p.y+10, p.x, p.y+10+fl);
         g.addColorStop(0, skin.glow + 'aa');
@@ -1250,7 +1214,6 @@ function draw(){
         ctx.closePath();
         ctx.fill();
         
-        // سفینه با شکل اسکین
         ctx.save();
         ctx.translate(p.x, p.y);
         drawShipShape(ctx, skin, 0.8);
