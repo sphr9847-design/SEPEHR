@@ -50,7 +50,6 @@
     100% { transform: translate(-50%, -50%) scale(1); }
   }
   
-  /* استایل جدید برای آیکون‌های هشدار */
   .warn-icon {
     display: flex; align-items: center; justify-content: center;
     color: #ff5c8a;
@@ -1225,7 +1224,7 @@ function resize(){
   cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
 }
 resize();
-addEventListener('resize', () => { resize(); if(S){ S.player.y = H - 90; S.player.x = Math.min(S.player.x, W - 22); } });
+addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
 let S, isDead = false;
 let currentBossIndex = 0;
@@ -1259,27 +1258,31 @@ function reset(){
 }
 reset();
 
-const keys = {left:false, right:false, fire:false};
-let touching = false, touchX = null;
+const keys = {left:false, right:false, up:false, down:false, fire:false};
+let touching = false, touchX = null, touchY = null;
 
 addEventListener('keydown', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = true;
   if(['ArrowRight','d','D'].includes(e.key)) keys.right = true;
+  if(['ArrowUp','w','W'].includes(e.key)) keys.up = true; // دکمه بالا
+  if(['ArrowDown','s','S'].includes(e.key)) keys.down = true; // دکمه پایین
   if(e.key === ' '){ keys.fire = true; e.preventDefault(); }
   if(e.key === 'Enter') SND.init();
 });
 addEventListener('keyup', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = false;
   if(['ArrowRight','d','D'].includes(e.key)) keys.right = false;
+  if(['ArrowUp','w','W'].includes(e.key)) keys.up = false; // رها کردن بالا
+  if(['ArrowDown','s','S'].includes(e.key)) keys.down = false; // رها کردن پایین
   if(e.key === ' ') keys.fire = false;
 });
 
-cvs.addEventListener('touchstart', e => { e.preventDefault(); SND.init(); touching = true; const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
-cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if(t) touchX = t.clientX; }, {passive:false});
-cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; }, {passive:false});
+cvs.addEventListener('touchstart', e => { e.preventDefault(); SND.init(); touching = true; const t = e.touches[0]; if(t) { touchX = t.clientX; touchY = t.clientY; } }, {passive:false});
+cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches[0]; if(t) { touchX = t.clientX; touchY = t.clientY; } }, {passive:false});
+cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; touchY = null; }, {passive:false});
 cvs.addEventListener('mousedown', () => { SND.init(); keys.fire = true; });
 addEventListener('mouseup', () => keys.fire = false);
-cvs.addEventListener('mousemove', e => { if(keys.fire) touchX = e.clientX; });
+cvs.addEventListener('mousemove', e => { if(keys.fire) { touchX = e.clientX; touchY = e.clientY; } });
 
 function fire(){
   let w = S.tempWeapon ? S.tempWeapon : WEAPONS.find(x => x.id === equippedWeapon);
@@ -1419,10 +1422,24 @@ function update(dt){
   
   const p = S.player;
   const sp = 0.9 * dt;
+  
+  // حرکت افقی و عمودی
   if(keys.left)  p.x -= sp;
   if(keys.right) p.x += sp;
-  if(touchX !== null){ const d = touchX - p.x; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, d)); }
+  if(keys.up)    p.y -= sp;
+  if(keys.down)  p.y += sp;
+  
+  // حرکت با لمس (هم افقی هم عمودی)
+  if(touchX !== null && touchY !== null){ 
+    const dx = touchX - p.x; 
+    const dy = touchY - p.y;
+    p.x += Math.max(-sp*1.6, Math.min(sp*1.6, dx)); 
+    p.y += Math.max(-sp*1.6, Math.min(sp*1.6, dy));
+  }
+  
+  // محدودیت‌های صفحه
   p.x = Math.max(22, Math.min(W - 22, p.x));
+  p.y = Math.max(TOP_UI_HEIGHT + 30, Math.min(H - 40, p.y)); // از زیر منو تا بالای لبه پایین
 
   S.cool -= dt;
   if((keys.fire || touching) && S.cool <= 0) fire();
