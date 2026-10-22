@@ -33,10 +33,10 @@
     position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
     background: rgba(20, 0, 4, 0.7);
     border: 2px solid rgba(255, 92, 138, 0.6);
-    padding: 12px 30px; border-radius: 15px;
+    padding: 12px 35px; border-radius: 15px;
     display: flex; align-items: center; justify-content: center; gap: 15px;
     font-size: 26px; font-weight: 900; color: #ffb3b3;
-    font-family: 'Vazirmatn', monospace; letter-spacing: 4px;
+    font-family: 'Vazirmatn', sans-serif; letter-spacing: 4px;
     z-index: 1500; pointer-events: none;
     opacity: 0; transition: opacity 0.3s;
     box-shadow: 0 0 25px rgba(255, 92, 138, 0.3), inset 0 0 15px rgba(255, 92, 138, 0.1);
@@ -46,12 +46,23 @@
   
   @keyframes warnPulse {
     0% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.05); }
+    50% { transform: translate(-50%, -50%) scale(1.03); }
     100% { transform: translate(-50%, -50%) scale(1); }
   }
   
+  /* استایل جدید برای آیکون‌های هشدار */
   .warn-icon {
-    font-size: 28px; color: #ff5c8a; text-shadow: 0 0 15px #ff5c8a;
+    display: flex; align-items: center; justify-content: center;
+    color: #ff5c8a;
+  }
+  .warn-icon svg {
+    width: 28px; height: 28px;
+    filter: drop-shadow(0 0 8px #ff5c8a);
+    animation: iconPulse 1s infinite alternate;
+  }
+  @keyframes iconPulse {
+    from { transform: scale(1); opacity: 0.8; }
+    to { transform: scale(1.15); opacity: 1; }
   }
 
   /* ═══════════ اعلان خرید ═══════════ */
@@ -434,9 +445,21 @@
 
 <!-- اعلان هشدار وسط صفحه -->
 <div id="bossWarning">
-  <span class="warn-icon">⚠️</span>
+  <div class="warn-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </div>
   DANGER
-  <span class="warn-icon">⚠️</span>
+  <div class="warn-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </div>
 </div>
 
 <div id="toastNotification">
@@ -1456,7 +1479,7 @@ function update(dt){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
       
-      // 🔥 فیکس: دشمن باید کاملا از زیر نوار منوها بیرون اومده باشه تا تیر بخوره
+      // دشمن باید کاملا از زیر نوار منوها بیرون اومده باشه تا تیر بخوره
       if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > TOP_UI_HEIGHT){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
