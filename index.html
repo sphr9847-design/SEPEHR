@@ -1213,6 +1213,7 @@ let bossWarningTimer = 0;
 
 const dangerOverlay = document.getElementById('dangerOverlay');
 const bossWarning = document.getElementById('bossWarning');
+const TOP_UI_HEIGHT = 60; // ارتفاع منوها + حاشیه امن
 
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
@@ -1371,7 +1372,6 @@ function update(dt){
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
-  // مدیریت هشدار آمدن غول
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) {
     isBossWarningActive = true;
     bossWarningTimer = 3000;
@@ -1455,8 +1455,9 @@ function update(dt){
     for(let j = S.enemies.length - 1; j >= 0; j--){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
-      // دشمن باید کاملا وارد صفحه شده باشه
-      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > -e.r){
+      
+      // 🔥 فیکس: دشمن باید کاملا از زیر نوار منوها بیرون اومده باشه تا تیر بخوره
+      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > TOP_UI_HEIGHT){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
