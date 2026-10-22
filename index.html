@@ -1449,17 +1449,13 @@ function update(dt){
     S.miniShipCool -= dt;
     
     if (S.miniShipCool <= 0) {
-      S.miniShipCool = 250; 
+      S.miniShipCool = 200; // سرعت شلیک مینی‌ها
       for (let ms of S.miniShips) {
-        S.bullets.push({ x: ms.x, y: ms.y - 10, vx: 0, vy: -1.8, dmg: 1, color: '#ffd700', size: 3 });
+        // محاسبه دقیق موقعیت مینی‌سفینه در لحظه شلیک
+        let mX = p.x + ms.offsetX;
+        let mY = p.y + ms.offsetY;
+        S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -2.0, dmg: 1, color: '#00ffff', size: 3.5 });
       }
-    }
-    
-    for (let ms of S.miniShips) {
-      const targetX = p.x + ms.offsetX;
-      const targetY = p.y + ms.offsetY + Math.sin(S.t * 0.01 + ms.phase) * 8;
-      ms.x += (targetX - ms.x) * 0.1 * dt;
-      ms.y += (targetY - ms.y) * 0.1 * dt;
     }
   } else {
     S.miniShips = [];
@@ -1528,11 +1524,12 @@ function update(dt){
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
             SND.play('bigExplosion');
             
+            // جایزه مینی سفینه!
             S.miniShipTimer = 40000; 
             S.miniShipCool = 0; 
             S.miniShips = [
-                { x: S.player.x - 40, y: S.player.y + 20, offsetX: -45, offsetY: 15, phase: 0 },
-                { x: S.player.x + 40, y: S.player.y + 20, offsetX: 45, offsetY: 15, phase: Math.PI }
+                { offsetX: -45, offsetY: 15, phase: 0 },
+                { offsetX: 45, offsetY: 15, phase: Math.PI }
             ];
             
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
@@ -1773,32 +1770,63 @@ function draw(){
     }
   }
 
-  // ═══════════ رسم مینی سفینه‌ها ═══════════
+  // ═══════════ رسم مینی سفینه‌ها (دیزاین جدید و قفل شده به سفینه اصلی) ═══════════
   if (S.miniShipTimer > 0 && S.miniShips.length > 0) {
+    const p = S.player;
     for (let ms of S.miniShips) {
+      // محاسبه دقیق موقعیت‌ها برای عدم تاخیر (Lag)
+      let drawX = p.x + ms.offsetX;
+      let drawY = p.y + ms.offsetY + Math.sin(S.t * 0.01 + ms.phase) * 6;
+
       ctx.save();
-      ctx.translate(ms.x, ms.y);
+      ctx.translate(drawX, drawY);
       
+      // هاله درخشان
       ctx.shadowBlur = 10;
-      ctx.shadowColor = '#ffd700';
+      ctx.shadowColor = '#00ffff';
       
-      ctx.fillStyle = '#111';
+      // بدنه فلزی نقره‌ای
+      let grad = ctx.createLinearGradient(0, -14, 0, 14);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(1, '#555555');
+      ctx.fillStyle = grad;
+      
       ctx.beginPath();
-      ctx.moveTo(0, -12);
-      ctx.lineTo(8, 5);
-      ctx.lineTo(0, 2);
-      ctx.lineTo(-8, 5);
+      ctx.moveTo(0, -14); // دماغه
+      ctx.lineTo(6, -2);  // بال راست
+      ctx.lineTo(14, 6);  // نوک بال راست
+      ctx.lineTo(4, 4);   
+      ctx.lineTo(3, 12);  // موتور راست
+      ctx.lineTo(0, 8);   // مرکز
+      ctx.lineTo(-3, 12); // موتور چپ
+      ctx.lineTo(-4, 4);  
+      ctx.lineTo(-14, 6); // نوک بال چپ
+      ctx.lineTo(-6, -2); // بال چپ
       ctx.closePath();
       ctx.fill();
       
+      // خطوط نئونی طلایی
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 1.5;
       ctx.stroke();
       
-      ctx.fillStyle = '#fff';
-      ctx.shadowBlur = 15;
+      // هسته درخشان فیروزه‌ای
+      ctx.fillStyle = '#00ffff';
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#00ffff';
       ctx.beginPath();
-      ctx.arc(0, -3, 2, 0, Math.PI*2);
+      ctx.ellipse(0, -3, 2.5, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      
+      // شعله موتور طلایی
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#ffd700';
+      ctx.beginPath();
+      ctx.moveTo(-2.5, 10);
+      ctx.lineTo(0, 16 + Math.random()*6);
+      ctx.lineTo(2.5, 10);
+      ctx.closePath();
       ctx.fill();
       
       ctx.restore();
@@ -1907,56 +1935,4 @@ async function renderRank(){
     return;
   }
   
-  if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
-  
-  list.innerHTML = scores.map((s, i) => {
-    let avatarHtml = '';
-    if (typeof s.avatar === 'number') {
-      const av = getAvatarById(s.avatar) || getAvatarById(1);
-      avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
-    } else {
-      avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`;
-    }
-    return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
-  }).join('');
-}
-
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.onclick = async () => {
-    SND.init(); SND.play('uiClick');
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
-    document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
-    document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    
-    if(tab === 'shop') {
-      renderShop();
-    } else if(tab === 'rank'){ 
-      let currentScore = S ? (S.score || 0) : 0;
-      if (currentScore > 0) {
-         await saveScoreToLeaderboard(totalScore + currentScore, true);
-      }
-      renderRank(); 
-    }
-  };
-});
-
-document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
-
-let last = 0;
-function loop(ts){
-  const dt = last ? Math.min(ts - last, 50) : 16;
-  last = ts;
-  const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
-                 !document.getElementById('profilePanel').classList.contains('show') &&
-                 !document.getElementById('shopPanel').classList.contains('show');
-  if(onGame){ update(dt); draw(); }
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-renderShop();
-</script>
-</body>
-</html>
+  if
