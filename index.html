@@ -117,7 +117,6 @@
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
   
-  /* 👇 کارت‌های فروشگاه (سلاح و اسکین) */
   .shop-tabs { display: flex; gap: 10px; max-width: 500px; margin: 0 auto 20px; }
   .shop-tab { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(0,255,255,0.2);
     background: rgba(0,255,255,0.05); color: #7df9ff; font-family: inherit; font-weight: 700;
@@ -140,12 +139,11 @@
   .w-action, .s-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   .w-price, .s-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
   
-  /* 👇 پیش‌نمایش اسکین در فروشگاه */
   .skin-preview {
-    width: 50px; height: 50px; border-radius: 12px;
+    width: 55px; height: 55px; border-radius: 12px;
     background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
-    margin-left: 10px;
+    margin-left: 10px; overflow: hidden;
   }
   .skin-preview canvas { width: 100%; height: 100%; }
 
@@ -192,19 +190,6 @@
     transform:none; border:1px solid #333; text-shadow: none;
   }
 
-  /* 👇 دکمه‌های سیو و بازیابی */
-  .save-controls { display: flex; gap: 10px; max-width: 400px; margin: 15px auto; }
-  .save-controls button {
-    flex: 1; padding: 12px; border-radius: 12px;
-    font-family: inherit; font-weight: 700; font-size: 14px;
-    cursor: pointer; transition: 0.3s; border: none;
-  }
-  #manualSaveBtn { background: linear-gradient(135deg, #0ff, #00d2ff); color: #04060f; }
-  #manualSaveBtn:active { transform: scale(0.95); }
-  #restoreBtn { background: transparent; border: 1px solid rgba(255,200,100,0.4); color: #ffc864; }
-  #restoreBtn:active { transform: scale(0.95); background: rgba(255,200,100,0.1); }
-
-  /* 👇 دکمه صدا */
   .sound-toggle {
     display: flex; align-items: center; justify-content: space-between;
     max-width: 400px; margin: 15px auto; padding: 15px 20px;
@@ -282,7 +267,7 @@
 </head>
 <body>
 <div id="purchaseToast">
-  <span id="toastText">سلاح خریداری شد!</span>
+  <span id="toastText">خرید موفق!</span>
 </div>
 
 <div id="tabs">
@@ -333,13 +318,6 @@
     <div class="avatar-grid" id="avatarGrid"></div>
   </div>
   
-  <!-- 👇 دکمه‌های سیو و بازیابی -->
-  <div class="save-controls">
-    <button id="manualSaveBtn">💾 ذخیره پیشرفت</button>
-    <button id="restoreBtn">🔄 بازیابی</button>
-  </div>
-  
-  <!-- 👇 کلید صدا -->
   <div class="sound-toggle on" id="soundToggle">
     <span>🔊 افکت‌های صوتی</span>
     <div class="icon"></div>
@@ -458,7 +436,6 @@ const SKINS = [
   { id: 5, name: "کریستال کهکشانی", cost: 6000, color: "#7df9ff", glow: "#00d2ff", type: "crystal" }
 ];
 
-/* ═══════════════ دیتای بازی ═══════════════ */
 const WEAPONS = [
   { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
   { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
@@ -495,7 +472,7 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-/* ═══════════════ مدیریت ذخیره‌سازی (بهبود یافته) ═══════════════ */
+/* ═══════════════ ذخیره‌سازی خودکار ═══════════════ */
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 let profile = { name: defaultName, avatar: 1 };
@@ -509,7 +486,6 @@ let totalScore = 0;
 
 function loadGameData() {
   try {
-    // اول از کلید جدید
     let raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const d = JSON.parse(raw);
@@ -523,7 +499,7 @@ function loadGameData() {
       if (typeof d.totalScore === 'number') totalScore = d.totalScore;
       return;
     }
-    // اگه کلید جدید نبود، از کلیدهای قدیمی بخون (مهاجرت)
+    // مهاجرت از کلیدهای قدیمی
     const oldProf = localStorage.getItem('shooter_profile');
     if (oldProf) profile = JSON.parse(oldProf);
     const oldCoins = localStorage.getItem('shooter_coins');
@@ -536,9 +512,7 @@ function loadGameData() {
     if (oldLevels) weaponLevels = JSON.parse(oldLevels);
     const oldTotal = localStorage.getItem('shooter_total_score');
     if (oldTotal) totalScore = parseInt(oldTotal);
-  } catch(e) {
-    console.error('Load failed', e);
-  }
+  } catch(e) {}
 }
 
 function saveGameData() {
@@ -550,7 +524,6 @@ function saveGameData() {
       savedAt: Date.now()
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    // پشتیبان در کلید قدیمی
     localStorage.setItem('shooter_coins', coins);
     localStorage.setItem('shooter_weapons', JSON.stringify(ownedWeapons));
     localStorage.setItem('shooter_equipped', equippedWeapon);
@@ -559,17 +532,28 @@ function saveGameData() {
     localStorage.setItem('shooter_total_score', totalScore);
     localStorage.setItem('shooter_skins', JSON.stringify(ownedSkins));
     localStorage.setItem('shooter_equipped_skin', equippedSkin);
-  } catch(e) {
-    console.error('Save failed', e);
-  }
+  } catch(e) {}
 }
 
+// 👈 بارگذاری خودکار در شروع
 loadGameData();
 
 if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) {
     profile = { name: defaultName, avatar: 1 };
     saveGameData();
 }
+
+// 👈 ذخیره خودکار هر ۱ ثانیه
+setInterval(() => { saveGameData(); }, 1000);
+
+// 👈 ذخیره فوری موقع خروج یا مخفی شدن تب
+window.addEventListener('beforeunload', () => {
+  saveGameData();
+  if(!isDead && S && S.score > 0) saveScoreToLeaderboard(totalScore + S.score, true);
+});
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) saveGameData();
+});
 
 function getSkinById(id) {
   return SKINS.find(s => s.id === id) || SKINS[0];
@@ -581,12 +565,7 @@ function saveData() {
   saveTimeout = setTimeout(saveGameData, 300);
 }
 
-window.addEventListener('beforeunload', () => {
-  saveGameData();
-  if(!isDead && S && S.score > 0) saveScoreToLeaderboard(totalScore + S.score, true);
-});
-
-/* ═══════════════ بقیه منطق بازی ═══════════════ */
+/* ═══════════════ بقیه منطق ═══════════════ */
 let selectedAvatarId = profile.avatar;
 
 function getAvatarById(id) {
@@ -632,30 +611,12 @@ document.getElementById('saveProfileBtn').onclick = async () => {
       return;
   }
   profile = { name: newName, avatar: selectedAvatarId };
-  saveData();
+  saveGameData();
   await saveScoreToLeaderboard(totalScore);
   alert('پروفایل با موفقیت ذخیره شد! 🎉');
   btn.textContent = 'ذخیره پروفایل';
   btn.disabled = false;
   document.querySelector('.tab[data-tab="game"]').click();
-};
-
-// 👇 دکمه ذخیره دستی
-document.getElementById('manualSaveBtn').onclick = () => {
-  saveGameData();
-  SND.play('purchase');
-  alert('✅ پیشرفت شما با موفقیت ذخیره شد!\n💰 سکه: ' + coins + '\n🚀 اسکین: ' + getSkinById(equippedSkin).name);
-};
-
-// 👇 دکمه بازیابی
-document.getElementById('restoreBtn').onclick = () => {
-  if(confirm('آیا می‌خواهید پیشرفت ذخیره‌شده را بازیابی کنید؟')) {
-    loadGameData();
-    renderProfileUI();
-    renderShop();
-    SND.play('powerup');
-    alert('✅ پیشرفت شما بازیابی شد!\n💰 سکه: ' + coins);
-  }
 };
 
 document.getElementById('soundToggle').addEventListener('click', () => {
@@ -717,7 +678,6 @@ function renderShop() {
         '<div class="w-action">' + (isOwned ? '' : '<div class="w-price">💰 ' + w.cost + '</div>') + actionHtml + upgradeHtml + '</div></div>';
     }).join('');
   } else {
-    // 👇 اسکین‌ها
     list.innerHTML = SKINS.map(sk => {
       const isOwned = ownedSkins.includes(sk.id);
       const isEquipped = equippedSkin === sk.id;
@@ -730,7 +690,6 @@ function renderShop() {
         actionHtml = '<button class="w-btn btn-buy" ' + (!canAfford ? 'disabled' : '') + ' onclick="buySkin(' + sk.id + ')">خرید</button>';
       }
 
-      // ساخت پیش‌نمایش با Canvas
       return '<div class="skin-card ' + (isOwned ? 'owned' : '') + ' ' + (isEquipped ? 'equipped' : '') + '">' +
         '<div class="s-info"><h3>' + sk.name + '</h3><p>ظاهر سفینه</p></div>' +
         '<div style="display:flex;align-items:center;">' +
@@ -740,7 +699,6 @@ function renderShop() {
       '</div>';
     }).join('');
     
-    // رسم پیش‌نمایش اسکین‌ها بعد از رندر DOM
     setTimeout(() => {
       document.querySelectorAll('.skin-preview').forEach(el => {
         const skinId = parseInt(el.dataset.skin);
@@ -750,64 +708,137 @@ function renderShop() {
   }
 }
 
-// رسم پیش‌نمایش اسکین روی Canvas کوچک
 function drawSkinPreview(container, skinId) {
   const canvas = document.createElement('canvas');
   canvas.width = 100; canvas.height = 100;
+  canvas.style.width = '100%'; canvas.style.height = '100%';
   const c = canvas.getContext('2d');
   const sk = getSkinById(skinId);
-  
   c.translate(50, 50);
-  drawShipShape(c, sk);
-  
+  drawShipShape(c, sk, 1.5);
   container.innerHTML = '';
   container.appendChild(canvas);
 }
 
-// شکل سفینه بر اساس نوع اسکین
-function drawShipShape(c, skin) {
+function drawShipShape(c, skin, scale) {
+  scale = scale || 1;
+  c.save();
+  c.scale(scale, scale);
+  
   c.strokeStyle = skin.color;
-  c.fillStyle = 'rgba(0,0,0,0.5)';
-  c.lineWidth = 3;
-  c.shadowBlur = 15;
+  c.fillStyle = 'rgba(4, 8, 20, 0.75)';
+  c.lineWidth = 2.2 / scale;
+  c.lineJoin = 'round';
+  c.shadowBlur = 18;
   c.shadowColor = skin.glow;
   
   c.beginPath();
   switch(skin.type) {
     case 'default':
-      c.moveTo(0, -32); c.lineTo(22, 22); c.lineTo(12, 26); c.lineTo(0, 14); c.lineTo(-12, 26); c.lineTo(-22, 22);
+      c.moveTo(0, -22);
+      c.lineTo(8, -8);
+      c.lineTo(22, 8);
+      c.lineTo(10, 14);
+      c.lineTo(4, 10);
+      c.lineTo(2, 16);
+      c.lineTo(0, 12);
+      c.lineTo(-2, 16);
+      c.lineTo(-4, 10);
+      c.lineTo(-10, 14);
+      c.lineTo(-22, 8);
+      c.lineTo(-8, -8);
       break;
     case 'phantom':
-      c.moveTo(0, -36); c.lineTo(10, -14); c.lineTo(24, 6); c.lineTo(8, 10); c.lineTo(0, 28);
-      c.lineTo(-8, 10); c.lineTo(-24, 6); c.lineTo(-10, -14);
+      c.moveTo(0, -26);
+      c.lineTo(6, -10);
+      c.lineTo(24, 12);
+      c.lineTo(8, 6);
+      c.lineTo(4, 18);
+      c.lineTo(-4, 18);
+      c.lineTo(-8, 6);
+      c.lineTo(-24, 12);
+      c.lineTo(-6, -10);
       break;
     case 'shadow':
-      c.moveTo(0, -32); c.lineTo(26, 16); c.lineTo(16, 22); c.lineTo(6, 12); c.lineTo(-6, 12);
-      c.lineTo(-16, 22); c.lineTo(-26, 16);
+      c.moveTo(0, -20);
+      c.lineTo(4, -14);
+      c.lineTo(16, -16);
+      c.lineTo(26, 6);
+      c.lineTo(18, 10);
+      c.lineTo(10, 18);
+      c.lineTo(0, 14);
+      c.lineTo(-10, 18);
+      c.lineTo(-18, 10);
+      c.lineTo(-26, 6);
+      c.lineTo(-16, -16);
+      c.lineTo(-4, -14);
       break;
     case 'star':
-      for(let i=0;i<10;i++){
-        const r = i%2===0 ? 28 : 12;
-        const a = i * Math.PI/5 - Math.PI/2;
+      for(let i=0;i<16;i++){
+        const r = i%2===0 ? 24 : 9;
+        const a = i * Math.PI/8 - Math.PI/2;
         const x = Math.cos(a)*r, y = Math.sin(a)*r;
         i===0 ? c.moveTo(x,y) : c.lineTo(x,y);
       }
       break;
     case 'crystal':
-      c.moveTo(0, -34); c.lineTo(20, -10); c.lineTo(20, 14); c.lineTo(0, 26); c.lineTo(-20, 14); c.lineTo(-20, -10);
+      c.moveTo(0, -24);
+      c.lineTo(10, -12);
+      c.lineTo(14, 4);
+      c.lineTo(8, 16);
+      c.lineTo(0, 20);
+      c.lineTo(-8, 16);
+      c.lineTo(-14, 4);
+      c.lineTo(-10, -12);
       break;
   }
   c.closePath();
   c.fill();
   c.stroke();
   
-  // هسته (نقطه مرکزی)
+  c.shadowBlur = 10;
+  c.strokeStyle = skin.glow;
+  c.lineWidth = 1.2 / scale;
   c.beginPath();
+  switch(skin.type) {
+    case 'default':
+      c.moveTo(0, -16); c.lineTo(0, 8);
+      c.moveTo(-6, -2); c.lineTo(6, -2);
+      break;
+    case 'phantom':
+      c.moveTo(0, -20); c.lineTo(0, 12);
+      c.moveTo(-10, 4); c.lineTo(10, 4);
+      break;
+    case 'shadow':
+      c.moveTo(0, -14); c.lineTo(0, 10);
+      c.moveTo(-10, -2); c.lineTo(10, -2);
+      c.moveTo(-14, 6); c.lineTo(14, 6);
+      break;
+    case 'star':
+      c.arc(0, 0, 5, 0, Math.PI*2);
+      break;
+    case 'crystal':
+      c.moveTo(0, -18); c.lineTo(0, 14);
+      c.moveTo(-6, -4); c.lineTo(6, -4);
+      c.moveTo(-8, 4); c.lineTo(8, 4);
+      break;
+  }
+  c.stroke();
+  
+  c.shadowBlur = 25;
   c.fillStyle = skin.glow;
-  c.shadowBlur = 20;
-  c.arc(0, 0, 5, 0, Math.PI*2);
+  c.beginPath();
+  switch(skin.type) {
+    case 'default': c.ellipse(0, -6, 2.5, 5, 0, 0, Math.PI*2); break;
+    case 'phantom': c.ellipse(0, -8, 3, 5, 0, 0, Math.PI*2); break;
+    case 'shadow': c.arc(0, -4, 3.5, 0, Math.PI*2); break;
+    case 'star': c.arc(0, 0, 5, 0, Math.PI*2); break;
+    case 'crystal': c.arc(0, 0, 4, 0, Math.PI*2); break;
+  }
   c.fill();
+  
   c.shadowBlur = 0;
+  c.restore();
 }
 
 function showPurchaseToast(msg) {
@@ -823,7 +854,7 @@ window.buyWeapon = (id) => {
   SND.init();
   const w = WEAPONS.find(x => x.id === id);
   if (coins >= w.cost && !ownedWeapons.includes(id)) {
-    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveData(); renderShop();
+    coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop();
     showPurchaseToast(`سلاح «${w.name}» خریداری شد!`);
     SND.play('purchase');
   }
@@ -835,7 +866,7 @@ window.upgradeWeapon = (id) => {
     const lvl = weaponLevels[id] || 0;
     const cost = Math.floor(200 * Math.pow(1.5, lvl));
     if (coins >= cost) {
-        coins -= cost; weaponLevels[id] = lvl + 1; saveData(); renderShop();
+        coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop();
         showPurchaseToast(`سلاح «${w.name}» به لول ${lvl+1} ارتقا یافت!`);
         SND.play('upgrade');
     }
@@ -843,14 +874,14 @@ window.upgradeWeapon = (id) => {
 
 window.equipWeapon = (id) => {
   SND.init(); SND.play('uiClick');
-  if (ownedWeapons.includes(id)) { equippedWeapon = id; saveData(); renderShop(); }
+  if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); }
 };
 
 window.buySkin = (id) => {
   SND.init();
   const sk = getSkinById(id);
   if (coins >= sk.cost && !ownedSkins.includes(id)) {
-    coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveData(); renderShop();
+    coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop();
     showPurchaseToast(`اسکین «${sk.name}» خریداری شد!`);
     SND.play('purchase');
   }
@@ -858,10 +889,10 @@ window.buySkin = (id) => {
 
 window.equipSkin = (id) => {
   SND.init(); SND.play('uiClick');
-  if (ownedSkins.includes(id)) { equippedSkin = id; saveData(); renderShop(); }
+  if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); }
 };
 
-/* ═══════════════ منطق بازی (خلاصه) ═══════════════ */
+/* ═══════════════ منطق بازی ═══════════════ */
 function resize(){
   W = innerWidth; H = innerHeight;
   cvs.width = W; cvs.height = H;
@@ -1002,7 +1033,7 @@ setInterval(autoSync, 15000);
 function update(dt){
   if(S.lives <= 0) return;
   S.t++;
-  if(S.t % 120 === 0) saveData();
+  if(S.t % 120 === 0) saveGameData();
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
@@ -1081,7 +1112,7 @@ function update(dt){
             SND.play('explosion');
             if (Math.random() < 0.01) spawnPowerup(e.x, e.y);
           }
-          saveData(); 
+          saveGameData(); 
         }
         break;
       }
@@ -1129,7 +1160,7 @@ function triggerGameOver() {
   const achievedScore = S.score;
   const bonusCoins = Math.floor(achievedScore / 10);
   if(achievedScore > 0) {
-    totalScore += achievedScore; coins += bonusCoins; saveData(); 
+    totalScore += achievedScore; coins += bonusCoins; saveGameData(); 
     localStorage.setItem('shooter_current_score', 0); 
     saveScoreToLeaderboard(totalScore); 
     document.getElementById('finalScoreVal').textContent = achievedScore;
@@ -1204,59 +1235,26 @@ function draw(){
     if (p.inv > 0 && Math.floor(S.t * 0.1) % 2 === 0) {
         // چشمک نمیزنه
     } else {
-        // 👇 رسم سفینه با اسکین انتخابی
         const skin = getSkinById(equippedSkin);
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.strokeStyle = skin.color;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.lineWidth = 1.6;
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = skin.glow;
         
-        ctx.beginPath();
-        switch(skin.type) {
-          case 'default':
-            ctx.moveTo(0, -20); ctx.lineTo(14, 12); ctx.lineTo(7, 16); ctx.lineTo(0, 8); ctx.lineTo(-7, 16); ctx.lineTo(-14, 12);
-            break;
-          case 'phantom':
-            ctx.moveTo(0, -22); ctx.lineTo(6, -8); ctx.lineTo(15, 4); ctx.lineTo(5, 6); ctx.lineTo(0, 17);
-            ctx.lineTo(-5, 6); ctx.lineTo(-15, 4); ctx.lineTo(-6, -8);
-            break;
-          case 'shadow':
-            ctx.moveTo(0, -20); ctx.lineTo(16, 10); ctx.lineTo(10, 14); ctx.lineTo(4, 8); ctx.lineTo(-4, 8);
-            ctx.lineTo(-10, 14); ctx.lineTo(-16, 10);
-            break;
-          case 'star':
-            for(let i=0;i<10;i++){
-              const r = i%2===0 ? 18 : 8;
-              const a = i * Math.PI/5 - Math.PI/2;
-              const x = Math.cos(a)*r, y = Math.sin(a)*r;
-              i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-            }
-            break;
-          case 'crystal':
-            ctx.moveTo(0, -22); ctx.lineTo(13, -7); ctx.lineTo(13, 9); ctx.lineTo(0, 17); ctx.lineTo(-13, 9); ctx.lineTo(-13, -7);
-            break;
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        
-        // هسته درخشان
-        ctx.fillStyle = skin.glow;
-        ctx.shadowBlur = 15;
-        ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.restore();
-        
-        // افکت آتش موتور (همه اسکین‌ها)
+        // آتش موتور
         const fl = 11 + Math.random()*9;
         const g = ctx.createLinearGradient(p.x, p.y+10, p.x, p.y+10+fl);
         g.addColorStop(0, skin.glow + 'aa');
         g.addColorStop(1, skin.glow + '00');
         ctx.fillStyle = g;
-        ctx.beginPath(); ctx.moveTo(p.x-5, p.y+10); ctx.lineTo(p.x, p.y+10+fl); ctx.lineTo(p.x+5, p.y+10); ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(p.x-5, p.y+10);
+        ctx.lineTo(p.x, p.y+10+fl);
+        ctx.lineTo(p.x+5, p.y+10);
+        ctx.closePath();
+        ctx.fill();
+        
+        // سفینه با شکل اسکین
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        drawShipShape(ctx, skin, 0.8);
+        ctx.restore();
     }
   }
 
@@ -1347,7 +1345,6 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 
-// رندر اولیه فروشگاه
 renderShop();
 </script>
 </body>
