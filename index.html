@@ -934,17 +934,10 @@ function bossShoot(boss, pattern) {
   }
 }
 
-/* ═══════════════ تعادل جدید دشمنان ═══════════════ */
 function spawnEnemy(){
   const r = 11 + Math.random()*9;
-  
-  // سرعت: رشد خیلی آهسته، سقف در ۲۰۰۰ امتیاز
   const diffSpeed = Math.min(S.score / 2000, 1);
-  
-  // جون دشمن عادی: هر ۲۰۰۰ امتیاز +۱ (تا سقف ۲)
   const diffHp = Math.min(Math.floor(S.score / 2000), 2);
-  
-  // جون شهاب‌سنگ: پایه ۲ + هر ۳۰۰ امتیاز ۱
   const rockBaseHp = 2 + Math.floor(S.score / 300);
   
   const enemy = {
@@ -960,7 +953,7 @@ function spawnEnemy(){
     enemy.type = 'rock'; 
     enemy.hp = rockBaseHp; 
     enemy.r = 18 + Math.random()*8;
-    enemy.vy *= 0.9; // شهاب‌سنگ‌ها کمی آهسته‌تر
+    enemy.vy *= 0.9;
   }
   
   S.enemies.push(enemy);
@@ -1023,7 +1016,6 @@ function update(dt){
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
-  // 👇 فاصله اسپاون خیلی آهسته‌تر رشد می‌کنه
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
     const maxEnemies = 8 + Math.floor(S.score / 500);
@@ -1079,14 +1071,14 @@ function update(dt){
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
           S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10; 
           let coinMultiplier = 1 + Math.floor(S.score / 1000);
-          coins += (e.isBoss ? 60 : 3) * coinMultiplier; // 👈 سکه بیشتر
+          coins += (e.isBoss ? 60 : 3) * coinMultiplier; 
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
             SND.play('bigExplosion');
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
           } else {
             SND.play('explosion');
-            if (Math.random() < 0.02) { // 👈 شانس افتادن آیتم ۲ درصد
+            if (Math.random() < 0.02) {
               spawnPowerup(e.x, e.y);
             }
           }
@@ -1136,7 +1128,7 @@ function update(dt){
 function triggerGameOver() {
   isDead = true; SND.play('gameOver');
   const achievedScore = S.score;
-  const bonusCoins = Math.floor(achievedScore / 8); // 👈 پاداش سکه بیشتر
+  const bonusCoins = Math.floor(achievedScore / 8); 
   if(achievedScore > 0) {
     totalScore += achievedScore; coins += bonusCoins; saveGameData(); 
     localStorage.setItem('shooter_current_score', 0); 
@@ -1235,4 +1227,92 @@ function draw(){
 
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
-  ctx.fill
+  ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
+  let currentMultiplier = 1 + Math.floor(S.score / 1000);
+  if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138); }
+  if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, currentMultiplier > 1 ? 166 : 138); }
+  ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
+}
+
+/* ═══════════════ رتبه‌بندی ═══════════════ */
+async function getScores(){
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (res.ok) return await res.json();
+  } catch(e) {}
+  return [];
+}
+
+async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
+  if(newTotalScore <= 0) return;
+  const syncIcon = document.getElementById('syncIndicator');
+  if (syncIcon) syncIcon.classList.add('syncing');
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar })
+    });
+    if (!res.ok && !isSilent) {
+        const errorData = await res.text();
+        alert("خطا در ذخیره امتیاز:\n" + errorData);
+    }
+  } catch(e) {
+    if (!isSilent) alert("خطای شبکه در ذخیره امتیاز:\n" + e.message);
+  }
+  if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+}
+
+async function renderRank(){
+  const list = document.getElementById('rankList');
+  list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
+  const scores = await getScores();
+  if(scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
+  list.innerHTML = scores.map((s, i) => {
+    let avatarHtml = '';
+    if (typeof s.avatar === 'number') {
+      const av = getAvatarById(s.avatar);
+      avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`;
+    } else avatarHtml = `<div class="avatar-svg" style="font-size:20px;">${s.avatar || '👾'}</div>`;
+    return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
+  }).join('');
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.onclick = async () => {
+    SND.init(); SND.play('uiClick');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
+    document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
+    document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
+    if(tab === 'shop') renderShop();
+    else if(tab === 'rank'){ await saveScoreToLeaderboard(totalScore + (S ? S.score : 0), false); renderRank(); }
+  };
+});
+
+document.getElementById('restartBtn').onclick = () => { SND.play('uiClick'); reset(); document.querySelector('.tab[data-tab="game"]').click(); };
+
+let last = 0;
+function loop(ts){
+  const dt = last ? Math.min(ts - last, 50) : 16;
+  last = ts;
+  const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
+                 !document.getElementById('profilePanel').classList.contains('show') &&
+                 !document.getElementById('shopPanel').classList.contains('show');
+  if(onGame){ update(dt); draw(); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+renderShop();
+</script>
+</body>
+</html>
