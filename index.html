@@ -14,7 +14,47 @@
   
   #c { display:block; position:fixed; inset:0; touch-action:none; }
   
-  /* ═══════════ اعلان ═══════════ */
+  /* ═══════════ افکت هشدار خطر (دور صفحه) ═══════════ */
+  #dangerOverlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 4;
+    box-shadow: inset 0 0 0 rgba(128, 11, 27, 0);
+    transition: box-shadow 0.5s;
+  }
+  #dangerOverlay.show {
+    animation: edgeGlow 1.2s infinite alternate;
+  }
+  @keyframes edgeGlow {
+    from { box-shadow: inset 0 0 30px rgba(128, 11, 27, 0.1); }
+    to { box-shadow: inset 0 0 100px rgba(128, 11, 27, 0.6); }
+  }
+
+  /* ═══════════ اعلان هشدار وسط صفحه ═══════════ */
+  #bossWarning {
+    position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(20, 0, 4, 0.7);
+    border: 2px solid rgba(255, 92, 138, 0.6);
+    padding: 12px 30px; border-radius: 15px;
+    display: flex; align-items: center; justify-content: center; gap: 15px;
+    font-size: 26px; font-weight: 900; color: #ffb3b3;
+    font-family: 'Vazirmatn', monospace; letter-spacing: 4px;
+    z-index: 1500; pointer-events: none;
+    opacity: 0; transition: opacity 0.3s;
+    box-shadow: 0 0 25px rgba(255, 92, 138, 0.3), inset 0 0 15px rgba(255, 92, 138, 0.1);
+    text-shadow: 0 0 10px rgba(255, 92, 138, 0.8);
+  }
+  #bossWarning.show { opacity: 0.85; animation: warnPulse 1.5s infinite; }
+  
+  @keyframes warnPulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+  
+  .warn-icon {
+    font-size: 28px; color: #ff5c8a; text-shadow: 0 0 15px #ff5c8a;
+  }
+
+  /* ═══════════ اعلان خرید ═══════════ */
   #toastNotification {
     position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
     background: linear-gradient(135deg, #800b1b, #3e0006);
@@ -389,6 +429,16 @@
 </style>
 </head>
 <body>
+<!-- افکت قرمز کمرنگ دور صفحه -->
+<div id="dangerOverlay"></div>
+
+<!-- اعلان هشدار وسط صفحه -->
+<div id="bossWarning">
+  <span class="warn-icon">⚠️</span>
+  DANGER
+  <span class="warn-icon">⚠️</span>
+</div>
+
 <div id="toastNotification">
   <span id="toastText">خرید موفق!</span>
 </div>
@@ -1161,6 +1211,9 @@ let isBossActive = false;
 let isBossWarningActive = false;
 let bossWarningTimer = 0;
 
+const dangerOverlay = document.getElementById('dangerOverlay');
+const bossWarning = document.getElementById('bossWarning');
+
 function reset(){
   let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
   S = {
@@ -1173,6 +1226,10 @@ function reset(){
   nextBossScore = (currentBossIndex + 1) * 1000;
   isBossActive = false; isDead = false;
   isBossWarningActive = false; bossWarningTimer = 0;
+  
+  dangerOverlay.classList.remove('show');
+  bossWarning.classList.remove('show');
+  
   document.getElementById('gameOver').style.display = 'none';
   for(let i = 0; i < 40; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
 }
@@ -1314,9 +1371,12 @@ function update(dt){
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
+  // مدیریت هشدار آمدن غول
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) {
     isBossWarningActive = true;
     bossWarningTimer = 3000;
+    dangerOverlay.classList.add('show');
+    bossWarning.classList.add('show');
     SND.play('bossWarn');
   }
 
@@ -1326,6 +1386,8 @@ function update(dt){
       spawnBoss();
       isBossActive = true;
       isBossWarningActive = false;
+      dangerOverlay.classList.remove('show');
+      bossWarning.classList.remove('show');
       S.enemies = S.enemies.filter(e => e.isBoss);
     }
   }
@@ -1393,8 +1455,8 @@ function update(dt){
     for(let j = S.enemies.length - 1; j >= 0; j--){
       const e = S.enemies[j];
       const dx = b.x - e.x, dy = b.y - e.y;
-      // فیکس باگ: دشمن باید وارد صفحه شده باشه که تیر بخوره
-      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > 0){
+      // دشمن باید کاملا وارد صفحه شده باشه
+      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > -e.r){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){ 
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); 
@@ -1640,18 +1702,6 @@ function draw(){
         drawShipShape(ctx, skin, 0.8);
         ctx.restore();
     }
-  }
-
-  // هشدار آمدن غول
-  if (isBossWarningActive) {
-    const alpha = 0.1 + 0.05 * Math.sin(S.t / 10);
-    ctx.fillStyle = `rgba(128, 11, 27, ${alpha})`;
-    ctx.fillRect(0, 0, W, H);
-    
-    ctx.font = '900 24px Vazirmatn';
-    ctx.fillStyle = `rgba(255, 92, 138, ${0.5 + 0.5 * Math.sin(S.t / 5)})`;
-    ctx.textAlign = 'center';
-    ctx.fillText('⚠️ هشدار! غول در حال نزدیک شدن است ⚠️', W/2, H/2);
   }
 
   // نوار سلامتی غول در بالای صفحه
