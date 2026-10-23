@@ -90,6 +90,14 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
 .avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
 
+/* 🟢 استایل تمیز و درست دکمه افکت صوتی */
+.sound-toggle { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; padding: 15px; background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.sound-toggle span { font-weight: bold; color: #fff; font-size: 14px; }
+.sound-toggle .icon { width: 44px; height: 24px; border-radius: 12px; background: #333; position: relative; transition: 0.3s; flex-shrink: 0; }
+.sound-toggle .icon::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #666; top: 3px; left: 3px; transition: 0.3s; }
+.sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.7); }
+.sound-toggle.on .icon::after { left: 23px; background: #04060f; }
+
 #gameOver{background:rgba(5,0,10,.95);position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;color:#fff;text-align:center;z-index:20}
 #gameOver h1{color:#ff0055;text-shadow:0 0 30px #ff0055, 0 0 60px #ff0055;font-size:45px;letter-spacing:2px}
 #restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);font-weight:900;letter-spacing:2px;transition:0.3s;margin-top:10px;padding:14px 40px;font-size:20px;border-radius:40px;cursor:pointer;font-family:inherit}
@@ -170,8 +178,9 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
     <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">انتخاب آواتار (نشان فرماندهی):</label>
     <div class="avatar-grid" id="avatarGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:10px;"></div>
   </div>
-  <div class="sound-toggle on" id="soundToggle" style="display:flex;align-items:center;justify-content:space-between;margin:15px 0;padding:15px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:12px;cursor:pointer;">
-    <span style="font-weight:bold;">🔊 افکت‌های صوتی</span><div class="icon" style="width:44px;height:24px;border-radius:12px;background:#0ff;position:relative;transition:0.3s;"></div>
+  <div class="sound-toggle on" id="soundToggle">
+    <span>🔊 افکت‌های صوتی</span>
+    <div class="icon"></div>
   </div>
   <div class="cloud-sync-box" style="padding:20px;">
     <div class="cloud-sync-title" style="text-align:center;color:#fff;font-size:15px;font-weight:900;margin-bottom:15px;">☁️ همگام‌سازی ابری</div>
@@ -185,33 +194,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
     <button class="save-btn" id="saveProfileBtn" style="width:100%;padding:14px;margin-bottom:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;position:relative;overflow:hidden;">ذخیره در فضای ابری</button>
     <button class="restore-btn" onclick="restoreAccount()" style="width:100%;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">بازیابی از دستگاه دیگر</button>
   </div>
-  
-  <!-- دکمه مخفی ادمین -->
-  <div id="adminSecretBtn" style="display:none; text-align:center; margin-top:20px;">
-    <button onclick="openAdminPanel()" style="background:transparent; color:#ff3333; border:1px solid #ff3333; padding:8px 20px; border-radius:10px; font-family:inherit; cursor:pointer; font-weight:bold;">⚙️ پنل مدیریت</button>
-  </div>
-</div>
-
-<!-- پنل ادمین مخفی -->
-<div id="adminPanel" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; padding:20px; color:#fff; overflow-y:auto;">
-  <h2 style="color:#ff3333; text-align:center; text-shadow:0 0 10px #ff3333;">👑 پنل مدیریت</h2>
-  
-  <div style="background:#111; padding:15px; border-radius:15px; border:1px solid #ff3333; margin-bottom:20px;">
-    <h3 style="margin-bottom:10px;">💰 سکه نامحدود (برای خودت)</h3>
-    <button onclick="adminSetCoins(99999999)" style="width:100%; padding:10px; background:#ffd700; color:#000; border:none; border-radius:10px; font-weight:bold;">دریافت ۹۹ میلیون سکه</button>
-  </div>
-
-  <div style="background:#111; padding:15px; border-radius:15px; border:1px solid #00ffff; margin-bottom:20px;">
-    <h3 style="margin-bottom:10px;">🎁 مدیریت بازیکن‌ها (اضافه/کم کردن)</h3>
-    <p style="font-size:11px; color:#aaa; margin-bottom:10px;">برای کم کردن، عدد را با منفی وارد کنید (مثلاً -5000)</p>
-    <input type="text" id="adminTargetName" placeholder="اسم بازیکن..." style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #555; background:#222; color:#fff;">
-    <input type="number" id="adminTargetCoins" placeholder="تعداد سکه..." style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #555; background:#222; color:#fff;">
-    <input type="number" id="adminTargetScore" placeholder="تعداد امتیاز (اختیاری)..." style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #555; background:#222; color:#fff;">
-    <button onclick="adminGiveGift()" style="width:100%; padding:10px; background:#00ffff; color:#000; border:none; border-radius:10px; font-weight:bold;">اعمال تغییرات</button>
-    <p id="adminMsg" style="margin-top:10px; color:#ffd700; text-align:center; font-size:12px;"></p>
-  </div>
-
-  <button onclick="document.getElementById('adminPanel').style.display='none'" style="width:100%; padding:15px; background:#ff3333; color:#fff; border:none; border-radius:10px; font-weight:bold; margin-top:auto;">بستن پنل</button>
 </div>
 
 <div id="questsPanel" class="panel">
@@ -249,9 +231,6 @@ const SUPABASE_URL = "https://wjgnbgbcqdtdcxonyrsb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs";
 let deviceId = localStorage.getItem('shooter_device_id');
 if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); localStorage.setItem('shooter_device_id', deviceId); }
-
-// 🔐 کد شناسایی گوشی ادمین
-const ADMIN_DEVICE_ID = "dev_jtc75330emvlgksn6";
 
 const SND = {
   ctx: null, masterGain: null, enabled: localStorage.getItem('shooter_sound') !== 'false',
@@ -482,14 +461,6 @@ function renderProfileUI() {
   document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
   document.getElementById('soundToggle').classList.toggle('on', SND.enabled);
   updateCoinsUI();
-
-  // 🟢 فعال کردن دکمه ادمین فقط برای گوشی تو
-  const adminBtn = document.getElementById('adminSecretBtn');
-  if (deviceId === ADMIN_DEVICE_ID) {
-    adminBtn.style.display = 'block';
-  } else {
-    adminBtn.style.display = 'none';
-  }
 }
 
 function showToast(msg) {
@@ -550,84 +521,14 @@ window.restoreAccount = async () => {
   } catch (e) { showToast("❌ خطای شبکه در بازیابی اکانت."); }
 };
 
-document.getElementById('soundToggle').addEventListener('click', () => { SND.init(); SND.setEnabled(!SND.enabled); renderProfileUI(); if (SND.enabled) SND.play('uiClick'); });
+document.getElementById('soundToggle').addEventListener('click', () => { 
+  SND.init(); 
+  SND.setEnabled(!SND.enabled); 
+  renderProfileUI(); 
+  if (SND.enabled) SND.play('uiClick'); 
+});
 renderProfileUI();
 renderQuests();
-
-// ================= سیستم ادمین =================
-window.openAdminPanel = function() {
-  if (deviceId !== ADMIN_DEVICE_ID) {
-    alert("❌ شما دسترسی به این بخش ندارید!");
-    return;
-  }
-  document.getElementById('adminPanel').style.display = 'flex';
-};
-
-window.adminSetCoins = function(amount) {
-  coins = amount;
-  saveGameData();
-  showToast("💰 سکه‌های ادمین اعمال شد!");
-  updateCoinsUI();
-  saveScoreToLeaderboard(getEffectiveTotalScore(), true);
-};
-
-window.adminGiveGift = async function() {
-  if (deviceId !== ADMIN_DEVICE_ID) return;
-  const targetName = document.getElementById('adminTargetName').value.trim();
-  const addCoins = parseInt(document.getElementById('adminTargetCoins').value) || 0;
-  const addScore = parseInt(document.getElementById('adminTargetScore').value) || 0;
-  const msg = document.getElementById('adminMsg');
-
-  if (!targetName) { msg.innerText = "اسم بازیکن رو بنویس!"; return; }
-  msg.innerText = "⏳ در حال پردازش...";
-
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${targetName}&select=*`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
-    const data = await res.json();
-    
-    if (data && data.length > 0) {
-      let user = data[0];
-      let sd = user.save_data || {};
-      
-      // کم کردن یا اضافه کردن (بدون منفی شدن)
-      sd.coins = Math.max(0, (sd.coins || 0) + addCoins);
-      let newScore = Math.max(0, (user.score || 0) + addScore);
-
-      const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
-        method: 'POST',
-        headers: { 
-          'apikey': SUPABASE_KEY, 
-          'Authorization': `Bearer ${SUPABASE_KEY}`, 
-          'Content-Type': 'application/json', 
-          'Prefer': 'resolution=merge-duplicates' 
-        },
-        body: JSON.stringify({ 
-          dev_id: user.dev_id, 
-          name: user.name, 
-          score: newScore, 
-          avatar: user.avatar, 
-          save_data: sd 
-        })
-      });
-
-      if (updateRes.ok) {
-        msg.innerText = `✅ با موفقیت ${addCoins} سکه و ${addScore} امتیاز به ${user.name} اعمال شد!`;
-        document.getElementById('adminTargetName').value = "";
-        document.getElementById('adminTargetCoins').value = "";
-        document.getElementById('adminTargetScore').value = "";
-      } else {
-        msg.innerText = "❌ خطا در ذخیره دیتابیس (شاید RLS بسته است).";
-      }
-    } else {
-      msg.innerText = "❌ بازیکن پیدا نشد.";
-    }
-  } catch(e) {
-    msg.innerText = "❌ خطای شبکه!";
-  }
-};
-// ===============================================
 
 let bgmAudio = new Audio();
 document.getElementById('bgmUpload').addEventListener('change', function(e) { const file = e.target.files[0]; if (file) { bgmAudio.src = URL.createObjectURL(file); bgmAudio.play(); } });
@@ -770,7 +671,7 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
-function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -1372,13 +1273,10 @@ let last = 0;
 function loop(ts){
   const dt = last ? Math.min(ts - last, 50) : 16;
   last = ts;
-  // متوقف کردن بازی وقتی پنل ادمین یا تب‌های دیگه بازن
-  const isAdminOpen = document.getElementById('adminPanel').style.display === 'flex';
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
                  !document.getElementById('profilePanel').classList.contains('show') && 
                  !document.getElementById('shopPanel').classList.contains('show') && 
-                 !document.getElementById('questsPanel').classList.contains('show') && 
-                 !isAdminOpen;
+                 !document.getElementById('questsPanel').classList.contains('show');
   
   if(onGame){ 
     if (S.hitStop > 0) {
@@ -1396,4 +1294,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html>  
+</html>
