@@ -41,7 +41,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .panel::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:10px}
 .panel::-webkit-scrollbar-thumb:hover{background:rgba(0,255,255,.6)}
 
-/* استایل ماموریت‌ها */
 .quest-card{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(0,0,0,.4));border:1px solid rgba(255,255,255,.1);padding:15px;border-radius:15px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;max-width:500px;margin-left:auto;margin-right:auto;box-shadow:0 4px 15px rgba(0,0,0,.5)}
 .quest-card.completed{border-color:#00ff88;box-shadow:0 0 15px rgba(0,255,136,.2)}
 .quest-info h3{font-size:15px;margin-bottom:5px;color:#fff;}
@@ -659,7 +658,7 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
- function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -684,7 +683,7 @@ function reset(){
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0, miniShipCool: 0, 
     combo: 0, comboTimer: 0, flash: 0, shockwaves: [], hitStop: 0, nebulas: [],
-    rocketCharge: 0, rocketState: 'idle', rocketTimer: 0, targets: [], rockets: []
+    rocketCharge: 0, rocketState: 'idle', rocket: null
   };
   
   for(let i = 0; i < 4; i++) S.nebulas.push({ x: Math.random()*W, y: Math.random()*H, r: 150 + Math.random()*200, color: Math.random()>0.5 ? 'rgba(0, 150, 255, 0.04)' : 'rgba(255, 0, 150, 0.04)' });
@@ -720,12 +719,14 @@ addEventListener('keyup', e => {
   if(e.key === ' ') keys.fire = false;
 });
 
+// مختصات دکمه موشک (پایین چپ)
+const btnX = 70, btnY = H - 90, btnR = 35;
+
 cvs.addEventListener('touchstart', e => { 
   e.preventDefault(); SND.init(); touching = true; const t = e.touches[0]; 
   if(t) { 
     touchX = t.clientX; touchY = t.clientY; 
-    // تشخیص کلیک روی دکمه موشک
-    if (Math.hypot(touchX - (W - 70), touchY - (H - 90)) < 50 && S.rocketCharge >= 100 && S.rocketState === 'idle') {
+    if (Math.hypot(touchX - btnX, touchY - btnY) < btnR + 15 && S.rocketCharge >= 100 && S.rocketState === 'idle') {
       triggerRocket();
     }
   } 
@@ -734,8 +735,7 @@ cvs.addEventListener('touchmove', e => { e.preventDefault(); const t = e.touches
 cvs.addEventListener('touchend', e => { e.preventDefault(); touching = false; touchX = null; touchY = null; }, {passive:false});
 cvs.addEventListener('mousedown', (e) => { 
   SND.init(); 
-  // تشخیص کلیک ماوس روی دکمه موشک
-  if (Math.hypot(e.clientX - (W - 70), e.clientY - (H - 90)) < 50 && S.rocketCharge >= 100 && S.rocketState === 'idle') {
+  if (Math.hypot(e.clientX - btnX, e.clientY - btnY) < btnR + 15 && S.rocketCharge >= 100 && S.rocketState === 'idle') {
     triggerRocket();
   } else {
     keys.fire = true; 
@@ -746,12 +746,9 @@ cvs.addEventListener('mousemove', e => { if(keys.fire) { touchX = e.clientX; tou
 
 function triggerRocket() {
   S.rocketCharge = 0;
-  S.rocketState = 'targeting';
-  S.rocketTimer = 800; // 0.8 ثانیه هدف‌گیری
-  SND.play('bossWarn');
-  // انتخاب حداکثر ۱۰ دشمن
-  let sorted = [...S.enemies].sort((a,b) => b.y - a.y); // نزدیک‌ترین‌ها به بالا
-  S.targets = sorted.slice(0, 10).map(e => ({ ref: e, id: Math.random() }));
+  S.rocketState = 'firing';
+  S.rocket = { x: S.player.x, y: S.player.y, r: 15 };
+  SND.play('rocket');
 }
 
 function fire(){
@@ -819,42 +816,47 @@ function update(dt){
     neb.y -= 0.05 * dt; if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
   }
 
-  // سیستم موشک
-  if (S.rocketState === 'targeting') {
-    S.rocketTimer -= dt;
-    // اگر همه هدف‌ها مردن یا تایمر تموم شد
-    if (S.rocketTimer <= 0 || S.targets.every(t => !S.enemies.includes(t.ref))) {
-      S.rocketState = 'firing';
-      S.rocketTimer = 0;
-      SND.play('rocket');
-      let validTargets = S.targets.filter(t => S.enemies.includes(t.ref));
-      validTargets.forEach((t, i) => {
-        setTimeout(() => {
-          if (S.enemies.includes(t.ref)) {
-            S.rockets.push({ x: S.player.x, y: S.player.y, target: t.ref, speed: 15 });
-          }
-        }, i * 100);
-      });
-      if (validTargets.length === 0) S.rocketState = 'idle';
-    }
-  }
+  // منطق موشک غول‌پیکر
+  if (S.rocketState === 'firing' && S.rocket) {
+    let dx = W/2 - S.rocket.x;
+    let dy = H/2 - S.rocket.y;
+    let dist = Math.hypot(dx, dy);
+    
+    if (dist < 25) {
+      // انفجار عظیم در وسط صفحه
+      S.rocketState = 'idle';
+      S.rocket = null;
+      S.flash = 600; 
+      S.shake = 500;
+      SND.play('bigExplosion');
+      S.shockwaves.push({ x: W/2, y: H/2, r: 10, maxR: Math.max(W, H), life: 1 });
 
-  if (S.rocketState === 'firing') {
-    for(let i = S.rockets.length - 1; i >= 0; i--){
-      let r = S.rockets[i];
-      if(!S.enemies.includes(r.target)) { S.rockets.splice(i,1); continue; }
-      let dx = r.target.x - r.x; let dy = r.target.y - r.y; let dist = Math.hypot(dx, dy);
-      if(dist < 20) {
-        // برخورد موشک
-        let e = r.target; 
-        e.hp = 0; // نابودی فوری
-        boom(e.x, e.y, 0, 30); S.shake = 150; SND.play('bigExplosion');
-        S.rockets.splice(i, 1);
-      } else {
-        r.x += (dx/dist) * r.speed * dt; r.y += (dy/dist) * r.speed * dt;
-      }
+      // نابودی همه دشمنان
+      S.enemies.forEach(e => {
+        boom(e.x, e.y, e.hue, 30);
+        if (e.isBoss) {
+          S.score += 300;
+          addQuestProgress('bosses', 1);
+          isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
+          spawnHeart(e.x, e.y);
+        } else {
+          S.combo++; S.comboTimer = 2500;
+          let comboMult = Math.min(1 + Math.floor(S.combo / 10), 3);
+          S.score += 10 * comboMult;
+          addQuestProgress('kills', 1);
+        }
+        let coinMultiplier = 1 + Math.floor(S.score / 2000);
+        coins += (e.isBoss ? 60 : 3) * coinMultiplier;
+      });
+      addQuestProgress('score', S.score, true);
+      S.enemies = []; 
+      S.ebullets = []; 
+      saveGameData();
+    } else {
+      S.rocket.x += (dx/dist) * 20 * dt; 
+      S.rocket.y += (dy/dist) * 20 * dt;
+      if (S.t % 2 === 0) S.parts.push({ x: S.rocket.x, y: S.rocket.y, vx: (Math.random()-0.5)*3, vy: (Math.random()-0.5)*3, life: 1, hue: 30, r: 8 });
     }
-    if(S.rockets.length === 0) { S.rocketState = 'idle'; S.targets = []; }
   }
 
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive && S.rocketState === 'idle') { isBossWarningActive = true; bossWarningTimer = 3000; dangerOverlay.classList.add('show'); bossWarning.classList.add('show'); SND.play('bossWarn'); }
@@ -935,11 +937,11 @@ function update(dt){
           
           if (e.isBoss) {
             S.score += 300;
-            S.rocketCharge = Math.min(100, S.rocketCharge + 30); // غول شارژ زیاد میده
+            S.rocketCharge = Math.min(100, S.rocketCharge + 30);
             addQuestProgress('bosses', 1);
           } else {
             S.score += 10 * comboMult;
-            S.rocketCharge = Math.min(100, S.rocketCharge + 4); // دشمن عادی شارژ کم میده
+            S.rocketCharge = Math.min(100, S.rocketCharge + 4);
             addQuestProgress('kills', 1);
           }
           addQuestProgress('score', S.score, true);
@@ -1038,7 +1040,8 @@ function draw(){
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(neb.x, neb.y, neb.r, 0, Math.PI*2); ctx.fill();
   }
 
-  if (S.flash > 0) { ctx.fillStyle = 'rgba(255,0,0,' + (S.flash / 300 * 0.3) + ')'; ctx.fillRect(0,0,W,H); }
+  if (S.flash > 0) { ctx.fillStyle = 'rgba(255,0,0,' + (S.flash / 600 * 0.4) + ')'; ctx.fillRect(0,0,W,H); }
+  if (S.flash > 400) { ctx.fillStyle = 'rgba(255,255,255,' + ((S.flash - 400) / 200 * 0.8) + ')'; ctx.fillRect(0,0,W,H); }
   
   ctx.fillStyle = '#8fd8ff'; for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); } ctx.globalAlpha = 1;
   
@@ -1050,25 +1053,23 @@ function draw(){
 
   for(const q of S.parts){ ctx.globalAlpha = Math.max(q.life, 0); ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)'; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28); ctx.fill(); } ctx.globalAlpha = 1;
   
-  // رسم هدف‌های موشک
-  if (S.rocketState === 'targeting') {
-    for (const t of S.targets) {
-      if (S.enemies.includes(t.ref)) {
-        ctx.beginPath(); ctx.arc(t.ref.x, t.ref.y, t.ref.r + 10, 0, Math.PI*2);
-        ctx.strokeStyle = '#ff0000'; ctx.lineWidth = 2; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(t.ref.x - 20, t.ref.y); ctx.lineTo(t.ref.x + 20, t.ref.y);
-        ctx.moveTo(t.ref.x, t.ref.y - 20); ctx.lineTo(t.ref.x, t.ref.y + 20); ctx.stroke();
-      }
-    }
-  }
-
-  // رسم موشک‌ها
-  for (const r of S.rockets) {
-    let angle = Math.atan2(r.target.y - r.y, r.target.x - r.x);
-    ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(angle);
-    ctx.fillStyle = '#ff3333'; ctx.shadowBlur = 15; ctx.shadowColor = '#ff3333';
-    ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-10, 8); ctx.lineTo(-10, -8); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#ffff00'; ctx.beginPath(); ctx.arc(-10, 0, 5, 0, Math.PI*2); ctx.fill();
+  // رسم موشک غول‌پیکر
+  if (S.rocket) {
+    ctx.save(); ctx.translate(S.rocket.x, S.rocket.y);
+    ctx.shadowBlur = 25; ctx.shadowColor = '#ff3333';
+    // بدنه موشک
+    ctx.fillStyle = '#eeeeee';
+    ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(15, 10); ctx.lineTo(-15, 10); ctx.closePath(); ctx.fill();
+    // باله‌ها
+    ctx.fillStyle = '#ff3333';
+    ctx.beginPath(); ctx.moveTo(15, 10); ctx.lineTo(25, 25); ctx.lineTo(5, 15); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-15, 10); ctx.lineTo(-25, 25); ctx.lineTo(-5, 15); ctx.fill();
+    // شیشه کابین
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath(); ctx.arc(0, -5, 4, 0, Math.PI*2); ctx.fill();
+    // شعله
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath(); ctx.moveTo(-8, 10); ctx.lineTo(0, 20 + Math.random()*15); ctx.lineTo(8, 10); ctx.fill();
     ctx.restore();
   }
 
@@ -1143,30 +1144,39 @@ function draw(){
   
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 87);
 
-  // رسم دکمه موشک
-  const btnX = W - 70, btnY = H - 90, btnR = 40;
+  // رسم دکمه موشک (پایین چپ)
   ctx.beginPath(); ctx.arc(btnX, btnY, btnR, 0, Math.PI*2);
-  ctx.fillStyle = S.rocketCharge >= 100 ? 'rgba(255, 50, 50, 0.3)' : 'rgba(50, 50, 50, 0.5)';
+  ctx.fillStyle = S.rocketCharge >= 100 ? 'rgba(255, 50, 50, 0.4)' : 'rgba(30, 30, 30, 0.6)';
   ctx.fill();
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = S.rocketCharge >= 100 ? '#ff3333' : '#555';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = S.rocketCharge >= 100 ? '#ff3333' : '#444';
   ctx.stroke();
 
-  // نشانگر شارژ دکمه
   if (S.rocketCharge > 0 && S.rocketCharge < 100) {
     ctx.beginPath(); ctx.arc(btnX, btnY, btnR, -Math.PI/2, -Math.PI/2 + (Math.PI*2 * (S.rocketCharge/100)));
     ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 4; ctx.stroke();
   }
 
-  // آیکون موشک
+  // وکتور موشک روی دکمه
   ctx.save(); ctx.translate(btnX, btnY); ctx.rotate(-Math.PI/4);
-  ctx.fillStyle = S.rocketCharge >= 100 ? '#fff' : '#777';
-  ctx.beginPath(); ctx.moveTo(0, -15); ctx.lineTo(8, 10); ctx.lineTo(0, 5); ctx.lineTo(-8, 10); ctx.closePath(); ctx.fill();
+  let iconColor = S.rocketCharge >= 100 ? '#ff3333' : '#777';
+  ctx.fillStyle = iconColor;
+  // بدنه
+  ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(10, -5, 8, 10); ctx.lineTo(0, 5); ctx.lineTo(-8, 10); ctx.quadraticCurveTo(-10, -5, 0, -15); ctx.fill();
+  // باله راست
+  ctx.beginPath(); ctx.moveTo(8, 5); ctx.lineTo(16, 16); ctx.lineTo(5, 10); ctx.fill();
+  // باله چپ
+  ctx.beginPath(); ctx.moveTo(-8, 5); ctx.lineTo(-16, 16); ctx.lineTo(-5, 10); ctx.fill();
+  // شیشه
+  ctx.fillStyle = S.rocketCharge >= 100 ? '#fff' : '#222';
+  ctx.beginPath(); ctx.arc(0, -5, 3, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 
   if (S.rocketCharge >= 100 && S.rocketState === 'idle') {
     ctx.fillStyle = '#ff3333'; ctx.font = '900 12px Vazirmatn'; ctx.textAlign = 'center';
+    ctx.shadowBlur = 10; ctx.shadowColor = '#ff3333';
     ctx.fillText('آماده!', btnX, btnY + 25);
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -1249,4 +1259,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html> 
+</html>
