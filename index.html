@@ -79,10 +79,44 @@
   #rankList .avatar-svg svg { width: 28px !important; height: 28px !important; max-width: 28px; max-height: 28px; filter: drop-shadow(0 0 5px currentColor); }
   #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
-  .refresh-btn { display: block; margin: 0 auto 15px auto; padding: 10px 20px;
-    background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff;
-    border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
-  .refresh-btn:hover { background: rgba(0,255,255,0.2); }
+  .refresh-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 0 auto 15px auto; padding: 10px 22px;
+  background: linear-gradient(135deg, rgba(0,255,255,0.12), rgba(255,79,216,0.08));
+  border: 1px solid rgba(0,255,255,0.5); color: #7df9ff;
+  border-radius: 25px; cursor: pointer; font-family: inherit;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0,255,255,0.15), inset 0 0 10px rgba(0,255,255,0.05);
+  position: relative; overflow: hidden;
+}
+.refresh-btn::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.25), transparent);
+  transition: left 0.6s ease; pointer-events: none;
+}
+.refresh-btn:hover {
+  background: linear-gradient(135deg, rgba(0,255,255,0.22), rgba(255,79,216,0.15));
+  border-color: #0ff; color: #fff;
+  box-shadow: 0 0 25px rgba(0,255,255,0.45), inset 0 0 15px rgba(0,255,255,0.15);
+  transform: translateY(-2px);
+}
+.refresh-btn:hover::before { left: 100%; }
+.refresh-btn:active { transform: translateY(0) scale(0.97); }
+
+.refresh-icon {
+  width: 18px; height: 18px;
+  filter: drop-shadow(0 0 4px rgba(0,255,255,0.7));
+  transition: transform 0.4s ease;
+}
+.refresh-btn:hover .refresh-icon { transform: rotate(180deg); }
+.refresh-btn.loading .refresh-icon {
+  animation: spinRefresh 0.8s linear infinite;
+}
+@keyframes spinRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
   .profile-top-section { display: flex; gap: 12px; max-width: 400px; margin: 0 auto 15px auto; align-items: stretch; }
   .profile-card { flex: 1; padding: 12px 10px;
     background: linear-gradient(145deg, rgba(0,255,255,0.08), rgba(4,6,15,0.9));
@@ -283,7 +317,14 @@
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
-  <button class="refresh-btn" onclick="renderRank()">🔄 بروزرسانی لیست</button>
+ <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn">
+  <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23 4 23 10 17 10"></polyline>
+    <polyline points="1 20 1 14 7 14"></polyline>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+  </svg>
+  بروزرسانی لیست
+</button>
   <ol id="rankList"></ol>
 </div>
 
@@ -1099,15 +1140,18 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
 }
 
 async function renderRank(){
+  const btn = document.getElementById('refreshRankBtn');
+  if (btn) btn.classList.add('loading');
   const list = document.getElementById('rankList'); list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   const scores = await getScores();
-  if (scores.error) { list.innerHTML = `<li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>`; return; }
-  if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; return; }
+  if (scores.error) { list.innerHTML = `<li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>`; if (btn) btn.classList.remove('loading'); return; }
+  if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; if (btn) btn.classList.remove('loading'); return; }
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
     if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`; } else { avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`; }
     return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
   }).join('');
+  if (btn) btn.classList.remove('loading');
 }
 
 document.querySelectorAll('.tab').forEach(btn => {
