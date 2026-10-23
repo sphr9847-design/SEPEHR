@@ -136,7 +136,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <h2>👤 پروفایل شما</h2>
   <div class="profile-top-section" style="display:flex;gap:15px;margin-bottom:20px;align-items:stretch;">
     
-    <!-- موزیک پلیر در سمت راست (اول در RTL) -->
+    <!-- موزیک پلیر در سمت راست -->
     <div class="music-player" style="flex:1;padding:15px;display:flex;flex-direction:column;justify-content:center;">
       <label style="font-size:12px;color:#0ff;display:block;margin-bottom:10px;font-weight:bold;">🎵 موزیک دلخواه:</label>
       <div class="file-upload-wrapper" style="position:relative;overflow:hidden;margin-bottom:10px;">
@@ -149,7 +149,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
       </div>
     </div>
 
-    <!-- پروفایل کارت در سمت چپ (دوم در RTL) -->
+    <!-- پروفایل کارت در سمت چپ -->
     <div class="profile-card" style="flex:1;padding:15px;text-align:center;">
       <div class="preview-avatar" id="previewAvatar" style="width:60px;height:60px;margin:0 auto 10px auto;"></div>
       <div class="preview-name" id="previewName" style="font-size:16px;font-weight:900;color:#fff;"></div>
@@ -741,7 +741,12 @@ function update(dt){
         let isEnraged = e.hp < e.maxHp * 0.4;
         if (isEnraged) e.vy = 3 + currentBossIndex * 0.5;
         e.shootT -= dt;
-        if (e.shootT <= 0) { e.shootT = Math.max(isEnraged ? 400 : 800, (isEnraged ? 1000 : 2000) - currentBossIndex * 200); const patterns = ['aimed', 'spread', 'radial', 'spread']; bossShoot(e, patterns[e.patternIdx % patterns.length]); e.patternIdx++; }
+        if (e.shootT <= 0) { 
+          e.shootT = Math.max(isEnraged ? 400 : 800, (isEnraged ? 1000 : 2000) - currentBossIndex * 200); 
+          const patterns = ['aimed', 'spread', 'radial', 'spread']; 
+          if (S.ebullets.length < 150) bossShoot(e, patterns[e.patternIdx % patterns.length]); 
+          e.patternIdx++; 
+        }
       }
     } else if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
   }
@@ -766,15 +771,15 @@ function update(dt){
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); if (e.isBoss) S.hitStop = 100; else S.hitStop = 15;
           
           S.combo++; S.comboTimer = 2500;
-          let comboMult = 1 + Math.floor(S.combo / 5);
+          let comboMult = Math.min(1 + Math.floor(S.combo / 10), 3);
           
           if (e.isBoss) {
-            S.score += 500;
+            S.score += 300;
           } else {
             S.score += 10 * comboMult;
           }
           
-          let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
+          let coinMultiplier = 1 + Math.floor(S.score / 2000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
           if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
           else { SND.play('explosion'); if (Math.random() < 0.02) spawnPowerup(e.x, e.y); }
           saveGameData();
@@ -820,7 +825,7 @@ function drawBoss(c, e, bossLvl) {
   else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; }
   else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; }
   else { col1 = '#111111'; col2 = '#333333'; glow = '#ffffff'; }
-  c.shadowColor = glow; c.shadowBlur = 25;
+  c.shadowColor = glow; c.shadowBlur = 15;
   if (lvl === 0) {
     c.fillStyle = col1; c.beginPath(); c.moveTo(-r*1.8, 0); c.lineTo(-r*0.8, -r*0.7); c.lineTo(-r*0.2, -r*0.9); c.lineTo(0, -r*0.5); c.lineTo(r*0.2, -r*0.9); c.lineTo(r*0.8, -r*0.7); c.lineTo(r*1.8, 0); c.lineTo(r*0.8, r*0.8); c.lineTo(0, r*0.4); c.lineTo(-r*0.8, r*0.8); c.closePath(); c.fill(); c.strokeStyle = glow; c.lineWidth = 2; c.stroke();
     c.fillStyle = col2; c.beginPath(); c.moveTo(-r*0.6, -r*0.4); c.lineTo(r*0.6, -r*0.4); c.lineTo(r*0.8, r*0.4); c.lineTo(0, r*0.6); c.lineTo(-r*0.8, r*0.4); c.closePath(); c.fill();
@@ -943,7 +948,7 @@ function draw(){
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 87);
   ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 115);
-  let currentMultiplier = 1 + Math.floor(S.score / 1000);
+  let currentMultiplier = 1 + Math.floor(S.score / 2000);
   if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 143); }
   let lineY = currentMultiplier > 1 ? 171 : 143;
   if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); }
