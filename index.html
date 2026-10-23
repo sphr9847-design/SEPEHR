@@ -135,12 +135,8 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
   <div class="profile-top-section" style="display:flex;gap:15px;margin-bottom:20px;align-items:stretch;">
-    <div class="profile-card" style="flex:1;padding:15px;text-align:center;">
-      <div class="preview-avatar" id="previewAvatar" style="width:60px;height:60px;margin:0 auto 10px auto;"></div>
-      <div class="preview-name" id="previewName" style="font-size:16px;font-weight:900;color:#fff;"></div>
-      <div class="preview-title" style="font-size:10px;color:#0ff;margin-top:5px;">SPACE COMMANDER</div>
-      <div class="preview-total" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,255,255,.2);font-size:13px;color:#ffd700;font-weight:bold;">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
-    </div>
+    
+    <!-- موزیک پلیر در سمت راست (اول در RTL) -->
     <div class="music-player" style="flex:1;padding:15px;display:flex;flex-direction:column;justify-content:center;">
       <label style="font-size:12px;color:#0ff;display:block;margin-bottom:10px;font-weight:bold;">🎵 موزیک دلخواه:</label>
       <div class="file-upload-wrapper" style="position:relative;overflow:hidden;margin-bottom:10px;">
@@ -152,7 +148,16 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
         <button id="pauseBgmBtn" style="flex:1;padding:8px;border-radius:10px;border:1px solid #ff5c8a;background:transparent;color:#ff5c8a;font-weight:bold;cursor:pointer;">توقف</button>
       </div>
     </div>
+
+    <!-- پروفایل کارت در سمت چپ (دوم در RTL) -->
+    <div class="profile-card" style="flex:1;padding:15px;text-align:center;">
+      <div class="preview-avatar" id="previewAvatar" style="width:60px;height:60px;margin:0 auto 10px auto;"></div>
+      <div class="preview-name" id="previewName" style="font-size:16px;font-weight:900;color:#fff;"></div>
+      <div class="preview-title" style="font-size:10px;color:#0ff;margin-top:5px;">SPACE COMMANDER</div>
+      <div class="preview-total" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,255,255,.2);font-size:13px;color:#ffd700;font-weight:bold;">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
+    </div>
   </div>
+
   <div class="form-group" style="margin-bottom:15px;">
     <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">اسم شما (نام فرمانده):</label>
     <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
@@ -560,7 +565,7 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
-function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -723,8 +728,7 @@ function update(dt){
 
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    // محدود کردن تعداد دشمنان برای جلوگیری از هنگ کردن
-    const maxEnemies = 10 + Math.floor(S.score / 500); 
+    const maxEnemies = 10 + Math.floor(S.score / 500);
     if (S.enemies.length < maxEnemies) { spawnEnemy(); S.spawnT = isBossActive ? 1200 : Math.max(250, 700 - S.score * 0.4); } else { S.spawnT = 500; }
   }
 
@@ -764,7 +768,6 @@ function update(dt){
           S.combo++; S.comboTimer = 2500;
           let comboMult = 1 + Math.floor(S.combo / 5);
           
-          // فیکس شدن باگ امتیاز غول‌ها (دیگه ضریب روش اعمال نمیشه)
           if (e.isBoss) {
             S.score += 500;
           } else {
@@ -946,14 +949,6 @@ function draw(){
   if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); }
   
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 87);
-  
-  if (S.combo > 2) {
-    ctx.textAlign = 'center'; ctx.fillStyle = '#ff00ff'; ctx.font = '900 24px Vazirmatn, system-ui, sans-serif';
-    ctx.shadowBlur = 15; ctx.shadowColor = '#ff00ff';
-    // جای متن COMBO اصلاح شد که روی بقیه نوشته‌ها نیفته
-    ctx.fillText('COMBO x' + (1 + Math.floor(S.combo / 5)) + '  (' + S.combo + ')', W/2, 180);
-    ctx.shadowBlur = 0;
-  }
 }
 
 async function getScores(){
@@ -1032,4 +1027,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html>  
+</html>
