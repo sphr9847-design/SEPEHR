@@ -9,150 +9,77 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn',system-ui,sans-serif;direction:rtl}
-#c{display:block;position:fixed;inset:0;touch-action:none}
+html,body{height:100%;overflow:hidden;background:radial-gradient(circle at center, #0a1225 0%, #02040a 100%);font-family:'Vazirmatn',system-ui,sans-serif;direction:rtl;color:#fff}
+#c{display:block;position:fixed;inset:0;touch-action:none;z-index:1}
 #dangerOverlay{position:fixed;inset:0;pointer-events:none;z-index:4;box-shadow:inset 0 0 0 rgba(128,11,27,0);transition:box-shadow .5s}
 #dangerOverlay.show{animation:edgeGlow 1.2s infinite alternate}
-@keyframes edgeGlow{from{box-shadow:inset 0 0 30px rgba(128,11,27,.1)}to{box-shadow:inset 0 0 100px rgba(128,11,27,.6)}}
-#bossWarning{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);background:rgba(20,0,4,.7);border:2px solid rgba(255,92,138,.6);padding:12px 35px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:15px;font-size:26px;font-weight:900;color:#ffb3b3;font-family:'Vazirmatn',sans-serif;letter-spacing:4px;z-index:1500;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 0 25px rgba(255,92,138,.3),inset 0 0 15px rgba(255,92,138,.1);text-shadow:0 0 10px rgba(255,92,138,.8)}
-#bossWarning.show{opacity:.85;animation:warnPulse 1.5s infinite}
-@keyframes warnPulse{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.03)}100%{transform:translate(-50%,-50%) scale(1)}}
-.warn-icon{display:flex;align-items:center;justify-content:center;color:#ff5c8a}
-.warn-icon svg{width:28px;height:28px;filter:drop-shadow(0 0 8px #ff5c8a);animation:iconPulse 1s infinite alternate}
-@keyframes iconPulse{from{transform:scale(1);opacity:.8}to{transform:scale(1.15);opacity:1}}
-#toastNotification{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#800b1b,#3e0006);color:#ffe6e6;padding:14px 28px;border-radius:20px;font-size:15px;font-weight:700;box-shadow:0 10px 30px rgba(62,0,6,.7),inset 0 1px 0 rgba(255,255,255,.15);border:1px solid rgba(255,100,100,.2);z-index:2000;transition:top .5s cubic-bezier(.175,.885,.32,1.275),opacity .3s;opacity:0;pointer-events:none;text-align:center;white-space:nowrap;text-shadow:0 2px 4px rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+@keyframes edgeGlow{from{box-shadow:inset 0 0 30px rgba(128,11,27,.1)}to{box-shadow:inset 0 0 150px rgba(255,0,50,.8)}}
+
+#bossWarning{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(20,0,10,.8);border:2px solid #ff3366;padding:15px 40px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:15px;font-size:30px;font-weight:900;color:#fff;backdrop-filter:blur(10px);letter-spacing:5px;z-index:1500;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 0 50px rgba(255,51,102,.5),inset 0 0 20px rgba(255,51,102,.3);text-shadow:0 0 15px #ff3366}
+#bossWarning.show{opacity:1;animation:warnPulse 1s infinite alternate}
+@keyframes warnPulse{from{transform:translate(-50%,-50%) scale(0.95)}to{transform:translate(-50%,-50%) scale(1.05)}}
+.warn-icon svg{width:32px;height:32px;filter:drop-shadow(0 0 10px #ff3366);animation:iconPulse 0.5s infinite alternate}
+@keyframes iconPulse{from{transform:scale(1)}to{transform:scale(1.2)}}
+
+#toastNotification{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:rgba(10, 20, 40, 0.9);border:1px solid #00ffff;color:#00ffff;padding:12px 30px;border-radius:30px;font-size:16px;font-weight:700;backdrop-filter:blur(10px);z-index:2000;transition:all .5s cubic-bezier(.175,.885,.32,1.275);opacity:0;pointer-events:none;box-shadow:0 0 20px rgba(0,255,255,.3), inset 0 0 10px rgba(0,255,255,.2);text-shadow:0 0 8px #00ffff}
 #toastNotification.show{top:20px;opacity:1}
-#tabs{position:fixed;top:0;left:0;right:0;height:50px;background:rgba(4,6,15,.85);border-bottom:1px solid rgba(0,255,255,.15);display:flex;z-index:10;backdrop-filter:blur(6px)}
-.tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:13px;font-weight:600;cursor:pointer;transition:.3s;font-family:inherit;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 5px}
-.tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:.3s}
-.tab.active{color:#7df9ff;text-shadow:0 0 10px rgba(0,255,255,.5)}
-.tab.active svg{filter:drop-shadow(0 0 5px rgba(0,255,255,.8))}
-.tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:3px;background:linear-gradient(90deg,#0ff,#ff4fd8);border-radius:3px 3px 0 0;transition:width .3s ease,left .3s ease;box-shadow:0 0 12px rgba(0,255,255,.9)}
-.tab.active::after{width:80%;left:10%}
-.panel{position:fixed;top:50px;left:0;right:0;bottom:0;background:#04060f;color:#7df9ff;padding:20px;overflow-y:auto;display:none;z-index:5}
-.panel.show{display:block;animation:panelSlide .3s ease-out}
-@keyframes panelSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.panel h2{text-align:center;font-size:22px;margin-bottom:10px;background:linear-gradient(90deg,#7df9ff 20%,#ff4fd8 80%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;letter-spacing:1px}
-.panel::-webkit-scrollbar{width:6px}
+
+#tabs{position:fixed;top:0;left:0;right:0;height:55px;background:rgba(5,10,20,.6);border-bottom:1px solid rgba(0,255,255,.15);display:flex;z-index:10;backdrop-filter:blur(15px)}
+.tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:13px;font-weight:700;cursor:pointer;transition:.3s;font-family:inherit;position:relative;display:flex;align-items:center;justify-content:center;gap:8px}
+.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;transition:.3s}
+.tab.active{color:#00ffff;text-shadow:0 0 10px #00ffff}
+.tab.active svg{filter:drop-shadow(0 0 6px #00ffff)}
+.tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:3px;background:#00ffff;border-radius:3px 3px 0 0;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 0 15px #00ffff}
+.tab.active::after{width:60%;left:20%}
+
+.panel{position:fixed;top:55px;left:0;right:0;bottom:0;background:rgba(3,6,15,.85);color:#7df9ff;padding:25px 20px;overflow-y:auto;display:none;z-index:5;backdrop-filter:blur(20px)}
+.panel.show{display:block;animation:panelSlide .4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+@keyframes panelSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.panel h2{text-align:center;font-size:24px;margin-bottom:20px;color:#fff;text-shadow:0 0 15px rgba(255,255,255,0.3);font-weight:900}
+.panel::-webkit-scrollbar{width:8px}
 .panel::-webkit-scrollbar-track{background:transparent}
-.panel::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#0ff,#ff4fd8);border-radius:3px}
-#rankList{list-style:none;max-width:400px;margin:0 auto;padding:0}
-#rankList li{display:flex;align-items:center;padding:12px 18px;margin-bottom:10px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:12px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
-#rankList li:hover{background:rgba(0,255,255,.12);box-shadow:0 0 15px rgba(0,255,255,.15);transform:translateX(-5px)}
-#rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
-#rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px;text-align:center}
-#rankList .pos{width:28px;height:28px;border-radius:50%;background:rgba(0,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px;flex-shrink:0}
-#rankList li:nth-child(1) .pos{background:gold;color:#04060f;box-shadow:0 0 10px gold}
-#rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f}
-#rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f}
-#rankList .avatar-svg{width:28px;height:28px;margin-right:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-#rankList .avatar-svg svg{width:28px!important;height:28px!important;max-width:28px;max-height:28px;filter:drop-shadow(0 0 5px currentColor)}
-#rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
-.refresh-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 15px auto;padding:10px 22px;background:linear-gradient(135deg,rgba(0,255,255,.12),rgba(255,79,216,.08));border:1px solid rgba(0,255,255,.5);color:#7df9ff;border-radius:25px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.5px;transition:all .3s ease;box-shadow:0 0 15px rgba(0,255,255,.15),inset 0 0 10px rgba(0,255,255,.05);position:relative;overflow:hidden}
-.refresh-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,255,255,.25),transparent);transition:left .6s ease;pointer-events:none}
-.refresh-btn:hover{background:linear-gradient(135deg,rgba(0,255,255,.22),rgba(255,79,216,.15));border-color:#0ff;color:#fff;box-shadow:0 0 25px rgba(0,255,255,.45),inset 0 0 15px rgba(0,255,255,.15);transform:translateY(-2px)}
-.refresh-btn:hover::before{left:100%}
-.refresh-btn:active{transform:translateY(0) scale(.97)}
-.refresh-icon{width:18px;height:18px;filter:drop-shadow(0 0 4px rgba(0,255,255,.7));transition:transform .4s ease}
-.refresh-btn:hover .refresh-icon{transform:rotate(180deg)}
-.refresh-btn.loading .refresh-icon{animation:spinRefresh .8s linear infinite}
-@keyframes spinRefresh{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.profile-top-section{display:flex;gap:12px;max-width:400px;margin:0 auto 15px auto;align-items:stretch}
-.profile-card{flex:1;padding:12px 10px;background:linear-gradient(145deg,rgba(0,255,255,.08),rgba(4,6,15,.9));border:1px solid rgba(0,255,255,.4);box-shadow:0 0 20px rgba(0,255,255,.15),inset 0 0 15px rgba(0,255,255,.05);border-radius:15px;text-align:center;position:relative;overflow:hidden;backdrop-filter:blur(10px);margin:0}
-.profile-card::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,.15),transparent);transform:skewX(-25deg);transition:.5s}
-.profile-card:hover::before{left:150%}
-.preview-avatar{width:50px;height:50px;margin:0 auto 5px auto;display:flex;align-items:center;justify-content:center}
-.preview-avatar svg{width:100%;height:100%;filter:drop-shadow(0 0 10px currentColor)}
-.preview-name{font-size:15px;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 0 10px rgba(255,255,255,.4)}
-.preview-title{font-size:8px;color:#0ff;margin-top:2px;opacity:.9;letter-spacing:1px}
-.preview-total{margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,255,255,.15);font-size:12px;color:#ffd700;font-weight:700}
-.music-player{flex:1;padding:12px 10px;background:linear-gradient(145deg,rgba(0,255,255,.05),rgba(4,6,15,.8));border:1px solid rgba(0,255,255,.2);border-radius:15px;box-shadow:inset 0 0 15px rgba(0,255,255,.05);text-align:center;transition:box-shadow .3s,border-color .3s;margin:0;display:flex;flex-direction:column;justify-content:center}
-.music-player:hover{box-shadow:0 0 20px rgba(0,255,255,.15),inset 0 0 20px rgba(0,255,255,.08);border-color:rgba(0,255,255,.4)}
-.music-player label{font-size:11px;color:#0ff;display:block;margin-bottom:8px;font-weight:700}
-.file-upload-wrapper{position:relative;overflow:hidden;display:inline-block;width:100%;margin-bottom:10px}
-.file-upload-wrapper input[type="file"]{font-size:100px;position:absolute;left:0;top:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.file-upload-btn{border:1px dashed #0ff;color:#0ff;padding:10px 8px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;background:rgba(0,255,255,.05);transition:.3s}
-.file-upload-btn svg{width:16px;height:16px}
-.file-upload-wrapper:hover .file-upload-btn{background:rgba(0,255,255,.15);box-shadow:0 0 10px rgba(0,255,255,.2)}
-.music-controls{display:flex;gap:8px}
-.music-controls button{flex:1;padding:10px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;transition:.3s;border:none;font-size:12px;display:flex;align-items:center;justify-content:center}
-.music-controls button svg{width:18px;height:18px}
-#playBgmBtn{background:linear-gradient(90deg,#00ffcc,#00ccff);color:#04060f;box-shadow:0 0 10px rgba(0,255,204,.3)}
-#playBgmBtn:hover{box-shadow:0 0 15px rgba(0,255,204,.6);transform:translateY(-2px)}
-#pauseBgmBtn{background:transparent;border:1px solid #ff5c8a;color:#ff5c8a;box-shadow:inset 0 0 10px rgba(255,92,138,.2)}
-#pauseBgmBtn:hover{background:rgba(255,92,138,.1);transform:translateY(-2px)}
-.form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
-.form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
-.form-group input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.5);border:1px solid rgba(0,255,255,.25);color:#fff;font-family:inherit;font-size:14px;outline:none;transition:.3s;box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
-.form-group input[type="text"]:focus{border-color:#0ff;box-shadow:0 0 15px rgba(0,255,255,.4),inset 0 2px 5px rgba(0,0,0,.5)}
-.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(45px,1fr));gap:8px;max-width:340px;margin:0 auto}
-.avatar-btn{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:10px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;height:48px;transition:transform .25s,border-color .25s,background .25s,box-shadow .25s}
-.avatar-btn svg{width:100%;height:100%;transition:.3s}
-.avatar-btn:hover{background:rgba(0,255,255,.12);transform:translateY(-2px);border-color:rgba(0,255,255,.4)}
-.avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,.2);transform:scale(1.05);box-shadow:0 0 12px rgba(0,255,255,.5)}
-.avatar-btn.selected svg{filter:drop-shadow(0 0 8px currentColor)}
-.cloud-sync-box{max-width:340px;margin:20px auto 15px auto;padding:15px;background:linear-gradient(145deg,rgba(0,255,255,.05),rgba(0,0,0,.6));border:1px solid rgba(0,255,255,.3);border-radius:15px;box-shadow:inset 0 0 20px rgba(0,255,255,.05)}
-.cloud-sync-title{text-align:center;color:#fff;font-size:14px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
-.cloud-sync-title svg{width:20px;height:20px;stroke:#0ff}
-.recovery-box{margin:0 0 15px 0;padding:10px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.02));border:1px solid rgba(255,215,0,.4);border-radius:10px;text-align:center;color:#ffd700;font-size:12px;box-shadow:0 0 15px rgba(255,215,0,.1)}
-.recovery-code-container{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px}
-.recovery-code-container strong{font-size:18px;letter-spacing:1px;color:#fff;text-shadow:0 0 10px rgba(255,255,255,.5)}
-.copy-btn{background:rgba(255,215,0,.15);border:1px solid #ffd700;border-radius:8px;padding:6px;cursor:pointer;color:#ffd700;transition:.3s;display:flex;align-items:center;justify-content:center}
-.copy-btn:hover{background:rgba(255,215,0,.3);box-shadow:0 0 15px rgba(255,215,0,.5);transform:scale(1.05)}
-.copy-btn svg{width:16px;height:16px}
-.save-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:linear-gradient(135deg,#00d2ff,#0055ff);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:.3s;box-shadow:0 4px 15px rgba(0,100,255,.4);position:relative;overflow:hidden}
-.save-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5}
-.save-btn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(to right,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-25deg);transition:.5s}
-.save-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,100,255,.6)}
-.save-btn:hover::after{left:150%}
-.save-btn:disabled{background:#333;color:#666;box-shadow:none;cursor:not-allowed;transform:none}
-.restore-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;margin-top:10px;background:transparent;border:2px solid #ff4fd8;color:#ff4fd8;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;transition:.3s}
-.restore-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.5}
-.restore-btn:hover{background:rgba(255,79,216,.15);box-shadow:0 0 15px rgba(255,79,216,.4);transform:translateY(-2px)}
-.sound-toggle{display:flex;align-items:center;justify-content:space-between;max-width:340px;margin:10px auto;padding:12px 16px;background:linear-gradient(145deg,rgba(0,255,255,.05),rgba(0,0,0,.4));border:1px solid rgba(0,255,255,.2);border-radius:12px;cursor:pointer;transition:.3s}
-.sound-toggle:hover{border-color:rgba(0,255,255,.4);background:linear-gradient(145deg,rgba(0,255,255,.1),rgba(0,0,0,.4))}
-.sound-toggle span{color:#fff;font-weight:700;font-size:14px}
-.sound-toggle .icon{width:44px;height:24px;border-radius:12px;background:#333;position:relative;transition:.3s}
-.sound-toggle .icon::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#666;top:3px;left:3px;transition:.3s}
-.sound-toggle.on .icon{background:#0ff;box-shadow:0 0 15px rgba(0,255,255,.7)}
-.sound-toggle.on .icon::after{left:23px;background:#04060f}
-.shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,.5)}
-.shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
-.shop-tabs{display:flex;gap:8px;max-width:500px;margin:0 auto 20px}
-.shop-tab{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(0,255,255,.2);background:rgba(0,255,255,.05);color:#7df9ff;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
-.shop-tab.active{background:#0ff;color:#04060f;box-shadow:0 0 20px rgba(0,255,255,.4)}
-.shop-tab::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:left .5s ease;pointer-events:none}
-.shop-tab:hover::before{left:100%}
-.weapon-card,.skin-card,.mini-card{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(0,0,0,.6));border:1px solid rgba(0,255,255,.15);padding:15px 20px;border-radius:15px;box-shadow:0 6px 20px rgba(0,0,0,.4);transition:transform .25s,box-shadow .25s,border-color .25s}
-.weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-2px);box-shadow:0 0 25px rgba(0,255,255,.18),0 12px 30px rgba(0,0,0,.6);border-color:rgba(0,255,255,.4)}
-.weapon-card.owned,.skin-card.owned,.mini-card.owned{border-color:rgba(0,255,0,.3);background:linear-gradient(145deg,rgba(0,255,0,.05),rgba(0,0,0,.6))}
-.weapon-card.equipped,.skin-card.equipped,.mini-card.equipped{border-color:#0ff;box-shadow:0 0 20px rgba(0,255,255,.2)}
-.w-info h3,.s-info h3,.m-info h3{font-size:17px;margin-bottom:5px;color:#fff;font-weight:700}
-.w-info p,.s-info p,.m-info p{font-size:13px;color:#8bb5c9;font-weight:400}
-.w-action,.s-action,.m-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.w-price,.s-price,.m-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,.5)}
-.skin-preview,.mini-preview{width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden}
-.skin-preview canvas,.mini-preview canvas{width:100%!important;height:100%!important;display:block;position:static!important;inset:auto!important}
-.w-btn,.m-btn{padding:10px 15px;border-radius:25px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;transition:.3s;letter-spacing:.5px;width:150px;text-align:center;position:relative;overflow:hidden}
-.w-btn::before,.m-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.25);border-radius:50%;transform:translate(-50%,-50%);transition:width .5s ease,height .5s ease;pointer-events:none}
-.w-btn:active::before,.m-btn:active::before{width:200px;height:200px}
-.btn-buy{background:linear-gradient(45deg,#ffd700,#ffaa00);color:#000;box-shadow:0 0 15px rgba(255,215,0,.4)}
-.btn-buy:not(:disabled):hover{box-shadow:0 0 25px rgba(255,215,0,.8)}
-.btn-buy:disabled{background:#333;color:#666;box-shadow:none;cursor:not-allowed}
-.btn-equip{background:transparent;border:1px solid #0ff;color:#0ff;box-shadow:inset 0 0 10px rgba(0,255,255,.1)}
-.btn-equipped{background:linear-gradient(45deg,#00ffcc,#00ccff);color:#000;box-shadow:0 0 15px rgba(0,255,204,.5)}
-.btn-upgrade,.m-btn-upgrade{background:linear-gradient(135deg,#ff00cc,#333399);color:#fff;box-shadow:0 4px 15px rgba(255,0,204,.5),inset 0 1px 0 rgba(255,255,255,.2);margin-top:5px;border:1px solid rgba(255,150,255,.4);text-shadow:0 1px 2px rgba(0,0,0,.8);font-weight:900;border-radius:15px}
-.btn-upgrade:not(:disabled):hover,.m-btn-upgrade:not(:disabled):hover{box-shadow:0 0 30px rgba(255,0,204,.9),inset 0 0 15px rgba(255,255,255,.2);transform:scale(1.03)}
-.btn-upgrade:disabled,.m-btn-upgrade:disabled{background:#222;color:#555;box-shadow:none;cursor:not-allowed;transform:none;border:1px solid #333;text-shadow:none}
-#gameOver{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
-#gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a;font-weight:900}
-#gameOver p{font-size:20px;color:#7df9ff}
-#gameOver .final-score{font-size:28px;font-weight:900;color:#fff;margin:10px 0}
-#bonusCoins{font-size:20px;color:#ffd700;font-weight:900;margin-bottom:15px;text-shadow:0 0 10px rgba(255,215,0,.5)}
-#restartBtn{margin-top:10px;padding:14px 40px;font-size:20px;border:2px solid #0ff;background:transparent;color:#0ff;border-radius:40px;cursor:pointer;font-family:inherit;font-weight:700;transition:.3s}
-#restartBtn:active{background:#0ff;color:#04060f}
+.panel::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:10px}
+.panel::-webkit-scrollbar-thumb:hover{background:rgba(0,255,255,.6)}
+
+.profile-card,.music-player,.cloud-sync-box{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,255,.15);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 20px rgba(0,255,255,.05);backdrop-filter:blur(10px)}
+.weapon-card,.skin-card,.mini-card{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(0,0,0,.4));border:1px solid rgba(255,255,255,.05);padding:18px 22px;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.6);transition:all .3s ease}
+.weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(0,255,255,.4);box-shadow:0 15px 35px rgba(0,0,0,.8), 0 0 20px rgba(0,255,255,.15)}
+.weapon-card.equipped,.skin-card.equipped,.mini-card.equipped{border-color:#00ffff;background:linear-gradient(145deg, rgba(0,255,255,.08), rgba(0,0,0,.5));box-shadow:0 0 25px rgba(0,255,255,.2)}
+
+.w-btn,.m-btn{padding:12px 18px;border-radius:30px;font-size:13px;font-weight:900;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.5)}
+.btn-buy{background:linear-gradient(135deg, #ffd700, #ff8800);color:#000;border:none}
+.btn-buy:not(:disabled):hover{box-shadow:0 0 20px rgba(255,215,0,.6);transform:translateY(-2px)}
+.btn-equip{background:transparent;border:2px solid #00ffff;color:#00ffff}
+.btn-equipped{background:linear-gradient(135deg, #00ffcc, #00ccff);color:#000;border:none}
+.btn-upgrade,.m-btn-upgrade{background:linear-gradient(135deg, #ff00cc, #5500ff);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.btn-upgrade:not(:disabled):hover{box-shadow:0 0 25px rgba(255,0,204,.6);transform:translateY(-2px)}
+
+.save-btn{background:linear-gradient(135deg, #00d2ff, #0055ff);border-radius:15px;box-shadow:0 5px 20px rgba(0,85,255,.4);transition:0.3s}
+.save-btn:hover{box-shadow:0 0 30px rgba(0,210,255,.6);transform:translateY(-2px)}
+.restore-btn{border:2px solid #ff4fd8;color:#ff4fd8;border-radius:15px;transition:0.3s}
+.restore-btn:hover{background:rgba(255,79,216,.1);box-shadow:0 0 20px rgba(255,79,216,.3)}
+
+.refresh-btn{background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s}
+.refresh-btn:hover{background:rgba(0,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.4);transform:translateY(-2px);border-color:#00ffff}
+
+#rankList li{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.05);border-radius:15px;margin-bottom:12px;transition:0.3s}
+#rankList li:hover{border-color:rgba(0,255,255,.3);transform:translateX(-5px);background:rgba(0,255,255,.05)}
+#rankList li:nth-child(1){border-color:gold;box-shadow:0 0 20px rgba(255,215,0,.15)}
+#rankList li:nth-child(2){border-color:silver}
+#rankList li:nth-child(3){border-color:#cd7f32}
+
+.form-group input[type="text"]{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;transition:0.3s;color:#fff}
+.form-group input[type="text"]:focus{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.2);outline:none}
+.avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.05)}
+.avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
+.avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
+
+#gameOver{background:rgba(5,0,10,.9);backdrop-filter:blur(20px)}
+#gameOver h1{color:#ff0055;text-shadow:0 0 30px #ff0055, 0 0 60px #ff0055;font-size:45px;letter-spacing:2px}
+#restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);font-weight:900;letter-spacing:2px;transition:0.3s}
+#restartBtn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(255,0,85,.8)}
 #syncIndicator{position:fixed;bottom:20px;left:20px;color:#0ff;font-size:24px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100;text-shadow:0 0 10px #0ff}
+
 #syncIndicator.syncing{opacity:1;animation:pulse 1s infinite alternate}
 @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.2)}}
 </style>
@@ -176,18 +103,18 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
 
 <div id="shopPanel" class="panel">
   <h2>🛒 فروشگاه</h2>
-  <div class="shop-header">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
-  <div class="shop-tabs">
-    <button class="shop-tab active" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
-    <button class="shop-tab" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
-    <button class="shop-tab" onclick="switchShopTab('minis', this)">🛸 همراه</button>
+  <div class="shop-header" style="text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
+  <div class="shop-tabs" style="display:flex;gap:10px;margin-bottom:20px;">
+    <button class="shop-tab active" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('minis', this)">🛸 همراه</button>
   </div>
-  <div class="shop-list" id="shopList"></div>
+  <div class="shop-list" id="shopList" style="display:flex;flex-direction:column;gap:15px;"></div>
 </div>
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
-  <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn">
+  <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;">
     <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="23 4 23 10 17 10"></polyline>
       <polyline points="1 20 1 14 7 14"></polyline>
@@ -195,50 +122,53 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
     </svg>
     بروزرسانی لیست
   </button>
-  <ol id="rankList"></ol>
+  <ol id="rankList" style="list-style:none;padding:0;"></ol>
 </div>
 
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
-  <div class="profile-top-section">
-    <div class="profile-card">
-      <div class="preview-avatar" id="previewAvatar"></div>
-      <div class="preview-name" id="previewName">در حال بارگذاری...</div>
-      <div class="preview-title">SPACE COMMANDER</div>
-      <div class="preview-total">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
+  <div class="profile-top-section" style="display:flex;gap:15px;margin-bottom:20px;align-items:stretch;">
+    <div class="profile-card" style="flex:1;padding:15px;text-align:center;">
+      <div class="preview-avatar" id="previewAvatar" style="width:60px;height:60px;margin:0 auto 10px auto;"></div>
+      <div class="preview-name" id="previewName" style="font-size:16px;font-weight:900;color:#fff;"></div>
+      <div class="preview-title" style="font-size:10px;color:#0ff;margin-top:5px;">SPACE COMMANDER</div>
+      <div class="preview-total" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,255,255,.2);font-size:13px;color:#ffd700;font-weight:bold;">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
     </div>
-    <div class="music-player">
-      <label>🎵 موزیک دلخواه:</label>
-      <div class="file-upload-wrapper">
-        <div class="file-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>انتخاب آهنگ</div>
-        <input type="file" id="bgmUpload" accept="audio/*">
+    <div class="music-player" style="flex:1;padding:15px;display:flex;flex-direction:column;justify-content:center;">
+      <label style="font-size:12px;color:#0ff;display:block;margin-bottom:10px;font-weight:bold;">🎵 موزیک دلخواه:</label>
+      <div class="file-upload-wrapper" style="position:relative;overflow:hidden;margin-bottom:10px;">
+        <div style="border:1px dashed #0ff;color:#0ff;padding:10px;border-radius:10px;text-align:center;font-size:12px;background:rgba(0,255,255,.05);">انتخاب آهنگ</div>
+        <input type="file" id="bgmUpload" accept="audio/*" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
       </div>
-      <div class="music-controls">
-        <button id="playBgmBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-        <button id="pauseBgmBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+      <div style="display:flex;gap:8px;">
+        <button id="playBgmBtn" style="flex:1;padding:8px;border-radius:10px;border:none;background:#0ff;color:#000;font-weight:bold;cursor:pointer;">پخش</button>
+        <button id="pauseBgmBtn" style="flex:1;padding:8px;border-radius:10px;border:1px solid #ff5c8a;background:transparent;color:#ff5c8a;font-weight:bold;cursor:pointer;">توقف</button>
       </div>
     </div>
   </div>
-  <div class="form-group">
-    <label>اسم شما (نام فرمانده):</label>
-    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
+  <div class="form-group" style="margin-bottom:15px;">
+    <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">اسم شما (نام فرمانده):</label>
+    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()" style="width:100%;padding:12px;border-radius:10px;">
   </div>
-  <div class="form-group">
-    <label>انتخاب آواتار (نشان فرماندهی):</label>
-    <div class="avatar-grid" id="avatarGrid"></div>
+  <div class="form-group" style="margin-bottom:15px;">
+    <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">انتخاب آواتار (نشان فرماندهی):</label>
+    <div class="avatar-grid" id="avatarGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:10px;"></div>
   </div>
-  <div class="sound-toggle on" id="soundToggle"><span>🔊 افکت‌های صوتی</span><div class="icon"></div></div>
-  <div class="cloud-sync-box">
-    <div class="cloud-sync-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>همگام‌سازی ابری</div>
-    <div class="recovery-box">
+  <div class="sound-toggle on" id="soundToggle" style="display:flex;align-items:center;justify-content:space-between;margin:15px 0;padding:15px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:12px;cursor:pointer;">
+    <span style="font-weight:bold;">🔊 افکت‌های صوتی</span><div class="icon" style="width:44px;height:24px;border-radius:12px;background:#0ff;position:relative;transition:0.3s;"></div>
+  </div>
+  <div class="cloud-sync-box" style="padding:20px;">
+    <div class="cloud-sync-title" style="text-align:center;color:#fff;font-size:15px;font-weight:900;margin-bottom:15px;">☁️ همگام‌سازی ابری</div>
+    <div class="recovery-box" style="margin-bottom:15px;padding:12px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:10px;text-align:center;color:#ffd700;font-size:13px;">
       کد بازیابی اختصاصی شما:
-      <div class="recovery-code-container">
-        <strong id="recoveryCodeDisplay">در حال تولید...</strong>
-        <button class="copy-btn" onclick="copyRecoveryCode()" title="کپی کد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-      </div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px;">
+        <strong id="recoveryCodeDisplay" style="font-size:18px;color:#fff;">در حال تولید...</strong>
+        <button onclick="copyRecoveryCode()" style="background:rgba(255,215,0,.2);border:1px solid #ffd700;border-radius:8px;padding:6px;cursor:pointer;color:#ffd700;">📋</button>
+
+</div>
     </div>
-    <button class="save-btn" id="saveProfileBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>ذخیره در فضای ابری</button>
-    <button class="restore-btn" onclick="restoreAccount()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>بازیابی از دستگاه دیگر</button>
+    <button class="save-btn" id="saveProfileBtn" style="width:100%;padding:14px;margin-bottom:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;position:relative;overflow:hidden;">ذخیره در فضای ابری</button>
+    <button class="restore-btn" onclick="restoreAccount()" style="width:100%;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">بازیابی از دستگاه دیگر</button>
   </div>
 </div>
 
@@ -249,6 +179,7 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
   <div id="bonusCoins">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
 </div>
+
 <script>
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
@@ -279,7 +210,9 @@ const SND = {
   setEnabled(v) { this.enabled = v; localStorage.setItem('shooter_sound', v ? 'true' : 'false'); if (this.masterGain && this.ctx) this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime); },
   sweep(type, f0, f1, dur, vol, delay) { if (!this.ctx) return; const t = this.ctx.currentTime + (delay || 0); const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = type; osc.frequency.setValueAtTime(f0, t); osc.frequency.exponentialRampToValueAtTime(f1, t + dur); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); osc.connect(gain); gain.connect(this.masterGain); osc.start(t); osc.stop(t + dur + 0.02); },
   noise(dur, vol, filterFreq) { if (!this.ctx) return; const t = this.ctx.currentTime; const bufferSize = Math.floor(this.ctx.sampleRate * dur); const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; const src = this.ctx.createBufferSource(); src.buffer = buffer; const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(filterFreq || 2000, t); filter.frequency.exponentialRampToValueAtTime(200, t + dur); const gain = this.ctx.createGain(); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); src.connect(filter); filter.connect(gain); gain.connect(this.masterGain); src.start(t); src.stop(t + dur); },
-  play(name) { if (!this.ctx || !this.enabled) return; switch(name) { case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break; case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break; case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break; case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break; case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break; case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break; case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break; case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break; case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break; case 'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break; case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break; } }
+  play(name) { if (!this.ctx || !this.enabled) return; switch(name) { case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break; case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break; case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break; case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break; case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break; case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break; case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break; case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break; case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break; case
+
+'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break; case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break; } }
 };
 
 const SKINS = [
@@ -327,14 +260,14 @@ const DROP_WEAPONS = [
 ];
 
 const AVATARS = [
-  { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
-  { id: 2, name: "فضایی", color: "#ff00ff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg>` },
-  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg>` },
-  { id: 4, name: "ربات", color: "#ffcc00", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg>` },
-  { id: 5, name: "ماسک", color: "#ff3333", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg>` },
-  { id: 6, name: "کریستال", color: "#00ff88", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg>` },
-  { id: 7, name: "روح", color: "#aaffff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg>` },
-  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
+  { id: 1, name: "سفینه", color: "#00ffcc", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg> },
+  { id: 2, name: "فضایی", color: "#ff00ff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg> },
+  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg> },
+  { id: 4, name: "ربات", color: "#ffcc00", svg: <svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg> },
+  { id: 5, name: "ماسک", color: "#ff3333", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg> },
+  { id: 6, name: "کریستال", color: "#00ff88", svg: <svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg> },
+  { id: 7, name: "روح", color: "#aaffff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg> },
+  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: <svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg> }
 ];
 
 const SAVE_KEY = 'sepehr_save_v3';
@@ -361,6 +294,7 @@ function getRunScore() { return (typeof S !== 'undefined' && S && !isDead) ? (S.
 function getEffectiveTotalScore() { return totalScore + getRunScore(); }
 function getSkinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
 function getMiniById(id) { return MINI_SHIPS.find(s => s.id === id) || MINI_SHIPS[0]; }
+function getAvatarById(id) { return AVATARS.find(a => a.id === id) || AVATARS[0]; }
 
 function loadGameData() {
   try {
@@ -399,7 +333,7 @@ function saveGameData() {
 }
 
 loadGameData();
-if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
+if(!profile  profile.name === 'بازیکن ناشناس'  !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
 
 setInterval(() => { saveGameData(); }, 30000);
 function handleExitSave() { saveGameData(); if (!isDead && typeof S !== 'undefined' && S && S.score > 0) saveScoreToLeaderboard(getEffectiveTotalScore(), true); }
@@ -408,7 +342,6 @@ window.addEventListener('pagehide', handleExitSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) handleExitSave(); });
 
 let selectedAvatarId = profile.avatar;
-function getAvatarById(id) { return AVATARS.find(a => a.id === id) || AVATARS[0]; }
 
 function renderProfileUI() {
   document.getElementById('nameInput').value = profile.name;
@@ -418,7 +351,7 @@ function renderProfileUI() {
   document.getElementById('previewName').textContent = profile.name;
   document.getElementById('totalScoreVal').textContent = totalScore;
   document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
-  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
+  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => <div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}; padding: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer;" onclick="selectAvatar(${a.id})">${a.svg}</div>).join('');
   document.getElementById('soundToggle').classList.toggle('on', SND.enabled);
 }
 
@@ -449,7 +382,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
   saveGameData(); await saveScoreToLeaderboard(getEffectiveTotalScore());
-  showToast(oldName !== newName ? `✨ اسم شما به «${newName}» تغییر یافت و سیو شد!` : '✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
+  showToast(oldName !== newName ? ✨ اسم شما به «${newName}» تغییر یافت و سیو شد! : '✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
   btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; document.querySelector('.tab[data-tab="game"]').click();
 };
 
@@ -460,16 +393,16 @@ window.restoreAccount = async () => {
   if (!codeToRestore) return;
   showToast("⏳ در حال جستجوی اکانت...");
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY} } });
     const data = await res.json();
     if (data && data.length > 0 && data[0].save_data) {
       const remoteSave = data[0].save_data;
       if (remoteSave.recoveryCode !== codeToRestore) { showToast("❌ کد بازیابی اشتباه است! دسترسی رد شد."); return; }
       profile = remoteSave.profile || { name: data[0].name, avatar: data[0].avatar };
-      coins = remoteSave.coins || 0; ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
-      ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
-      ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
-      weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
+      coins = remoteSave.coins  0; ownedWeapons = remoteSave.ownedWeapons  [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
+      ownedSkins = remoteSave.ownedSkins  [1]; equippedSkin = remoteSave.equippedSkin  1;
+      ownedMinis = remoteSave.ownedMinis  [1]; equippedMini = remoteSave.equippedMini  1;
+      weaponLevels = remoteSave.weaponLevels  {}; miniShipLevels = remoteSave.miniShipLevels  {};
       totalScore = safeNum(remoteSave.totalScore, 0);
       currentRunScore = safeNum(remoteSave.currentRunScore, 0);
       localStorage.setItem('shooter_current_run_score', String(currentRunScore));
@@ -491,8 +424,9 @@ document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
 let currentShopTab = 'weapons';
 function switchShopTab(tab, btn) {
   SND.play('uiClick'); currentShopTab = tab;
-  document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); renderShop();
+  document.querySelectorAll('.shop-tab').forEach(b => { b.style.background = 'rgba(0,255,255,.1)'; b.style.color = '#fff'; b.classList.remove('active'); });
+  btn.style.background = '#00ffff'; btn.style.color = '#000'; btn.classList.add('active');
+  renderShop();
 }
 
 function renderShop() {
@@ -502,24 +436,25 @@ function renderShop() {
     list.innerHTML = WEAPONS.map(w => {
       const isOwned = ownedWeapons.includes(w.id); const isEquipped = equippedWeapon === w.id;
       const lvl = weaponLevels[w.id] || 0; const actualDmg = w.dmg + (lvl * 2); const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>`;
-      let upgradeHtml = isOwned ? `<button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
-      return `<div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? `<div class="w-price">💰 ${w.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div>`;
-    }).join('');
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button> : <button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>;
+      let upgradeHtml = isOwned ? <button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button> : '';
+      return <div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? <div class="w-price">💰 ${w.cost}</div> : ''}${actionHtml}${upgradeHtml}</div></div>;
+
+}).join('');
   } else if (currentShopTab === 'skins') {
     list.innerHTML = SKINS.map(sk => {
       const isOwned = ownedSkins.includes(sk.id); const isEquipped = equippedSkin === sk.id;
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>`;
-      return `<div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}"></div><div class="s-action">${!isOwned ? `<div class="s-price">💰 ${sk.cost}</div>` : ''}${actionHtml}</div></div></div>`;
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button> : <button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>;
+      return <div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? <div class="s-price">💰 ${sk.cost}</div> : ''}${actionHtml}</div></div></div>;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.skin-preview').forEach(el => { drawSkinPreview(el, parseInt(el.dataset.skin)); }); }, 50);
   } else {
     list.innerHTML = MINI_SHIPS.map(m => {
       const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
       const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
-      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button>` : `<button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>`;
-      let upgradeHtml = isOwned ? `<button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
-      return `<div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}"></div><div class="m-action">${!isOwned ? `<div class="m-price">💰 ${m.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div></div>`;
+      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button> : <button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>;
+      let upgradeHtml = isOwned ? <button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button> : '';
+      return <div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="m-action">${!isOwned ? <div class="m-price">💰 ${m.cost}</div> : ''}${actionHtml}${upgradeHtml}</div></div></div>;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.mini-preview').forEach(el => { drawMiniPreview(el, parseInt(el.dataset.mini)); }); }, 50);
   }
@@ -540,14 +475,15 @@ function drawMiniPreview(container, miniId) {
   container.innerHTML = ''; container.appendChild(canvas);
 }
 
-window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
-window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
+window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🔫 سلاح «${w.name}» خریداری شد!); SND.play('purchase'); } };
+
+window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(⚡ ارتقا به لول ${lvl+1} انجام شد!); SND.play('upgrade'); } };
 window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
+window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🚀 اسکین «${sk.name}» خریداری شد!); SND.play('purchase'); } };
 window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
+window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🛸 همراه «${m.name}» خریداری شد!); SND.play('purchase'); } };
 window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
+window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!); SND.play('upgrade'); } };
 
 function drawShipShape(c, skin, scale) {
   scale = scale || 1; c.save(); c.scale(scale, scale);
@@ -563,7 +499,8 @@ function drawShipShape(c, skin, scale) {
     c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
     c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
     c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
-    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
+
+c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
   } else if (t === 'phantom') {
     c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
     c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
@@ -602,7 +539,8 @@ function drawMiniShape(c, mini, scale) {
     c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
   } else if (mini.type === 'eye') {
     c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+
+c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
     c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
     c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
   } else if (mini.type === 'gatling') {
@@ -623,7 +561,8 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
-  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+
+function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -636,17 +575,23 @@ let bossWarningTimer = 0;
 
 const dangerOverlay = document.getElementById('dangerOverlay');
 const bossWarning = document.getElementById('bossWarning');
-const TOP_UI_HEIGHT = 60;
+const TOP_UI_HEIGHT = 55;
 
 function reset(){
   let savedScore = safeNum(currentRunScore, 0);
   if (savedScore < 0 || savedScore > 1000000) savedScore = 0;
+  
   S = {
     player: {x: W/2, y: H - 90, r: 3, inv: 0},
     bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
-    tempWeapon: null, tempWeaponTime: 0, miniShipCool: 0
+    tempWeapon: null, tempWeaponTime: 0, miniShipCool: 0, 
+    combo: 0, comboTimer: 0, floatTexts: [], flash: 0, shockwaves: [], hitStop: 0, nebulas: []
   };
+  
+  // ساخت پس‌زمینه سحابی برای ظاهر خفن‌تر
+  for(let i = 0; i < 4; i++) S.nebulas.push({ x: Math.random()*W, y: Math.random()*H, r: 150 + Math.random()*200, color: Math.random()>0.5 ? 'rgba(0, 150, 255, 0.04)' : 'rgba(255, 0, 150, 0.04)' });
+
   currentBossIndex = Math.floor(savedScore / 1000);
   nextBossScore = (currentBossIndex + 1) * 1000;
   isBossActive = false; isDead = false;
@@ -654,7 +599,8 @@ function reset(){
   dangerOverlay.classList.remove('show');
   bossWarning.classList.remove('show');
   document.getElementById('gameOver').style.display = 'none';
-  for(let i = 0; i < 40; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
+  
+  for(let i = 0; i < 50; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
 }
 reset();
 
@@ -694,6 +640,7 @@ function fire(){
     let angle = 0;
     if(w.count > 1){ const spreadRad = (w.spread * Math.PI) / 180; angle = -spreadRad/2 + (spreadRad / (w.count - 1)) * i; }
     const speed = 1.6;
+    if(i === 0) S.parts.push({ x: S.player.x, y: S.player.y - 25, vx: 0, vy: -2, life: 0.5, hue: 180, r: 6 });
     S.bullets.push({ x: S.player.x, y: S.player.y - 22, vx: Math.sin(angle) * speed, vy: -Math.cos(angle) * speed, dmg: dmg, color: w.color, size: w.size });
   }
   SND.play('shoot');
@@ -721,7 +668,10 @@ function spawnBoss(){
 
 function spawnPowerup(x, y) { S.powerups.push({ x, y, vy: 0.5, weapon: DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)], r: 12, rot: 0 }); }
 function spawnHeart(x, y) { S.powerups.push({ x, y, vy: 0.4, isHeart: true, r: 16, rot: 0 }); }
-function boom(x, y, hue, n){ for(let i = 0; i < n; i++){ const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05; S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 }); } }
+function boom(x, y, hue, n){ 
+  S.shockwaves.push({ x, y, r: 5, maxR: hue === 0 ? 40 : 80, life: 1 });
+  for(let i = 0; i < n; i++){ const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05; S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 }); } 
+}
 
 let lastSync = 0;
 function autoSync() { if(!isDead && S && S.score > 0) { let currentTotal = totalScore + S.score; if(currentTotal > lastSync + 10) { saveScoreToLeaderboard(currentTotal, true); lastSync = currentTotal; } } }
@@ -732,11 +682,24 @@ function update(dt){
   S.t++;
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
+  
+  if (S.comboTimer > 0) { S.comboTimer -= dt; if (S.comboTimer <= 0) S.combo = 0; }
+  if (S.flash > 0) S.flash -= dt;
+  
+  for(let i = S.floatTexts.length - 1; i >= 0; i--) {
+    let ft = S.floatTexts[i]; ft.y += ft.vy * dt; ft.life -= dt * 0.002;
+    if (ft.life <= 0) S.floatTexts.splice(i, 1);
+  }
+
+  for(let i = S.shockwaves.length - 1; i >= 0; i--) { 
+    let sw = S.shockwaves[i]; sw.r += 1.5 * dt; sw.life -= dt * 0.005; 
+    if(sw.life <= 0) S.shockwaves.splice(i, 1); 
+  }
 
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) { isBossWarningActive = true; bossWarningTimer = 3000; dangerOverlay.classList.add('show'); bossWarning.classList.add('show'); SND.play('bossWarn'); }
   if (isBossWarningActive) { bossWarningTimer -= dt; if (bossWarningTimer <= 0) { spawnBoss(); isBossActive = true; isBossWarningActive = false; dangerOverlay.classList.remove('show'); bossWarning.classList.remove('show'); S.enemies = S.enemies.filter(e => e.isBoss); } }
 
-  for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
+for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
   const p = S.player; const sp = 0.9 * dt;
   if(keys.left) p.x -= sp; if(keys.right) p.x += sp; if(keys.up) p.y -= sp; if(keys.down) p.y += sp;
   if(touchX !== null && touchY !== null){ const dx = touchX - p.x; const dy = touchY - p.y; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, dx)); p.y += Math.max(-sp*1.6, Math.min(sp*1.6, dy)); }
@@ -757,7 +720,7 @@ function update(dt){
       for (let i = 0; i < 2; i++) {
         let mX = p.x + (i === 0 ? -65 : 65);
         let mY = p.y + 15;
-        S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed || 2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize || 3.5 });
+        S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed  2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize  3.5 });
       }
     }
   }
@@ -765,12 +728,7 @@ function update(dt){
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
     const maxEnemies = 15 + Math.floor(S.score / 300);
-    if (S.enemies.length < maxEnemies) { 
-      spawnEnemy(); 
-      S.spawnT = isBossActive ? 1200 : Math.max(250, 700 - S.score * 0.4); 
-    } else { 
-      S.spawnT = 500; 
-    }
+    if (S.enemies.length < maxEnemies) { spawnEnemy(); S.spawnT = isBossActive ? 1200 : Math.max(250, 700 - S.score * 0.4); } else { S.spawnT = 500; }
   }
 
   for(let i = S.enemies.length - 1; i >= 0; i--){
@@ -779,18 +737,20 @@ function update(dt){
       if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
       if (e.y > 120) e.y = 120;
       if (e.y >= 120) {
+        let isEnraged = e.hp < e.maxHp * 0.4;
+        if (isEnraged) e.vy = 3 + currentBossIndex * 0.5;
         e.shootT -= dt;
-        if (e.shootT <= 0) { e.shootT = Math.max(800, 2000 - currentBossIndex * 200); const patterns = ['aimed', 'spread', 'radial', 'spread']; bossShoot(e, patterns[e.patternIdx % patterns.length]); e.patternIdx++; }
+        if (e.shootT <= 0) { e.shootT = Math.max(isEnraged ? 400 : 800, (isEnraged ? 1000 : 2000) - currentBossIndex * 200); const patterns = ['aimed', 'spread', 'radial', 'spread']; bossShoot(e, patterns[e.patternIdx % patterns.length]); e.patternIdx++; }
       }
     } else if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
   }
 
   for(let i = S.ebullets.length - 1; i >= 0; i--) {
     const eb = S.ebullets[i]; eb.x += eb.vx * dt; eb.y += eb.vy * dt;
-    if (eb.x < -20 || eb.x > W + 20 || eb.y < -20 || eb.y > H + 20) { S.ebullets.splice(i, 1); continue; }
+    if (eb.x < -20  eb.x > W + 20  eb.y < -20 || eb.y > H + 20) { S.ebullets.splice(i, 1); continue; }
     if (S.lives > 0 && S.player.inv <= 0) {
       const dx = eb.x - S.player.x, dy = eb.y - S.player.y, rr = eb.r + S.player.r + 3;
-      if (dx*dx + dy*dy < rr*rr) { S.ebullets.splice(i, 1); S.lives--; S.shake = 220; S.player.inv = 1500; boom(S.player.x, S.player.y, 0, 15); SND.play('playerHit'); if(S.lives <= 0) triggerGameOver(); }
+      if (dx*dx + dy*dy < rr*rr) { S.ebullets.splice(i, 1); S.lives--; S.shake = 220; S.player.inv = 1500; boom(S.player.x, S.player.y, 0, 15); SND.play('playerHit'); S.flash = 300; S.combo = 0; if(S.lives <= 0) triggerGameOver(); }
     }
   }
 
@@ -802,9 +762,16 @@ function update(dt){
       if(dx*dx + dy*dy < hitR*hitR && e.y > TOP_UI_HEIGHT){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){
-          boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10;
+          boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); if (e.isBoss) S.hitStop = 100; else S.hitStop = 15;
+          S.combo++; S.comboTimer = 2500;
+          let comboMult = 1 + Math.floor(S.combo / 5);
+          let addedScore = (e.isBoss ? 500 : 10) * comboMult;
+          S.score += addedScore;
+          S.floatTexts.push({ x: e.x, y: e.y, text: '+' + addedScore, color: e.isBoss ? '#ff00ff' : '#ffd700', life: 1, vy: -1.5 });
+          
           let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
-          if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
+
+if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
           else { SND.play('explosion'); if (Math.random() < 0.02) spawnPowerup(e.x, e.y); }
           saveGameData();
         }
@@ -817,7 +784,7 @@ function update(dt){
     const e = S.enemies[j]; const dx = p.x - e.x, dy = p.y - e.y;
     if(dx*dx + dy*dy < (e.r + p.r)**2 && S.player.inv <= 0) {
       boom(e.x, e.y, e.hue, 12); S.enemies.splice(j, 1); S.shake = 220; S.lives--;
-      S.player.inv = 1500; SND.play('playerHit'); if(e.isBoss) isBossActive = false;
+      S.player.inv = 1500; SND.play('playerHit'); if(e.isBoss) isBossActive = false; S.flash = 300; S.combo = 0;
       if(S.lives <= 0) triggerGameOver(); break;
     }
   }
@@ -842,7 +809,9 @@ function update(dt){
 
 function drawBoss(c, e, bossLvl) {
   const r = e.r; const lvl = bossLvl % 5; let col1, col2, glow;
-  if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; }
+  const isEnraged = e.hp < e.maxHp * 0.4;
+  if (isEnraged) { col1 = '#4a0000'; col2 = '#ff0000'; glow = '#ff3333'; }
+  else if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; }
   else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; }
   else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; }
   else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; }
@@ -856,7 +825,8 @@ function drawBoss(c, e, bossLvl) {
     c.fillStyle = col2; c.beginPath(); c.arc(-r*1.2, 0, r*0.4, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(r*1.2, 0, r*0.4, 0, Math.PI*2); c.fill(); c.fillStyle = glow; c.beginPath(); c.arc(-r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill();
   } else if (lvl === 2) {
     c.fillStyle = col1; c.fillRect(-r*1.3, -r*0.8, r*2.6, r*1.6); c.strokeStyle = glow; c.lineWidth = 4; c.strokeRect(-r*1.3, -r*0.8, r*2.6, r*1.6);
-    c.fillStyle = col2; c.fillRect(-r*0.9, -r*0.5, r*1.8, r*1.0); c.strokeStyle = '#fff'; c.lineWidth = 1; c.strokeRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
+
+c.fillStyle = col2; c.fillRect(-r*0.9, -r*0.5, r*1.8, r*1.0); c.strokeStyle = '#fff'; c.lineWidth = 1; c.strokeRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
     c.fillStyle = glow; c.fillRect(-r*1.3, -r*0.8, r*0.4, r*0.4); c.fillRect(r*0.9, -r*0.8, r*0.4, r*0.4); c.fillRect(-r*1.3, r*0.4, r*0.4, r*0.4); c.fillRect(r*0.9, r*0.4, r*0.4, r*0.4);
   } else if (lvl === 3) {
     c.fillStyle = col1; c.beginPath(); for(let i=0; i<16; i++){ let rad = i%2===0 ? r*1.6 : r*0.6; let ang = i * Math.PI/8 - Math.PI/2; let px = Math.cos(ang)*rad, py = Math.sin(ang)*rad; i===0 ? c.moveTo(px, py) : c.lineTo(px, py); } c.closePath(); c.fill(); c.strokeStyle = glow; c.lineWidth = 2; c.stroke();
@@ -871,20 +841,14 @@ function drawBoss(c, e, bossLvl) {
 function triggerGameOver() {
   isDead = true; SND.play('gameOver'); const achievedScore = S.score; const bonusCoins = Math.floor(achievedScore / 8);
   if(achievedScore > 0) {
-    totalScore += achievedScore;
-    coins += bonusCoins;
-    currentRunScore = 0;
-    localStorage.setItem('shooter_current_run_score', '0');
-    saveGameData();
-    saveScoreToLeaderboard(totalScore);
+    totalScore += achievedScore; coins += bonusCoins; currentRunScore = 0;
+    localStorage.setItem('shooter_current_run_score', '0'); saveGameData(); saveScoreToLeaderboard(totalScore);
     document.getElementById('finalScoreVal').textContent = achievedScore;
     document.getElementById('bonusCoins').textContent = '💰 پاداش سکه: +' + bonusCoins;
     document.getElementById('bonusCoins').style.display = 'block';
   } else {
-    currentRunScore = 0;
-    localStorage.setItem('shooter_current_run_score', '0');
-    document.getElementById('finalScoreVal').textContent = 0;
-    document.getElementById('bonusCoins').style.display = 'none';
+    currentRunScore = 0; localStorage.setItem('shooter_current_run_score', '0');
+    document.getElementById('finalScoreVal').textContent = 0; document.getElementById('bonusCoins').style.display = 'none';
   }
   document.getElementById('gameOver').style.display = 'flex';
 }
@@ -892,15 +856,34 @@ function triggerGameOver() {
 function draw(){
   const sh = S.shake > 0 ? (Math.random() - 0.5) * S.shake * 0.03 : 0;
   ctx.setTransform(1, 0, 0, 1, sh, sh);
-  ctx.fillStyle = 'rgba(4,6,15,0.5)'; ctx.fillRect(-10, -10, W + 20, H + 20);
+  ctx.fillStyle = 'rgba(4,6,15,0.6)'; ctx.fillRect(-10, -10, W + 20, H + 20);
+  
+  // سحابی‌ها
+  for(const neb of S.nebulas) {
+    neb.y -= 0.02 * (S.t > 0 ? 16 : 1); if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
+    const g = ctx.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
+    g.addColorStop(0, neb.color); g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(neb.x, neb.y, neb.r, 0, Math.PI*2); ctx.fill();
+  }
+
+  if (S.flash > 0) { ctx.fillStyle = 'rgba(255,0,0,' + (S.flash / 300 * 0.3) + ')'; ctx.fillRect(0,0,W,H); }
+  
   ctx.fillStyle = '#8fd8ff'; for(const s of S.stars){ ctx.globalAlpha = s.z * 0.7; ctx.fillRect(s.x, s.y, s.z * 1.6, s.z * 2.6); } ctx.globalAlpha = 1;
+  
+  for(const sw of S.shockwaves) {
+    ctx.beginPath(); ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255, 255, 255, ' + sw.life + ')';
+    ctx.lineWidth = 3 * sw.life; ctx.stroke();
+  }
+
   for(const q of S.parts){ ctx.globalAlpha = Math.max(q.life, 0); ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)'; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28); ctx.fill(); } ctx.globalAlpha = 1;
   
   for(const pu of S.powerups) {
     ctx.save(); ctx.translate(pu.x, pu.y);
     if (pu.isHeart) {
       const pulse = 1 + Math.sin(S.t * 0.15) * 0.12;
-      ctx.scale(pulse, pulse);
+
+ctx.scale(pulse, pulse);
       ctx.fillStyle = '#ffd700'; ctx.shadowBlur = 25; ctx.shadowColor = '#ffaa00';
       ctx.beginPath(); ctx.moveTo(0, 8); ctx.bezierCurveTo(-18, -6, -18, -22, 0, -10); ctx.bezierCurveTo(18, -22, 18, -6, 0, 8); ctx.fill();
       ctx.fillStyle = '#fff5cc'; ctx.shadowBlur = 0;
@@ -946,10 +929,18 @@ function draw(){
     }
   }
 
+  for (const ft of S.floatTexts) {
+    ctx.globalAlpha = Math.max(0, ft.life);
+    ctx.font = '900 20px Vazirmatn, system-ui, sans-serif';
+    ctx.fillStyle = ft.color; ctx.textAlign = 'center';
+    ctx.fillText(ft.text, ft.x, ft.y);
+  }
+  ctx.globalAlpha = 1;
+
   if (isBossActive) {
     const boss = S.enemies.find(e => e.isBoss);
     if (boss) {
-      const barWidth = Math.min(W * 0.8, 400); const barHeight = 12; const barX = (W - barWidth) / 2; const barY = 60;
+      const barWidth = Math.min(W * 0.8, 400); const barHeight = 12; const barX = (W - barWidth) / 2; const barY = 65;
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.roundRect(barX, barY, barWidth, barHeight, 6); ctx.fill();
       const hpPct = Math.max(0, boss.hp / boss.maxHp); const grad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0); grad.addColorStop(0, '#ff5c8a'); grad.addColorStop(1, '#800b1b');
       ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(barX, barY, barWidth * hpPct, barHeight, 6); ctx.fill();
@@ -958,18 +949,27 @@ function draw(){
   }
 
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
-  ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 82);
-  ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 110);
+  ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 87);
+
+ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 115);
   let currentMultiplier = 1 + Math.floor(S.score / 1000);
-  if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138); }
-  let lineY = currentMultiplier > 1 ? 166 : 138;
+  if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 143); }
+  let lineY = currentMultiplier > 1 ? 171 : 143;
   if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); }
-  ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
+  
+  ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 87);
+  
+  if (S.combo > 2) {
+    ctx.textAlign = 'center'; ctx.fillStyle = '#ff00ff'; ctx.font = '900 24px Vazirmatn, system-ui, sans-serif';
+    ctx.shadowBlur = 15; ctx.shadowColor = '#ff00ff';
+    ctx.fillText('COMBO x' + (1 + Math.floor(S.combo / 5)) + '  (' + S.combo + ')', W/2, 105);
+    ctx.shadowBlur = 0;
+  }
 }
 
 async function getScores(){
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY} } });
     if (res.ok) return await res.json();
     return { error: res.status };
   } catch(e) { return { error: e.message }; }
@@ -979,9 +979,9 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(isNaN(newTotalScore) || newTotalScore < 0) return;
   const syncIcon = document.getElementById('syncIndicator'); if (syncIcon) syncIcon.classList.add('syncing');
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
+    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id, {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY}, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore, recoveryCode } })
     });
     if (!res.ok && !isSilent) { const errorData = await res.text(); console.error("Save Error:", errorData); }
@@ -995,12 +995,12 @@ async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   const scores = await getScores();
-  if (scores.error) { list.innerHTML = `<li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>`; if (btn) btn.classList.remove('loading'); return; }
+  if (scores.error) { list.innerHTML = <li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>; if (btn) btn.classList.remove('loading'); return; }
   if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; if (btn) btn.classList.remove('loading'); return; }
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
-    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`; }
-    else { avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`; }
+    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = <div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>; }
+    else { avatarHtml = <div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>; }
     return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
   }).join('');
   if (btn) btn.classList.remove('loading');
@@ -1011,7 +1011,8 @@ document.querySelectorAll('.tab').forEach(btn => {
     SND.init(); SND.play('uiClick');
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
+
+document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
     if(tab === 'shop') { renderShop(); }
@@ -1026,7 +1027,16 @@ function loop(ts){
   const dt = last ? Math.min(ts - last, 50) : 16;
   last = ts;
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && !document.getElementById('profilePanel').classList.contains('show') && !document.getElementById('shopPanel').classList.contains('show');
-  if(onGame){ update(dt); draw(); }
+  
+  if(onGame){ 
+    if (S.hitStop > 0) {
+      S.hitStop -= dt; 
+      draw(); 
+    } else {
+      update(dt); 
+      draw(); 
+    }
+  }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -1035,4 +1045,3 @@ renderShop();
 </script>
 </body>
 </html>
-  
