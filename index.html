@@ -11,180 +11,118 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;background:#04060f;
             font-family:'Vazirmatn', system-ui, sans-serif;direction:rtl}
-  
   #c { display:block; position:fixed; inset:0; touch-action:none; }
-  
-  /* ═══════════ افکت هشدار خطر (دور صفحه) ═══════════ */
-  #dangerOverlay {
-    position: fixed; inset: 0; pointer-events: none; z-index: 4;
-    box-shadow: inset 0 0 0 rgba(128, 11, 27, 0);
-    transition: box-shadow 0.5s;
-  }
+  #dangerOverlay { position: fixed; inset: 0; pointer-events: none; z-index: 4;
+    box-shadow: inset 0 0 0 rgba(128, 11, 27, 0); transition: box-shadow 0.5s; }
   #dangerOverlay.show { animation: edgeGlow 1.2s infinite alternate; }
-  @keyframes edgeGlow {
-    from { box-shadow: inset 0 0 30px rgba(128, 11, 27, 0.1); }
-    to { box-shadow: inset 0 0 100px rgba(128, 11, 27, 0.6); }
-  }
-
-  /* ═══════════ اعلان هشدار وسط صفحه ═══════════ */
-  #bossWarning {
-    position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(20, 0, 4, 0.7);
-    border: 2px solid rgba(255, 92, 138, 0.6);
-    padding: 12px 35px; border-radius: 15px;
-    display: flex; align-items: center; justify-content: center; gap: 15px;
-    font-size: 26px; font-weight: 900; color: #ffb3b3;
-    font-family: 'Vazirmatn', sans-serif; letter-spacing: 4px;
+  @keyframes edgeGlow { from { box-shadow: inset 0 0 30px rgba(128, 11, 27, 0.1); }
+    to { box-shadow: inset 0 0 100px rgba(128, 11, 27, 0.6); } }
+  #bossWarning { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(20, 0, 4, 0.7); border: 2px solid rgba(255, 92, 138, 0.6);
+    padding: 12px 35px; border-radius: 15px; display: flex; align-items: center;
+    justify-content: center; gap: 15px; font-size: 26px; font-weight: 900;
+    color: #ffb3b3; font-family: 'Vazirmatn', sans-serif; letter-spacing: 4px;
     z-index: 1500; pointer-events: none; opacity: 0; transition: opacity 0.3s;
     box-shadow: 0 0 25px rgba(255, 92, 138, 0.3), inset 0 0 15px rgba(255, 92, 138, 0.1);
-    text-shadow: 0 0 10px rgba(255, 92, 138, 0.8);
-  }
+    text-shadow: 0 0 10px rgba(255, 92, 138, 0.8); }
   #bossWarning.show { opacity: 0.85; animation: warnPulse 1.5s infinite; }
   @keyframes warnPulse { 0% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.03); } 100% { transform: translate(-50%, -50%) scale(1); } }
-  
   .warn-icon { display: flex; align-items: center; justify-content: center; color: #ff5c8a; }
   .warn-icon svg { width: 28px; height: 28px; filter: drop-shadow(0 0 8px #ff5c8a); animation: iconPulse 1s infinite alternate; }
   @keyframes iconPulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.15); opacity: 1; } }
-
-  /* ═══════════ اعلان خرید ═══════════ */
-  #toastNotification {
-    position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-    background: linear-gradient(135deg, #800b1b, #3e0006);
-    color: #ffe6e6; padding: 14px 28px; border-radius: 20px;
-    font-size: 15px; font-weight: 700;
+  #toastNotification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #800b1b, #3e0006); color: #ffe6e6; padding: 14px 28px;
+    border-radius: 20px; font-size: 15px; font-weight: 700;
     box-shadow: 0 10px 30px rgba(62, 0, 6, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 100, 100, 0.2);
     z-index: 2000; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0; pointer-events: none; text-align: center; white-space: nowrap;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-    max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
-  }
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center;
+    justify-content: center; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
   #toastNotification.show { top: 20px; opacity: 1; }
-
-  /* ═══════════ تب‌ها ═══════════ */
   #tabs{position:fixed;top:0;left:0;right:0;height:50px;
     background:rgba(4,6,15,.85); border-bottom:1px solid rgba(0,255,255,.15);
     display:flex;z-index:10;backdrop-filter:blur(6px)}
-  
-  .tab{flex:1;background:transparent;border:none;
-    color:#5a7d8f;font-size:13px;font-weight:600;
+  .tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:13px;font-weight:600;
     cursor:pointer;transition:.3s;font-family:inherit;position:relative;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 0 5px;}
-    
+    display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 5px;}
   .tab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: 0.3s; }
   .tab.active{color:#7df9ff;text-shadow:0 0 10px rgba(0,255,255,.5)}
   .tab.active svg { filter: drop-shadow(0 0 5px rgba(0,255,255,0.8)); }
-  
-  .tab::after {
-    content: ''; position: absolute; bottom: 0; left: 50%;
-    width: 0; height: 3px;
-    background: linear-gradient(90deg, #0ff, #ff4fd8);
-    border-radius: 3px 3px 0 0;
-    transition: width 0.3s ease, left 0.3s ease;
-    box-shadow: 0 0 12px rgba(0,255,255,0.9);
-  }
+  .tab::after { content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 3px;
+    background: linear-gradient(90deg, #0ff, #ff4fd8); border-radius: 3px 3px 0 0;
+    transition: width 0.3s ease, left 0.3s ease; box-shadow: 0 0 12px rgba(0,255,255,0.9); }
   .tab.active::after { width: 80%; left: 10%; }
-
-  /* ═══════════ پنل‌ها ═══════════ */
-  .panel{position:fixed;top:50px;left:0;right:0;bottom:0;
-    background:#04060f;color:#7df9ff;
+  .panel{position:fixed;top:50px;left:0;right:0;bottom:0;background:#04060f;color:#7df9ff;
     padding:20px;overflow-y:auto;display:none;z-index:5}
   .panel.show{display:block; animation: panelSlide 0.3s ease-out;}
   @keyframes panelSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  
   .panel h2{text-align:center;font-size:22px;margin-bottom:10px;
     background: linear-gradient(90deg, #7df9ff 20%, #ff4fd8 80%);
     -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 900; letter-spacing: 1px;}
-
   .panel::-webkit-scrollbar { width: 6px; }
   .panel::-webkit-scrollbar-track { background: transparent; }
   .panel::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #0ff, #ff4fd8); border-radius: 3px; }
-
-  /* ═══════════ رتبه‌ها ═══════════ */
   #rankList{list-style:none;max-width:400px;margin:0 auto;padding:0}
-  #rankList li{display:flex;align-items:center;
-    padding:12px 18px;margin-bottom:10px;
+  #rankList li{display:flex;align-items:center;padding:12px 18px;margin-bottom:10px;
     background:rgba(0,255,255,.05); border:1px solid rgba(0,255,255,.2);
     border-radius:12px;font-size:16px; transition: transform 0.25s, background 0.25s, box-shadow 0.25s;}
   #rankList li:hover { background: rgba(0,255,255,0.12); box-shadow: 0 0 15px rgba(0,255,255,0.15); transform: translateX(-5px); }
   #rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
   #rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px; text-align:center;}
-  #rankList .pos{width:28px;height:28px;border-radius:50%;
-    background:rgba(0,255,255,.1); display:flex;align-items:center;justify-content:center;
-    font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px; flex-shrink: 0;}
+  #rankList .pos{width:28px;height:28px;border-radius:50%;background:rgba(0,255,255,.1);
+    display:flex;align-items:center;justify-content:center;font-weight:700;margin-left:10px;color:#7df9ff;font-size:14px; flex-shrink: 0;}
   #rankList li:nth-child(1) .pos{background:gold;color:#04060f;box-shadow:0 0 10px gold;}
   #rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f;}
   #rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f;}
-  
   #rankList .avatar-svg { width: 28px; height: 28px; margin-right: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   #rankList .avatar-svg svg { width: 28px !important; height: 28px !important; max-width: 28px; max-height: 28px; filter: drop-shadow(0 0 5px currentColor); }
   #rankList .name{color:#aaa;font-size:14px;margin-right:10px;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #rankList .sc{flex:1;font-size:18px;font-weight:700;color:#fff;text-align:left}
-
-  .refresh-btn { display: block; margin: 0 auto 15px auto; padding: 10px 20px; 
-    background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff; 
+  .refresh-btn { display: block; margin: 0 auto 15px auto; padding: 10px 20px;
+    background: rgba(0,255,255,0.1); border: 1px solid #0ff; color: #0ff;
     border-radius: 20px; cursor: pointer; font-family: inherit; transition: 0.3s;}
   .refresh-btn:hover { background: rgba(0,255,255,0.2); }
-
-  /* ═══════════ پروفایل ═══════════ */
   .profile-top-section { display: flex; gap: 12px; max-width: 400px; margin: 0 auto 15px auto; align-items: stretch; }
-
-  .profile-card {
-    flex: 1; padding: 12px 10px;
+  .profile-card { flex: 1; padding: 12px 10px;
     background: linear-gradient(145deg, rgba(0,255,255,0.08), rgba(4,6,15,0.9));
     border: 1px solid rgba(0, 255, 255, 0.4);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.15), inset 0 0 15px rgba(0,255,255,0.05);
     border-radius: 15px; text-align: center; position: relative; overflow: hidden;
-    backdrop-filter: blur(10px); margin: 0;
-  }
-  .profile-card::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    backdrop-filter: blur(10px); margin: 0; }
+  .profile-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
     background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
-    transform: skewX(-25deg); transition: 0.5s;
-  }
+    transform: skewX(-25deg); transition: 0.5s; }
   .profile-card:hover::before { left: 150%; }
-  
   .preview-avatar { width: 50px; height: 50px; margin: 0 auto 5px auto; display: flex; align-items: center; justify-content: center; }
   .preview-avatar svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px currentColor); }
   .preview-name { font-size: 15px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
   .preview-title { font-size: 8px; color: #0ff; margin-top: 2px; opacity: 0.9; letter-spacing: 1px; }
   .preview-total { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,255,255,0.15); font-size: 12px; color: #ffd700; font-weight: 700; }
-
-  .music-player { 
-    flex: 1; padding: 12px 10px; 
+  .music-player { flex: 1; padding: 12px 10px;
     background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(4,6,15,0.8));
     border: 1px solid rgba(0,255,255,0.2); border-radius: 15px;
     box-shadow: inset 0 0 15px rgba(0,255,255,0.05);
     text-align: center; transition: box-shadow 0.3s, border-color 0.3s;
-    margin: 0; display: flex; flex-direction: column; justify-content: center;
-  }
+    margin: 0; display: flex; flex-direction: column; justify-content: center; }
   .music-player:hover { box-shadow: 0 0 20px rgba(0,255,255,0.15), inset 0 0 20px rgba(0,255,255,0.08); border-color: rgba(0,255,255,0.4); }
   .music-player label { font-size: 11px; color: #0ff; display: block; margin-bottom: 8px; font-weight: 700; }
-  
   .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-bottom: 10px; }
   .file-upload-wrapper input[type="file"] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  
-  .file-upload-btn {
-    border: 1px dashed #0ff; color: #0ff; padding: 10px 8px;
+  .file-upload-btn { border: 1px dashed #0ff; color: #0ff; padding: 10px 8px;
     border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;
-    font-size: 12px; font-weight: 700; background: rgba(0,255,255,0.05); transition: 0.3s;
-  }
+    font-size: 12px; font-weight: 700; background: rgba(0,255,255,0.05); transition: 0.3s; }
   .file-upload-btn svg { width: 16px; height: 16px; }
   .file-upload-wrapper:hover .file-upload-btn { background: rgba(0,255,255,0.15); box-shadow: 0 0 10px rgba(0,255,255,0.2); }
-  
   .music-controls { display: flex; gap: 8px; }
-  .music-controls button {
-    flex: 1; padding: 10px; border-radius: 10px; font-family: inherit;
+  .music-controls button { flex: 1; padding: 10px; border-radius: 10px; font-family: inherit;
     font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-size: 12px;
-    display: flex; align-items: center; justify-content: center;
-  }
+    display: flex; align-items: center; justify-content: center; }
   .music-controls button svg { width: 18px; height: 18px; }
   #playBgmBtn { background: linear-gradient(90deg, #00ffcc, #00ccff); color: #04060f; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
   #playBgmBtn:hover { box-shadow: 0 0 15px rgba(0,255,204,0.6); transform: translateY(-2px); }
   #pauseBgmBtn { background: transparent; border: 1px solid #ff5c8a; color: #ff5c8a; box-shadow: inset 0 0 10px rgba(255,92,138,0.2); }
   #pauseBgmBtn:hover { background: rgba(255,92,138,0.1); transform: translateY(-2px); }
-
   .form-group{margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
   .form-group label{display:block;margin-bottom:6px;color:#8bb5c9;font-size:13px;font-weight:600}
   .form-group input[type="text"]{width:100%;padding:10px 12px;border-radius:10px;
@@ -192,186 +130,112 @@
     color:#fff;font-family:inherit;font-size:14px;outline:none;transition: 0.3s;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);}
   .form-group input[type="text"]:focus{border-color:#0ff; box-shadow: 0 0 15px rgba(0,255,255,0.4), inset 0 2px 5px rgba(0,0,0,0.5);}
-  
   .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(45px, 1fr));gap:8px; max-width: 340px; margin: 0 auto;}
-  .avatar-btn{
-    background:rgba(255,255,255,0.03);border:1px solid transparent;
+  .avatar-btn{background:rgba(255,255,255,0.03);border:1px solid transparent;
     border-radius:10px;padding:6px;cursor:pointer;
     display: flex; align-items: center; justify-content: center; height: 48px;
-    transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
-  }
+    transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;}
   .avatar-btn svg { width: 100%; height: 100%; transition: 0.3s; }
   .avatar-btn:hover { background:rgba(0,255,255,0.12); transform: translateY(-2px); border-color: rgba(0,255,255,0.4);}
   .avatar-btn.selected{border-color:#0ff;background:rgba(0,255,255,0.2);transform:scale(1.05); box-shadow: 0 0 12px rgba(0,255,255,0.5);}
   .avatar-btn.selected svg { filter: drop-shadow(0 0 8px currentColor); }
-  
-  /* ═══════════ بخش همگام‌سازی ابری ═══════════ */
-  .cloud-sync-box {
-    max-width: 340px; margin: 20px auto 15px auto; padding: 15px;
+  .cloud-sync-box { max-width: 340px; margin: 20px auto 15px auto; padding: 15px;
     background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(0,0,0,0.6));
     border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 15px;
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05);
-  }
-  .cloud-sync-title {
-    text-align: center; color: #fff; font-size: 14px; font-weight: 900;
-    margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05); }
+  .cloud-sync-title { text-align: center; color: #fff; font-size: 14px; font-weight: 900;
+    margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .cloud-sync-title svg { width: 20px; height: 20px; stroke: #0ff; }
-
-  .recovery-box {
-    margin: 0 0 15px 0; padding: 10px;
+  .recovery-box { margin: 0 0 15px 0; padding: 10px;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.02));
     border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 10px; text-align: center; color: #ffd700; font-size: 12px;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
-  }
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
   .recovery-code-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 8px; }
   .recovery-code-container strong { font-size: 18px; letter-spacing: 1px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-  .copy-btn {
-    background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700; border-radius: 8px;
+  .copy-btn { background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700; border-radius: 8px;
     padding: 6px; cursor: pointer; color: #ffd700; transition: 0.3s;
-    display: flex; align-items: center; justify-content: center;
-  }
+    display: flex; align-items: center; justify-content: center; }
   .copy-btn:hover { background: rgba(255, 215, 0, 0.3); box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); transform: scale(1.05); }
   .copy-btn svg { width: 16px; height: 16px; }
-
-  .save-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+  .save-btn { display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 12px; background: linear-gradient(135deg, #00d2ff, #0055ff);
     color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer;
     font-family: inherit; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 100, 255, 0.4);
-    position: relative; overflow: hidden;
-  }
+    position: relative; overflow: hidden; }
   .save-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-  .save-btn::after {
-    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  .save-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
     background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
-    transform: skewX(-25deg); transition: 0.5s;
-  }
+    transform: skewX(-25deg); transition: 0.5s; }
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 100, 255, 0.6); }
   .save-btn:hover::after { left: 150%; }
   .save-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; transform: none; }
-
-  .restore-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+  .restore-btn { display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 10px; margin-top: 10px;
     background: transparent; border: 2px solid #ff4fd8; color: #ff4fd8;
     border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer;
-    font-family: inherit; transition: 0.3s;
-  }
+    font-family: inherit; transition: 0.3s; }
   .restore-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
   .restore-btn:hover { background: rgba(255, 79, 216, 0.15); box-shadow: 0 0 15px rgba(255, 79, 216, 0.4); transform: translateY(-2px); }
-
-  .sound-toggle {
-    display: flex; align-items: center; justify-content: space-between;
+  .sound-toggle { display: flex; align-items: center; justify-content: space-between;
     max-width: 340px; margin: 10px auto; padding: 12px 16px;
     background: linear-gradient(145deg, rgba(0,255,255,0.05), rgba(0,0,0,0.4));
     border: 1px solid rgba(0,255,255,0.2); border-radius: 12px;
-    cursor: pointer; transition: 0.3s;
-  }
+    cursor: pointer; transition: 0.3s; }
   .sound-toggle:hover { border-color: rgba(0,255,255,0.4); background: linear-gradient(145deg, rgba(0,255,255,0.1), rgba(0,0,0,0.4)); }
   .sound-toggle span { color: #fff; font-weight: 700; font-size: 14px; }
-  .sound-toggle .icon {
-    width: 44px; height: 24px; border-radius: 12px;
-    background: #333; position: relative; transition: 0.3s;
-  }
-  .sound-toggle .icon::after {
-    content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%;
-    background: #666; top: 3px; left: 3px; transition: 0.3s;
-  }
+  .sound-toggle .icon { width: 44px; height: 24px; border-radius: 12px;
+    background: #333; position: relative; transition: 0.3s; }
+  .sound-toggle .icon::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%;
+    background: #666; top: 3px; left: 3px; transition: 0.3s; }
   .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.7); }
   .sound-toggle.on .icon::after { left: 23px; background: #04060f; }
-
-  /* ═══════════ فروشگاه ═══════════ */
   .shop-header{text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;text-shadow:0 0 10px rgba(255,215,0,0.5)}
   .shop-list{display:flex;flex-direction:column;gap:15px;max-width:500px;margin:0 auto}
-  
   .shop-tabs { display: flex; gap: 8px; max-width: 500px; margin: 0 auto 20px; }
   .shop-tab { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid rgba(0,255,255,0.2);
     background: rgba(0,255,255,0.05); color: #7df9ff; font-family: inherit; font-weight: 700; font-size: 13px;
     cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;}
   .shop-tab.active { background: #0ff; color: #04060f; box-shadow: 0 0 20px rgba(0,255,255,0.4); }
-  .shop-tab::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  .shop-tab::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease; pointer-events: none;
-  }
+    transition: left 0.5s ease; pointer-events: none; }
   .shop-tab:hover::before { left: 100%; }
-
-  .weapon-card, .skin-card, .mini-card{
-    display:flex;align-items:center;justify-content:space-between;
+  .weapon-card, .skin-card, .mini-card{display:flex;align-items:center;justify-content:space-between;
     background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.6));
-    border:1px solid rgba(0,255,255,.15);
-    padding:15px 20px;border-radius:15px;
+    border:1px solid rgba(0,255,255,.15); padding:15px 20px;border-radius:15px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
-  }
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s; }
   .weapon-card:hover, .skin-card:hover, .mini-card:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0,255,255,0.18), 0 12px 30px rgba(0,0,0,0.6); border-color: rgba(0,255,255,0.4); }
   .weapon-card.owned, .skin-card.owned, .mini-card.owned{ border-color: rgba(0,255,0,.3); background: linear-gradient(145deg, rgba(0,255,0,0.05), rgba(0,0,0,0.6)); }
   .weapon-card.equipped, .skin-card.equipped, .mini-card.equipped{ border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
-  
   .w-info h3, .s-info h3, .m-info h3{font-size:17px;margin-bottom:5px;color:#fff; font-weight: 700;}
   .w-info p, .s-info p, .m-info p{font-size:13px;color:#8bb5c9; font-weight: 400;}
   .w-action, .s-action, .m-action{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   .w-price, .s-price, .m-price{font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.5)}
-  
-  .skin-preview, .mini-preview {
-    width: 65px; height: 65px; border-radius: 12px;
+  .skin-preview, .mini-preview { width: 65px; height: 65px; border-radius: 12px;
     background: rgba(0,0,0,0.4); border: 1px solid rgba(0,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
-    margin-left: 10px; overflow: hidden;
-  }
-  .skin-preview canvas, .mini-preview canvas { 
-    width: 100% !important; height: 100% !important; 
-    display: block; position: static !important; inset: auto !important;
-  }
-
-  .w-btn, .m-btn{
-    padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
+    margin-left: 10px; overflow: hidden; }
+  .skin-preview canvas, .mini-preview canvas { width: 100% !important; height: 100% !important; display: block; position: static !important; inset: auto !important; }
+  .w-btn, .m-btn{padding:10px 15px;border-radius:25px;border:none;cursor:pointer;
     font-family:inherit;font-weight:700;font-size:13px;transition:.3s;
-    letter-spacing: 0.5px;width: 150px;text-align: center;
-    position: relative; overflow: hidden;
-  }
-  .w-btn::before, .m-btn::before {
-    content: ''; position: absolute; top: 50%; left: 50%;
+    letter-spacing: 0.5px;width: 150px;text-align: center; position: relative; overflow: hidden; }
+  .w-btn::before, .m-btn::before { content: ''; position: absolute; top: 50%; left: 50%;
     width: 0; height: 0; background: rgba(255,255,255,0.25);
     border-radius: 50%; transform: translate(-50%, -50%);
-    transition: width 0.5s ease, height 0.5s ease; pointer-events: none;
-  }
+    transition: width 0.5s ease, height 0.5s ease; pointer-events: none; }
   .w-btn:active::before, .m-btn:active::before { width: 200px; height: 200px; }
-
-  .btn-buy{
-    background: linear-gradient(45deg, #ffd700, #ffaa00);
-    color:#000; box-shadow: 0 0 15px rgba(255,215,0,0.4);
-  }
+  .btn-buy{ background: linear-gradient(45deg, #ffd700, #ffaa00); color:#000; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
   .btn-buy:not(:disabled):hover { box-shadow: 0 0 25px rgba(255,215,0,0.8); }
   .btn-buy:disabled{ background: #333; color:#666; box-shadow:none; cursor:not-allowed; }
-  
-  .btn-equip{
-    background: transparent; border:1px solid #0ff; color:#0ff;
-    box-shadow: inset 0 0 10px rgba(0,255,255,0.1);
-  }
-  
-  .btn-equipped{
-    background: linear-gradient(45deg, #00ffcc, #00ccff);
-    color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5);
-  }
-
-  .btn-upgrade, .m-btn-upgrade {
-    background: linear-gradient(135deg, #ff00cc, #333399);
+  .btn-equip{ background: transparent; border:1px solid #0ff; color:#0ff; box-shadow: inset 0 0 10px rgba(0,255,255,0.1); }
+  .btn-equipped{ background: linear-gradient(45deg, #00ffcc, #00ccff); color:#000; box-shadow: 0 0 15px rgba(0,255,204,0.5); }
+  .btn-upgrade, .m-btn-upgrade { background: linear-gradient(135deg, #ff00cc, #333399);
     color:#fff; box-shadow: 0 4px 15px rgba(255, 0, 204, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     margin-top: 5px; border: 1px solid rgba(255, 150, 255, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.8); font-weight: 900;
-    border-radius: 15px;
-  }
-  .btn-upgrade:not(:disabled):hover, .m-btn-upgrade:not(:disabled):hover {
-    box-shadow: 0 0 30px rgba(255, 0, 204, 0.9), inset 0 0 15px rgba(255,255,255,0.2);
-    transform: scale(1.03);
-  }
-  .btn-upgrade:disabled, .m-btn-upgrade:disabled { 
-    background: #222; color:#555; box-shadow:none; cursor:not-allowed; 
-    transform:none; border:1px solid #333; text-shadow: none;
-  }
-
-  /* ═══════════ Game Over ═══════════ */
+    border-radius: 15px; }
+  .btn-upgrade:not(:disabled):hover, .m-btn-upgrade:not(:disabled):hover { box-shadow: 0 0 30px rgba(255, 0, 204, 0.9), inset 0 0 15px rgba(255,255,255,0.2); transform: scale(1.03); }
+  .btn-upgrade:disabled, .m-btn-upgrade:disabled { background: #222; color:#555; box-shadow:none; cursor:not-allowed; transform:none; border:1px solid #333; text-shadow: none; }
   #gameOver{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;
     background:rgba(4,6,15,.9);color:#fff;text-align:center;z-index:20;backdrop-filter:blur(5px)}
   #gameOver h1{font-size:36px;color:#ff5c8a;text-shadow:0 0 20px #ff5c8a; font-weight: 900;}
@@ -381,8 +245,6 @@
   #restartBtn{margin-top:10px;padding:14px 40px;font-size:20px;border:2px solid #0ff;background:transparent;color:#0ff;
     border-radius:40px;cursor:pointer;font-family:inherit;font-weight: 700;transition:0.3s}
   #restartBtn:active{background:#0ff;color:#04060f}
-
-  /* ═══════════ نشانگر سیو ═══════════ */
   #syncIndicator { position: fixed; bottom: 20px; left: 20px; color: #0ff; font-size: 24px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; text-shadow: 0 0 10px #0ff; }
   #syncIndicator.syncing { opacity: 1; animation: pulse 1s infinite alternate; }
   @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
@@ -411,13 +273,11 @@
 <div id="shopPanel" class="panel">
   <h2>🛒 فروشگاه</h2>
   <div class="shop-header">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
-  
   <div class="shop-tabs">
     <button class="shop-tab active" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
     <button class="shop-tab" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
     <button class="shop-tab" onclick="switchShopTab('minis', this)">🛸 همراه</button>
   </div>
-  
   <div class="shop-list" id="shopList"></div>
 </div>
 
@@ -480,11 +340,31 @@
   <div id="bonusCoins">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
 </div>
-
 <script>
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
 let W, H;
+
+/* ═══════════ پچ ۱۱: Polyfill برای roundRect (Safari قدیمی) ═══════════ */
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = {tl: r, tr: r, br: r, bl: r};
+    else if (Array.isArray(r)) { r = {tl: r[0], tr: r[0], br: r[0], bl: r[0]}; }
+    else r = r || {tl:0, tr:0, br:0, bl:0};
+    this.beginPath();
+    this.moveTo(x + r.tl, y);
+    this.lineTo(x + w - r.tr, y);
+    this.arcTo(x + w, y, x + w, y + r.tr, r.tr);
+    this.lineTo(x + w, y + h - r.br);
+    this.arcTo(x + w, y + h, x + w - r.br, y + h, r.br);
+    this.lineTo(x + r.bl, y + h);
+    this.arcTo(x, y + h, x, y + h - r.bl, r.bl);
+    this.lineTo(x, y + r.tl);
+    this.arcTo(x, y, x + r.tl, y, r.tl);
+    this.closePath();
+    return this;
+  };
+}
 
 const SUPABASE_URL = "https://wjgnbgbcqdtdcxonyrsb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs";
@@ -548,7 +428,7 @@ const AVATARS = [
   { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
-/* ═══════════════ ذخیره‌سازی و کد بازیابی ═══════════════ */
+/* ═══════════════ ذخیره‌سازی + پچ ۱: currentRunScore ═══════════════ */
 const SAVE_KEY = 'sepehr_save_v3';
 let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 
@@ -565,8 +445,17 @@ let equippedMini = 1;
 let weaponLevels = {};
 let miniShipLevels = {};
 let totalScore = 0;
-let recoveryCode = generateRecoveryCode(); 
+let recoveryCode = generateRecoveryCode();
+let currentRunScore = parseInt(localStorage.getItem('shooter_current_run_score') || '0');
 
+function getRunScore() {
+  return (typeof S !== 'undefined' && S && !isDead) ? (S.score || 0) : 0;
+}
+function getEffectiveTotalScore() {
+  return totalScore + getRunScore();
+}
+
+/* ═══════════════ پچ ۲ و ۳: loadGameData و saveGameData ═══════════════ */
 function loadGameData() {
   try {
     let raw = localStorage.getItem(SAVE_KEY);
@@ -583,6 +472,7 @@ function loadGameData() {
       if (d.weaponLevels) weaponLevels = d.weaponLevels;
       if (d.miniShipLevels) miniShipLevels = d.miniShipLevels;
       if (typeof d.totalScore === 'number') totalScore = d.totalScore;
+      if (typeof d.currentRunScore === 'number') currentRunScore = d.currentRunScore;
       if (d.recoveryCode) recoveryCode = d.recoveryCode;
       return;
     }
@@ -591,10 +481,14 @@ function loadGameData() {
 
 function saveGameData() {
   try {
+    currentRunScore = getRunScore();
+    localStorage.setItem('shooter_current_run_score', String(currentRunScore));
     const data = {
       v: 3, profile, coins, ownedWeapons, equippedWeapon,
       ownedSkins, equippedSkin, ownedMinis, equippedMini,
-      weaponLevels, miniShipLevels, totalScore, recoveryCode, savedAt: Date.now()
+      weaponLevels, miniShipLevels,
+      totalScore, currentRunScore,
+      recoveryCode, savedAt: Date.now()
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
   } catch(e) {}
@@ -602,15 +496,21 @@ function saveGameData() {
 
 loadGameData();
 if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
-setInterval(() => { saveGameData(); }, 1000);
 
-window.addEventListener('beforeunload', () => { saveGameData(); if(!isDead && S && S.score > 0) saveScoreToLeaderboard(totalScore + S.score, true); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) saveGameData(); });
+/* ═══════════════ پچ ۴: تایمر ۳۰ ثانیه + pagehide + visibilitychange ═══════════════ */
+setInterval(() => { saveGameData(); }, 30000);
+
+function handleExitSave() {
+  saveGameData();
+  if (!isDead && typeof S !== 'undefined' && S && S.score > 0) saveScoreToLeaderboard(getEffectiveTotalScore(), true);
+}
+window.addEventListener('beforeunload', handleExitSave);
+window.addEventListener('pagehide', handleExitSave);
+document.addEventListener('visibilitychange', () => { if (document.hidden) handleExitSave(); });
 
 function getSkinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
 function getMiniById(id) { return MINI_SHIPS.find(s => s.id === id) || MINI_SHIPS[0]; }
-
-/* ═══════════════ منطق پروفایل و اعلان ═══════════════ */
+ /* ═══════════════ منطق پروفایل و اعلان ═══════════════ */
 let selectedAvatarId = profile.avatar;
 function getAvatarById(id) { return AVATARS.find(a => a.id === id) || AVATARS[0]; }
 
@@ -644,6 +544,7 @@ window.copyRecoveryCode = () => {
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
 window.updatePreview = () => { const val = document.getElementById('nameInput').value.trim(); document.getElementById('previewName').textContent = val || profile.name; };
 
+/* ═══════════════ پچ ۹: دکمه ذخیره پروفایل با امتیاز کل ═══════════════ */
 document.getElementById('saveProfileBtn').onclick = async () => {
   const newName = document.getElementById('nameInput').value.trim();
   const btn = document.getElementById('saveProfileBtn');
@@ -654,11 +555,12 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   if(isTaken) { showToast('❌ این اسم قبلا انتخاب شده است.'); btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; return; }
   const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
-  saveGameData(); await saveScoreToLeaderboard(totalScore);
+  saveGameData(); await saveScoreToLeaderboard(getEffectiveTotalScore());
   if (oldName !== newName) { showToast(`✨ اسم شما به «${newName}» تغییر یافت و سیو شد!`); } else { showToast('✅ پروفایل و پیشرفت شما در ابر ذخیره شد!'); }
   btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; document.querySelector('.tab[data-tab="game"]').click();
 };
 
+/* ═══════════════ پچ ۱۳: بازیابی اکانت با currentRunScore ═══════════════ */
 window.restoreAccount = async () => {
     const nameToRestore = prompt("نام فرمانده‌ای که قبلاً ساختی را وارد کن:");
     if (!nameToRestore) return;
@@ -677,7 +579,10 @@ window.restoreAccount = async () => {
             ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
             ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
             weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
-            totalScore = remoteSave.totalScore || 0; recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
+            totalScore = remoteSave.totalScore || 0;
+            currentRunScore = remoteSave.currentRunScore || 0;
+            localStorage.setItem('shooter_current_run_score', String(currentRunScore));
+            recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
             deviceId = remoteId; localStorage.setItem('shooter_device_id', deviceId);
             saveGameData(); showToast("✅ اکانت با موفقیت بازیابی شد! در حال رفرش..."); setTimeout(() => { location.reload(); }, 1500);
         } else { showToast("❌ اکانتی با این نام پیدا نشد."); }
@@ -724,11 +629,8 @@ function renderShop() {
     list.innerHTML = MINI_SHIPS.map(m => {
       const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
       const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
-      
       let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button>` : `<button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>`;
-      
       let upgradeHtml = isOwned ? `<button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
-      
       return `<div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}"></div><div class="m-action">${!isOwned ? `<div class="m-price">💰 ${m.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div></div>`;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.mini-preview').forEach(el => { drawMiniPreview(el, parseInt(el.dataset.mini)); }); }, 50);
@@ -788,7 +690,6 @@ function drawShipShape(c, skin, scale) {
 function drawMiniShape(c, mini, scale) {
   scale = scale || 1; c.save(); c.scale(scale, scale);
   c.shadowBlur = 10; c.shadowColor = mini.color;
-  
   if (mini.type === 'jet') {
     let grad = c.createLinearGradient(0, -14, 0, 14); grad.addColorStop(0, '#ffffff'); grad.addColorStop(1, '#555555');
     c.fillStyle = grad; c.beginPath(); c.moveTo(0, -14); c.lineTo(6, -2); c.lineTo(14, 6); c.lineTo(4, 4); c.lineTo(3, 12); c.lineTo(0, 8); c.lineTo(-3, 12); c.lineTo(-4, 4); c.lineTo(-14, 6); c.lineTo(-6, -2); c.closePath(); c.fill();
@@ -823,30 +724,29 @@ function drawMiniShape(c, mini, scale) {
     c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
     c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0, 0, 4, 0, Math.PI*2); c.fill();
   }
-  
   c.shadowBlur = 0; c.restore();
 }
 
-window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
-window.upgradeWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
-window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); } };
-window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
-window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); } };
-window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
-window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true); } };
+/* ═══════════════ پچ ۱۰: همه با getEffectiveTotalScore ═══════════════ */
+window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
+window.upgradeWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
+window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
+window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
+window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
+window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
+window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
 window.upgradeMini = (id) => {
     SND.init();
     const m = getMiniById(id);
     const lvl = miniShipLevels[id] || 0;
     const cost = Math.floor(2000 * Math.pow(1.8, lvl));
     if (coins >= cost && lvl < 5) {
-        coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(totalScore, true);
+        coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true);
         showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`);
         SND.play('upgrade');
     }
 };
-
-/* ═══════════════ منطق بازی ═══════════════ */
+ /* ═══════════════ منطق بازی ═══════════════ */
 function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
@@ -860,13 +760,14 @@ let bossWarningTimer = 0;
 
 const dangerOverlay = document.getElementById('dangerOverlay');
 const bossWarning = document.getElementById('bossWarning');
-const TOP_UI_HEIGHT = 60; 
+const TOP_UI_HEIGHT = 60;
 
+/* ═══════════════ پچ ۶: reset با currentRunScore ═══════════════ */
 function reset(){
-  let savedScore = parseInt(localStorage.getItem('shooter_current_score') || '0');
+  let savedScore = currentRunScore;
   S = {
-    player: {x: W/2, y: H - 90, r: 3, inv: 0}, 
-    bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [], 
+    player: {x: W/2, y: H - 90, r: 3, inv: 0},
+    bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0,
     miniShipCool: 0
@@ -890,16 +791,16 @@ let touching = false, touchX = null, touchY = null;
 addEventListener('keydown', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = true;
   if(['ArrowRight','d','D'].includes(e.key)) keys.right = true;
-  if(['ArrowUp','w','W'].includes(e.key)) keys.up = true; 
-  if(['ArrowDown','s','S'].includes(e.key)) keys.down = true; 
+  if(['ArrowUp','w','W'].includes(e.key)) keys.up = true;
+  if(['ArrowDown','s','S'].includes(e.key)) keys.down = true;
   if(e.key === ' '){ keys.fire = true; e.preventDefault(); }
   if(e.key === 'Enter') SND.init();
 });
 addEventListener('keyup', e => {
   if(['ArrowLeft','a','A'].includes(e.key)) keys.left = false;
   if(['ArrowRight','d','D'].includes(e.key)) keys.right = false;
-  if(['ArrowUp','w','W'].includes(e.key)) keys.up = false; 
-  if(['ArrowDown','s','S'].includes(e.key)) keys.down = false; 
+  if(['ArrowUp','w','W'].includes(e.key)) keys.up = false;
+  if(['ArrowDown','s','S'].includes(e.key)) keys.down = false;
   if(e.key === ' ') keys.fire = false;
 });
 
@@ -926,8 +827,8 @@ function fire(){
 }
 
 function bossShoot(boss, pattern) {
-  SND.play('bossShoot'); const bossLvl = currentBossIndex; const speed = 0.25 + bossLvl * 0.05; 
-  const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x); const bulletR = 6 + bossLvl * 1.5; 
+  SND.play('bossShoot'); const bossLvl = currentBossIndex; const speed = 0.25 + bossLvl * 0.05;
+  const angleToPlayer = Math.atan2(S.player.y - boss.y, S.player.x - boss.x); const bulletR = 6 + bossLvl * 1.5;
   if (pattern === 'aimed') { for (let i = 0; i < 3; i++) { const spreadAngle = angleToPlayer + (i - 1) * 0.1; S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(spreadAngle) * (speed * 1.2), vy: Math.sin(spreadAngle) * (speed * 1.2), r: bulletR, color: '#ff4fd8' }); } }
   else if (pattern === 'spread') { const count = 3 + bossLvl; for (let i = 0; i < count; i++) { const spreadAngle = angleToPlayer + (i - (count - 1) / 2) * 0.15; S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(spreadAngle) * speed, vy: Math.sin(spreadAngle) * speed, r: bulletR, color: '#ffd166' }); } }
   else if (pattern === 'radial') { const count = 8 + bossLvl * 2; const baseAngle = S.t * 0.05; for (let i = 0; i < count; i++) { const angle = baseAngle + (i / count) * Math.PI * 2; S.ebullets.push({ x: boss.x, y: boss.y, vx: Math.cos(angle) * speed * 0.8, vy: Math.sin(angle) * speed * 0.8, r: bulletR, color: '#7df9ff' }); } }
@@ -941,7 +842,7 @@ function spawnEnemy(){
 }
 
 function spawnBoss(){
-  const bossLvl = currentBossIndex; const hp = 200 + (bossLvl * 400); 
+  const bossLvl = currentBossIndex; const hp = 200 + (bossLvl * 400);
   S.enemies.push({ x: W/2, y: -150, r: 60 + bossLvl * 5, vy: 2 + bossLvl * 0.5, vx: 0.15 + bossLvl * 0.02, hue: 280, rot: 0, rv: 0.01, hp: hp, maxHp: hp, isBoss: true, shootT: 0, patternIdx: 0 });
 }
 
@@ -952,10 +853,10 @@ let lastSync = 0;
 function autoSync() { if(!isDead && S && S.score > 0) { let currentTotal = totalScore + S.score; if(currentTotal > lastSync + 10) { saveScoreToLeaderboard(currentTotal, true); lastSync = currentTotal; } } }
 setInterval(autoSync, 15000);
 
+/* ═══════════════ پچ ۵ (حذف ذخیره هر ۲ ثانیه) + پچ ۱۲ (مینی با لمس) ═══════════════ */
 function update(dt){
   if(S.lives <= 0) return;
   S.t++;
-  if(S.t % 120 === 0) saveGameData();
   if (S.tempWeaponTime > 0) { S.tempWeaponTime -= dt; if (S.tempWeaponTime <= 0) S.tempWeapon = null; }
   if (S.player.inv > 0) S.player.inv -= dt;
 
@@ -963,28 +864,28 @@ function update(dt){
   if (isBossWarningActive) { bossWarningTimer -= dt; if (bossWarningTimer <= 0) { spawnBoss(); isBossActive = true; isBossWarningActive = false; dangerOverlay.classList.remove('show'); bossWarning.classList.remove('show'); S.enemies = S.enemies.filter(e => e.isBoss); } }
 
   for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
-  
+
   const p = S.player; const sp = 0.9 * dt;
   if(keys.left) p.x -= sp; if(keys.right) p.x += sp; if(keys.up) p.y -= sp; if(keys.down) p.y += sp;
   if(touchX !== null && touchY !== null){ const dx = touchX - p.x; const dy = touchY - p.y; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, dx)); p.y += Math.max(-sp*1.6, Math.min(sp*1.6, dy)); }
-  p.x = Math.max(22, Math.min(W - 22, p.x)); p.y = Math.max(TOP_UI_HEIGHT + 30, Math.min(H - 40, p.y)); 
+  p.x = Math.max(22, Math.min(W - 22, p.x)); p.y = Math.max(TOP_UI_HEIGHT + 30, Math.min(H - 40, p.y));
 
   S.cool -= dt;
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
-  // ═══════════ منطق مینی سفینه‌ها (همیشه فعال) ═══════════
+  // ═══════════ پچ ۱۲: مینی سفینه فقط با لمس/شلیک ═══════════
   if (equippedMini > 0) {
     S.miniShipCool -= dt;
     const mData = getMiniById(equippedMini);
     const lvl = miniShipLevels[equippedMini] || 0;
     const actualDmg = mData.baseDmg + (lvl * 1);
     const actualFireRate = Math.max(40, mData.fireRate - (lvl * 30));
-    
-    if (S.miniShipCool <= 0) {
+
+    if ((keys.fire || touching) && S.miniShipCool <= 0) {
       S.miniShipCool = actualFireRate;
       for (let i = 0; i < 2; i++) {
-        let mX = p.x + (i === 0 ? -65 : 65); // فاصله بیشتر شد
+        let mX = p.x + (i === 0 ? -65 : 65);
         let mY = p.y + 15;
         S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed || 2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize || 3.5 });
       }
@@ -993,7 +894,7 @@ function update(dt){
 
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    const maxEnemies = 15 + Math.floor(S.score / 300); 
+    const maxEnemies = 15 + Math.floor(S.score / 300);
     if (!isBossActive && S.enemies.length < maxEnemies) { spawnEnemy(); S.spawnT = Math.max(250, 700 - S.score * 0.4); } else if (!isBossActive) { S.spawnT = 500; } else { S.spawnT = 1000; }
   }
 
@@ -1001,7 +902,7 @@ function update(dt){
     const e = S.enemies[i]; e.y += e.vy * dt; e.x += e.vx * dt; e.rot += e.rv * dt;
     if(e.isBoss) {
       if (e.x < e.r || e.x > W - e.r) e.vx *= -1;
-      if (e.y > 120) e.y = 120; 
+      if (e.y > 120) e.y = 120;
       if (e.y >= 120) {
           e.shootT -= dt;
           if (e.shootT <= 0) { e.shootT = Math.max(800, 2000 - currentBossIndex * 200); const patterns = ['aimed', 'spread', 'radial', 'spread']; bossShoot(e, patterns[e.patternIdx % patterns.length]); e.patternIdx++; }
@@ -1024,14 +925,14 @@ function update(dt){
       const e = S.enemies[j]; const dx = b.x - e.x, dy = b.y - e.y;
       if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > TOP_UI_HEIGHT){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
-        if(e.hp <= 0){ 
-          boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10; 
-          let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier; 
+        if(e.hp <= 0){
+          boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10;
+          let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion');
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
           } else { SND.play('explosion'); if (Math.random() < 0.02) spawnPowerup(e.x, e.y); }
-          saveGameData(); 
+          saveGameData();
         }
         break;
       }
@@ -1064,11 +965,11 @@ function update(dt){
 /* ═══════════════ طراحی گرافیکی غول‌ها ═══════════════ */
 function drawBoss(c, e, bossLvl) {
   const r = e.r; const lvl = bossLvl % 5; let col1, col2, glow;
-  if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; } 
-  else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; } 
-  else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; } 
-  else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; } 
-  else { col1 = '#111111'; col2 = '#333333'; glow = '#ffffff'; } 
+  if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; }
+  else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; }
+  else if (lvl === 2) { col1 = '#003333'; col2 = '#009999'; glow = '#00ffff'; }
+  else if (lvl === 3) { col1 = '#3e2a00'; col2 = '#998000'; glow = '#ffd700'; }
+  else { col1 = '#111111'; col2 = '#333333'; glow = '#ffffff'; }
   c.shadowColor = glow; c.shadowBlur = 25;
   if (lvl === 0) {
     c.fillStyle = col1; c.beginPath(); c.moveTo(-r*1.8, 0); c.lineTo(-r*0.8, -r*0.7); c.lineTo(-r*0.2, -r*0.9); c.lineTo(0, -r*0.5); c.lineTo(r*0.2, -r*0.9); c.lineTo(r*0.8, -r*0.7); c.lineTo(r*1.8, 0); c.lineTo(r*0.8, r*0.8); c.lineTo(0, r*0.4); c.lineTo(-r*0.8, r*0.8); c.closePath(); c.fill(); c.strokeStyle = glow; c.lineWidth = 2; c.stroke();
@@ -1089,14 +990,24 @@ function drawBoss(c, e, bossLvl) {
     c.fillStyle = '#fff'; c.beginPath(); c.ellipse(0, 0, r*0.5, r*0.3, 0, 0, Math.PI*2); c.fill(); c.fillStyle = glow; c.beginPath(); c.arc(0, 0, r*0.2, 0, Math.PI*2); c.fill(); c.fillStyle = '#000'; c.beginPath(); c.arc(0, 0, r*0.08, 0, Math.PI*2); c.fill();
   }
 }
-
+ /* ═══════════════ پچ ۷: triggerGameOver با currentRunScore ═══════════════ */
 function triggerGameOver() {
-  isDead = true; SND.play('gameOver'); const achievedScore = S.score; const bonusCoins = Math.floor(achievedScore / 8); 
+  isDead = true; SND.play('gameOver'); const achievedScore = S.score; const bonusCoins = Math.floor(achievedScore / 8);
   if(achievedScore > 0) {
-    totalScore += achievedScore; coins += bonusCoins; saveGameData(); localStorage.setItem('shooter_current_score', 0); saveScoreToLeaderboard(totalScore); 
-    document.getElementById('finalScoreVal').textContent = achievedScore; document.getElementById('bonusCoins').textContent = '💰 پاداش سکه: +' + bonusCoins; document.getElementById('bonusCoins').style.display = 'block';
+    totalScore += achievedScore;
+    coins += bonusCoins;
+    currentRunScore = 0;
+    localStorage.setItem('shooter_current_run_score', '0');
+    saveGameData();
+    saveScoreToLeaderboard(totalScore);
+    document.getElementById('finalScoreVal').textContent = achievedScore;
+    document.getElementById('bonusCoins').textContent = '💰 پاداش سکه: +' + bonusCoins;
+    document.getElementById('bonusCoins').style.display = 'block';
   } else {
-    localStorage.setItem('shooter_current_score', 0); document.getElementById('finalScoreVal').textContent = 0; document.getElementById('bonusCoins').style.display = 'none';
+    currentRunScore = 0;
+    localStorage.setItem('shooter_current_run_score', '0');
+    document.getElementById('finalScoreVal').textContent = 0;
+    document.getElementById('bonusCoins').style.display = 'none';
   }
   document.getElementById('gameOver').style.display = 'flex';
 }
@@ -1112,13 +1023,13 @@ function draw(){
   for(const eb of S.ebullets) { ctx.fillStyle = eb.color; ctx.shadowBlur = 15; ctx.shadowColor = eb.color; ctx.beginPath(); ctx.arc(eb.x, eb.y, eb.r, 0, 6.28); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(eb.x, eb.y, eb.r * 0.5, 0, 6.28); ctx.fill(); }
   ctx.shadowBlur = 0;
   for(const b of S.bullets) { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fill(); ctx.globalAlpha = 0.5; ctx.fillRect(b.x - b.size/2, b.y + b.size, b.size, 10); ctx.globalAlpha = 1; }
-  
+
   for(const e of S.enemies){
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rot);
     if (e.isBoss) { drawBoss(ctx, e, currentBossIndex); } else {
         ctx.strokeStyle = 'hsl(' + e.hue + ',100%,70%)'; ctx.fillStyle = 'hsla(' + e.hue + ',100%,55%,.25)'; ctx.lineWidth = 2; ctx.beginPath();
         for(let k = 0; k < 6; k++){ const a = k / 6 * 6.283; const px = Math.cos(a) * e.r, py = Math.sin(a) * e.r; k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
-        ctx.closePath(); ctx.fill(); ctx.stroke(); 
+        ctx.closePath(); ctx.fill(); ctx.stroke();
     } ctx.restore();
   }
 
@@ -1132,12 +1043,11 @@ function draw(){
     }
   }
 
-  // ═══════════ رسم مینی سفینه‌ها (فاصله بیشتر) ═══════════
   if (equippedMini > 0) {
     const p = S.player;
     const mData = getMiniById(equippedMini);
     for (let i = 0; i < 2; i++) {
-      let drawX = p.x + (i === 0 ? -65 : 65); // فاصله بیشتر شد
+      let drawX = p.x + (i === 0 ? -65 : 65);
       let drawY = p.y + 15;
       ctx.save(); ctx.translate(drawX, drawY); drawMiniShape(ctx, mData, 1); ctx.restore();
     }
@@ -1146,7 +1056,7 @@ function draw(){
   if (isBossActive) {
     const boss = S.enemies.find(e => e.isBoss);
     if (boss) {
-      const barWidth = Math.min(W * 0.8, 400); const barHeight = 12; const barX = (W - barWidth) / 2; const barY = 60; 
+      const barWidth = Math.min(W * 0.8, 400); const barHeight = 12; const barX = (W - barWidth) / 2; const barY = 60;
       ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.roundRect(barX, barY, barWidth, barHeight, 6); ctx.fill();
       const hpPct = Math.max(0, boss.hp / boss.maxHp); const grad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0); grad.addColorStop(0, '#ff5c8a'); grad.addColorStop(1, '#800b1b');
       ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(barX, barY, barWidth * hpPct, barHeight, 6); ctx.fill();
@@ -1173,14 +1083,15 @@ async function getScores(){
   } catch(e) { return { error: e.message }; }
 }
 
+/* ═══════════════ پچ ۸: اجازه ذخیره با امتیاز صفر ═══════════════ */
 async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
-  if(newTotalScore <= 0 || isNaN(newTotalScore)) return;
+  if(isNaN(newTotalScore) || newTotalScore < 0) return;
   const syncIcon = document.getElementById('syncIndicator'); if (syncIcon) syncIcon.classList.add('syncing');
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, recoveryCode } })
+      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore, recoveryCode } })
     });
     if (!res.ok && !isSilent) { const errorData = await res.text(); console.error("Save Error:", errorData); }
   } catch(e) { if (!isSilent) console.error("Network Error:", e.message); }
@@ -1207,7 +1118,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    if(tab === 'shop') { renderShop(); } else if(tab === 'rank') { let currentScore = S ? (S.score || 0) : 0; if (currentScore > 0) { await saveScoreToLeaderboard(totalScore + currentScore, true); } renderRank(); }
+    if(tab === 'shop') { renderShop(); } else if(tab === 'rank') { if (getRunScore() > 0) { await saveScoreToLeaderboard(getEffectiveTotalScore(), true); } renderRank(); }
   };
 });
 
