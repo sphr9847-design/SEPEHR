@@ -25,7 +25,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 #toastNotification.show{top:20px;opacity:1}
 
 #tabs{position:fixed;top:0;left:0;right:0;height:55px;background:rgba(5,10,20,0.95);border-bottom:1px solid rgba(0,255,255,.15);display:flex;z-index:10}
-.tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:12px;font-weight:700;cursor:pointer;transition:.3s;font-family:inherit;position:relative;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 2px}
+.tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:13px;font-weight:700;cursor:pointer;transition:.3s;font-family:inherit;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 5px}
 .tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;transition:.3s}
 .tab.active{color:#00ffff;text-shadow:0 0 10px #00ffff}
 .tab.active svg{filter:drop-shadow(0 0 6px #00ffff)}
@@ -90,7 +90,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
 .avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
 
-/* 🟢 استایل تمیز و درست دکمه افکت صوتی */
 .sound-toggle { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; padding: 15px; background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; }
 .sound-toggle span { font-weight: bold; color: #fff; font-size: 14px; }
 .sound-toggle .icon { width: 44px; height: 24px; border-radius: 12px; background: #333; position: relative; transition: 0.3s; flex-shrink: 0; }
@@ -120,7 +119,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <button class="tab" data-tab="shop"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>فروشگاه</button>
   <button class="tab" data-tab="rank"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1-10 0V4M7 4H4v2a3 3 0 0 0 3 3h0M17 4h3v2a3 3 0 0 1-3 3h0"/></svg>رتبه‌ها</button>
   <button class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>پروفایل</button>
-  <button class="tab" data-tab="quests"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>ماموریت</button>
 </div>
 <div id="syncIndicator">☁️</div>
 <canvas id="c"></canvas>
@@ -132,6 +130,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
     <button class="shop-tab active" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
     <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
     <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('minis', this)">🛸 همراه</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-weight:bold;cursor:pointer;transition:0.3s;" onclick="switchShopTab('quests', this)">📜 ماموریت</button>
   </div>
   <div class="shop-list" id="shopList" style="display:flex;flex-direction:column;gap:15px;"></div>
 </div>
@@ -194,11 +193,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
     <button class="save-btn" id="saveProfileBtn" style="width:100%;padding:14px;margin-bottom:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;position:relative;overflow:hidden;">ذخیره در فضای ابری</button>
     <button class="restore-btn" onclick="restoreAccount()" style="width:100%;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">بازیابی از دستگاه دیگر</button>
   </div>
-</div>
-
-<div id="questsPanel" class="panel">
-  <h2>📜 ماموریت‌های روزانه</h2>
-  <div id="questList" style="padding-bottom:20px;"></div>
 </div>
 
 <div id="gameOver">
@@ -340,12 +334,12 @@ function addQuestProgress(type, amount, isMax = false) {
     questState.progress[type] = (questState.progress[type] || 0) + amount;
   }
   localStorage.setItem('shooter_quests_v1', JSON.stringify(questState));
-  if (document.getElementById('questsPanel').classList.contains('show')) renderQuests();
+  if (document.getElementById('shopPanel').classList.contains('show') && currentShopTab === 'quests') renderQuests();
 }
 
 function renderQuests() {
   checkQuestReset();
-  const list = document.getElementById('questList');
+  const list = document.getElementById('shopList');
   list.innerHTML = QUEST_TEMPLATES.map(q => {
     let current = questState.progress[q.type] || 0;
     if (current > q.target) current = q.target;
@@ -528,7 +522,6 @@ document.getElementById('soundToggle').addEventListener('click', () => {
   if (SND.enabled) SND.play('uiClick'); 
 });
 renderProfileUI();
-renderQuests();
 
 let bgmAudio = new Audio();
 document.getElementById('bgmUpload').addEventListener('change', function(e) { const file = e.target.files[0]; if (file) { bgmAudio.src = URL.createObjectURL(file); bgmAudio.play(); } });
@@ -540,7 +533,12 @@ function switchShopTab(tab, btn) {
   SND.play('uiClick'); currentShopTab = tab;
   document.querySelectorAll('.shop-tab').forEach(b => { b.style.background = 'rgba(0,255,255,.1)'; b.style.color = '#fff'; b.classList.remove('active'); });
   btn.style.background = '#00ffff'; btn.style.color = '#000'; btn.classList.add('active');
-  renderShop();
+  
+  if (tab === 'quests') {
+    renderQuests();
+  } else {
+    renderShop();
+  }
 }
 
 function renderShop() {
@@ -561,7 +559,7 @@ function renderShop() {
       return `<div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? `<div class="s-price">💰 ${sk.cost}</div>` : ''}${actionHtml}</div></div></div>`;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.skin-preview').forEach(el => { drawSkinPreview(el, parseInt(el.dataset.skin)); }); }, 50);
-  } else {
+  } else if (currentShopTab === 'minis') {
     list.innerHTML = MINI_SHIPS.map(m => {
       const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
       const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
@@ -829,14 +827,13 @@ function update(dt){
     neb.y -= 0.05 * dt; if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
   }
 
-  // منطق موشک غول‌پیکر (پرواز آروم به سمت وسط و انفجار)
+  // منطق موشک غول‌پیکر
   if (S.rocketState === 'firing' && S.rocket) {
     let dx = W/2 - S.rocket.x;
     let dy = H/2 - S.rocket.y;
     let dist = Math.hypot(dx, dy);
     
     if (dist < 30) {
-      // انفجار عظیم در وسط صفحه
       S.rocketState = 'idle';
       S.rocket = null;
       S.flash = 600; 
@@ -844,7 +841,6 @@ function update(dt){
       SND.play('bigExplosion');
       S.shockwaves.push({ x: W/2, y: H/2, r: 10, maxR: Math.max(W, H), life: 1 });
 
-      // نابودی همه دشمنان
       S.enemies.forEach(e => {
         boom(e.x, e.y, e.hue, 30);
         if (e.isBoss) {
@@ -866,10 +862,8 @@ function update(dt){
       S.ebullets = []; 
       saveGameData();
     } else {
-      // حرکت آروم به سمت وسط (سرعت متوسط)
       S.rocket.x += (dx/dist) * 12 * (dt/16); 
       S.rocket.y += (dy/dist) * 12 * (dt/16);
-      // دنباله دود و آتش
       if (S.t % 2 === 0) S.parts.push({ x: S.rocket.x, y: S.rocket.y, vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2, life: 1, hue: 30, r: 10 });
     }
   }
@@ -1068,26 +1062,19 @@ function draw(){
 
   for(const q of S.parts){ ctx.globalAlpha = Math.max(q.life, 0); ctx.fillStyle = 'hsl(' + q.hue + ',100%,65%)'; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * q.life, 0, 6.28); ctx.fill(); } ctx.globalAlpha = 1;
   
-  // رسم موشک غول‌پیکر
   if (S.rocket) {
     ctx.save(); ctx.translate(S.rocket.x, S.rocket.y);
     ctx.shadowBlur = 25; ctx.shadowColor = '#ff3333';
-    
-    // شعله آتش پشت موشک
     let flameSize = 20 + Math.random() * 15;
     let flameGrad = ctx.createLinearGradient(0, 15, 0, flameSize);
     flameGrad.addColorStop(0, '#ffff00'); flameGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = flameGrad;
     ctx.beginPath(); ctx.moveTo(-10, 15); ctx.lineTo(0, flameSize); ctx.lineTo(10, 15); ctx.fill();
-    
-    // بدنه موشک
     ctx.fillStyle = '#eeeeee';
     ctx.beginPath(); ctx.moveTo(0, -25); ctx.lineTo(15, 10); ctx.lineTo(-15, 10); ctx.closePath(); ctx.fill();
-    // باله‌ها
     ctx.fillStyle = '#ff3333';
     ctx.beginPath(); ctx.moveTo(15, 10); ctx.lineTo(25, 25); ctx.lineTo(5, 15); ctx.fill();
     ctx.beginPath(); ctx.moveTo(-15, 10); ctx.lineTo(-25, 25); ctx.lineTo(-5, 15); ctx.fill();
-    // شیشه کابین
     ctx.fillStyle = '#00ffff';
     ctx.beginPath(); ctx.arc(0, -5, 5, 0, Math.PI*2); ctx.fill();
     ctx.restore();
@@ -1164,7 +1151,6 @@ function draw(){
   
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 87);
 
-  // رسم دکمه موشک (خوشگل و انیمیشنی)
   const isReady = S.rocketCharge >= 100;
   const pulseScale = isReady ? 1 + Math.sin(S.t * 0.15) * 0.05 : 1;
   
@@ -1190,7 +1176,6 @@ function draw(){
   ctx.strokeStyle = isReady ? 'rgba(255, 51, 51, 0.8)' : 'rgba(0, 255, 255, 0.2)';
   ctx.lineWidth = 1; ctx.stroke();
 
-  // وکتور موشک
   ctx.save(); ctx.rotate(-Math.PI/4);
   const iconColor = isReady ? '#ffffff' : '#888888';
   ctx.fillStyle = iconColor;
@@ -1259,11 +1244,9 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
-    document.getElementById('questsPanel').classList.toggle('show', tab === 'quests');
     
     if(tab === 'shop') { renderShop(); }
     else if(tab === 'rank') { if (getRunScore() > 0) { await saveScoreToLeaderboard(getEffectiveTotalScore(), true); } renderRank(); }
-    else if(tab === 'quests') { renderQuests(); }
   };
 });
 
@@ -1275,8 +1258,7 @@ function loop(ts){
   last = ts;
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
                  !document.getElementById('profilePanel').classList.contains('show') && 
-                 !document.getElementById('shopPanel').classList.contains('show') && 
-                 !document.getElementById('questsPanel').classList.contains('show');
+                 !document.getElementById('shopPanel').classList.contains('show');
   
   if(onGame){ 
     if (S.hitStop > 0) {
