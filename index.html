@@ -41,6 +41,21 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .panel::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:10px}
 .panel::-webkit-scrollbar-thumb:hover{background:rgba(0,255,255,.6)}
 
+/* استایل‌های اصلاح شده رتبه‌بندی */
+#rankList{list-style:none;max-width:450px;margin:0 auto;padding:0}
+#rankList li{display:flex;align-items:center;padding:15px 20px;margin-bottom:12px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:15px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
+#rankList li:hover{background:rgba(0,255,255,.1);box-shadow:0 0 15px rgba(0,255,255,.15);transform:translateX(-5px)}
+#rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
+#rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px;text-align:center}
+#rankList .pos{width:30px;height:30px;border-radius:50%;background:rgba(0,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:700;margin-left:12px;color:#7df9ff;font-size:14px;flex-shrink:0}
+#rankList li:nth-child(1) .pos{background:gold;color:#04060f;box-shadow:0 0 10px gold}
+#rankList li:nth-child(2) .pos{background:#c0c0c0;color:#04060f}
+#rankList li:nth-child(3) .pos{background:#cd7f32;color:#04060f}
+#rankList .avatar-svg{width:35px;height:35px;margin-right:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#rankList .avatar-svg svg{width:35px!important;height:35px!important;max-width:35px!important;max-height:35px!important;filter:drop-shadow(0 0 5px currentColor)}
+#rankList .name{color:#aaa;font-size:15px;margin-right:10px;width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold}
+#rankList .sc{flex:1;font-size:18px;font-weight:900;color:#fff;text-align:left;text-shadow:0 0 10px rgba(255,255,255,0.3)}
+
 .profile-card,.music-player,.cloud-sync-box{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,255,.15);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 20px rgba(0,255,255,.05);backdrop-filter:blur(10px)}
 .weapon-card,.skin-card,.mini-card{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(0,0,0,.4));border:1px solid rgba(255,255,255,.05);padding:18px 22px;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.6);transition:all .3s ease}
 .weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(0,255,255,.4);box-shadow:0 15px 35px rgba(0,0,0,.8), 0 0 20px rgba(0,255,255,.15)}
@@ -59,24 +74,18 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .restore-btn{border:2px solid #ff4fd8;color:#ff4fd8;border-radius:15px;transition:0.3s}
 .restore-btn:hover{background:rgba(255,79,216,.1);box-shadow:0 0 20px rgba(255,79,216,.3)}
 
-.refresh-btn{background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s}
+.refresh-btn{background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;}
 .refresh-btn:hover{background:rgba(0,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.4);transform:translateY(-2px);border-color:#00ffff}
 
-#rankList li{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.05);border-radius:15px;margin-bottom:12px;transition:0.3s}
-#rankList li:hover{border-color:rgba(0,255,255,.3);transform:translateX(-5px);background:rgba(0,255,255,.05)}
-#rankList li:nth-child(1){border-color:gold;box-shadow:0 0 20px rgba(255,215,0,.15)}
-#rankList li:nth-child(2){border-color:silver}
-#rankList li:nth-child(3){border-color:#cd7f32}
-
-.form-group input[type="text"]{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;transition:0.3s;color:#fff}
+.form-group input[type="text"]{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;transition:0.3s;color:#fff;width:100%;}
 .form-group input[type="text"]:focus{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.2);outline:none}
-.avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.05)}
+.avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.05);padding:5px;display:flex;justify-content:center;align-items:center;cursor:pointer}
 .avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
 .avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
 
-#gameOver{background:rgba(5,0,10,.9);backdrop-filter:blur(20px)}
+#gameOver{background:rgba(5,0,10,.9);backdrop-filter:blur(20px);position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;color:#fff;text-align:center;z-index:20}
 #gameOver h1{color:#ff0055;text-shadow:0 0 30px #ff0055, 0 0 60px #ff0055;font-size:45px;letter-spacing:2px}
-#restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);font-weight:900;letter-spacing:2px;transition:0.3s}
+#restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);font-weight:900;letter-spacing:2px;transition:0.3s;margin-top:10px;padding:14px 40px;font-size:20px;border-radius:40px;cursor:pointer;font-family:inherit}
 #restartBtn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(255,0,85,.8)}
 #syncIndicator{position:fixed;bottom:20px;left:20px;color:#0ff;font-size:24px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100;text-shadow:0 0 10px #0ff}
 #syncIndicator.syncing{opacity:1;animation:pulse 1s infinite alternate}
@@ -113,15 +122,15 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
-  <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;">
-    <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn">
+    <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;">
       <polyline points="23 4 23 10 17 10"></polyline>
       <polyline points="1 20 1 14 7 14"></polyline>
       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
     </svg>
     بروزرسانی لیست
   </button>
-  <ol id="rankList" style="list-style:none;padding:0;"></ol>
+  <ol id="rankList"></ol>
 </div>
 
 <div id="profilePanel" class="panel">
@@ -147,7 +156,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   </div>
   <div class="form-group" style="margin-bottom:15px;">
     <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">اسم شما (نام فرمانده):</label>
-    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()" style="width:100%;padding:12px;border-radius:10px;">
+    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
   </div>
   <div class="form-group" style="margin-bottom:15px;">
     <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:14px;">انتخاب آواتار (نشان فرماندهی):</label>
@@ -173,8 +182,8 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 <div id="gameOver">
   <h1>💥 بازی تموم شد!</h1>
   <p>جونات تموم شد...</p>
-  <div class="final-score">امتیاز این دست: <span id="finalScoreVal">0</span></div>
-  <div id="bonusCoins">💰 پاداش سکه: +0</div>
+  <div class="final-score" style="font-size:28px;font-weight:900;color:#fff;margin:10px 0;">امتیاز این دست: <span id="finalScoreVal">0</span></div>
+  <div id="bonusCoins" style="font-size:20px;color:#ffd700;font-weight:900;margin-bottom:15px;text-shadow:0 0 10px rgba(255,215,0,.5);">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
 </div>
 <script>
@@ -346,7 +355,7 @@ function renderProfileUI() {
   document.getElementById('previewName').textContent = profile.name;
   document.getElementById('totalScoreVal').textContent = totalScore;
   document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
-  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}; padding: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer;" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
+  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
   document.getElementById('soundToggle').classList.toggle('on', SND.enabled);
 }
 
@@ -552,7 +561,7 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
-  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+ function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -579,7 +588,6 @@ function reset(){
     combo: 0, comboTimer: 0, floatTexts: [], flash: 0, shockwaves: [], hitStop: 0, nebulas: []
   };
   
-  // ساخت پس‌زمینه سحابی برای ظاهر خفن‌تر
   for(let i = 0; i < 4; i++) S.nebulas.push({ x: Math.random()*W, y: Math.random()*H, r: 150 + Math.random()*200, color: Math.random()>0.5 ? 'rgba(0, 150, 255, 0.04)' : 'rgba(255, 0, 150, 0.04)' });
 
   currentBossIndex = Math.floor(savedScore / 1000);
@@ -684,6 +692,10 @@ function update(dt){
   for(let i = S.shockwaves.length - 1; i >= 0; i--) { 
     let sw = S.shockwaves[i]; sw.r += 1.5 * dt; sw.life -= dt * 0.005; 
     if(sw.life <= 0) S.shockwaves.splice(i, 1); 
+  }
+  
+  for(const neb of S.nebulas) {
+    neb.y -= 0.05 * dt; if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
   }
 
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) { isBossWarningActive = true; bossWarningTimer = 3000; dangerOverlay.classList.add('show'); bossWarning.classList.add('show'); SND.play('bossWarn'); }
@@ -846,9 +858,7 @@ function draw(){
   ctx.setTransform(1, 0, 0, 1, sh, sh);
   ctx.fillStyle = 'rgba(4,6,15,0.6)'; ctx.fillRect(-10, -10, W + 20, H + 20);
   
-  // سحابی‌ها
   for(const neb of S.nebulas) {
-    neb.y -= 0.02 * (S.t > 0 ? 16 : 1); if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
     const g = ctx.createRadialGradient(neb.x, neb.y, 0, neb.x, neb.y, neb.r);
     g.addColorStop(0, neb.color); g.addColorStop(1, 'transparent');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(neb.x, neb.y, neb.r, 0, Math.PI*2); ctx.fill();
@@ -1029,4 +1039,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html>
+</html> 
