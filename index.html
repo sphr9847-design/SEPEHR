@@ -41,7 +41,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .panel::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:10px}
 .panel::-webkit-scrollbar-thumb:hover{background:rgba(0,255,255,.6)}
 
-/* استایل‌های اصلاح شده رتبه‌بندی */
 #rankList{list-style:none;max-width:450px;margin:0 auto;padding:0}
 #rankList li{display:flex;align-items:center;padding:15px 20px;margin-bottom:12px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:15px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
 #rankList li:hover{background:rgba(0,255,255,.1);box-shadow:0 0 15px rgba(0,255,255,.15);transform:translateX(-5px)}
@@ -561,7 +560,7 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
- function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -585,7 +584,7 @@ function reset(){
     bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [],
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0, miniShipCool: 0, 
-    combo: 0, comboTimer: 0, floatTexts: [], flash: 0, shockwaves: [], hitStop: 0, nebulas: []
+    combo: 0, comboTimer: 0, flash: 0, shockwaves: [], hitStop: 0, nebulas: []
   };
   
   for(let i = 0; i < 4; i++) S.nebulas.push({ x: Math.random()*W, y: Math.random()*H, r: 150 + Math.random()*200, color: Math.random()>0.5 ? 'rgba(0, 150, 255, 0.04)' : 'rgba(255, 0, 150, 0.04)' });
@@ -667,7 +666,7 @@ function spawnBoss(){
 function spawnPowerup(x, y) { S.powerups.push({ x, y, vy: 0.5, weapon: DROP_WEAPONS[Math.floor(Math.random() * DROP_WEAPONS.length)], r: 12, rot: 0 }); }
 function spawnHeart(x, y) { S.powerups.push({ x, y, vy: 0.4, isHeart: true, r: 16, rot: 0 }); }
 function boom(x, y, hue, n){ 
-  S.shockwaves.push({ x, y, r: 5, maxR: hue === 0 ? 40 : 80, life: 1 });
+  if (n > 5) S.shockwaves.push({ x, y, r: 5, maxR: 80, life: 1 });
   for(let i = 0; i < n; i++){ const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05; S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 }); } 
 }
 
@@ -684,11 +683,6 @@ function update(dt){
   if (S.comboTimer > 0) { S.comboTimer -= dt; if (S.comboTimer <= 0) S.combo = 0; }
   if (S.flash > 0) S.flash -= dt;
   
-  for(let i = S.floatTexts.length - 1; i >= 0; i--) {
-    let ft = S.floatTexts[i]; ft.y += ft.vy * dt; ft.life -= dt * 0.002;
-    if (ft.life <= 0) S.floatTexts.splice(i, 1);
-  }
-
   for(let i = S.shockwaves.length - 1; i >= 0; i--) { 
     let sw = S.shockwaves[i]; sw.r += 1.5 * dt; sw.life -= dt * 0.005; 
     if(sw.life <= 0) S.shockwaves.splice(i, 1); 
@@ -729,7 +723,8 @@ function update(dt){
 
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    const maxEnemies = 15 + Math.floor(S.score / 300);
+    // محدود کردن تعداد دشمنان برای جلوگیری از هنگ کردن
+    const maxEnemies = 10 + Math.floor(S.score / 500); 
     if (S.enemies.length < maxEnemies) { spawnEnemy(); S.spawnT = isBossActive ? 1200 : Math.max(250, 700 - S.score * 0.4); } else { S.spawnT = 500; }
   }
 
@@ -765,11 +760,16 @@ function update(dt){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); if (e.isBoss) S.hitStop = 100; else S.hitStop = 15;
+          
           S.combo++; S.comboTimer = 2500;
           let comboMult = 1 + Math.floor(S.combo / 5);
-          let addedScore = (e.isBoss ? 500 : 10) * comboMult;
-          S.score += addedScore;
-          S.floatTexts.push({ x: e.x, y: e.y, text: '+' + addedScore, color: e.isBoss ? '#ff00ff' : '#ffd700', life: 1, vy: -1.5 });
+          
+          // فیکس شدن باگ امتیاز غول‌ها (دیگه ضریب روش اعمال نمیشه)
+          if (e.isBoss) {
+            S.score += 500;
+          } else {
+            S.score += 10 * comboMult;
+          }
           
           let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
           if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
@@ -926,14 +926,6 @@ function draw(){
     }
   }
 
-  for (const ft of S.floatTexts) {
-    ctx.globalAlpha = Math.max(0, ft.life);
-    ctx.font = '900 20px Vazirmatn, system-ui, sans-serif';
-    ctx.fillStyle = ft.color; ctx.textAlign = 'center';
-    ctx.fillText(ft.text, ft.x, ft.y);
-  }
-  ctx.globalAlpha = 1;
-
   if (isBossActive) {
     const boss = S.enemies.find(e => e.isBoss);
     if (boss) {
@@ -958,7 +950,8 @@ function draw(){
   if (S.combo > 2) {
     ctx.textAlign = 'center'; ctx.fillStyle = '#ff00ff'; ctx.font = '900 24px Vazirmatn, system-ui, sans-serif';
     ctx.shadowBlur = 15; ctx.shadowColor = '#ff00ff';
-    ctx.fillText('COMBO x' + (1 + Math.floor(S.combo / 5)) + '  (' + S.combo + ')', W/2, 105);
+    // جای متن COMBO اصلاح شد که روی بقیه نوشته‌ها نیفته
+    ctx.fillText('COMBO x' + (1 + Math.floor(S.combo / 5)) + '  (' + S.combo + ')', W/2, 180);
     ctx.shadowBlur = 0;
   }
 }
@@ -1039,4 +1032,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html> 
+</html>  
