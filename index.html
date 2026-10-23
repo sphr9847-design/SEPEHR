@@ -357,7 +357,7 @@
   }
 
   .btn-upgrade, .m-btn-upgrade {
-    background: linear-gradient(135deg, #ff00cc, #333399); /* دکمه خاص بنفش/صورتی */
+    background: linear-gradient(135deg, #ff00cc, #333399);
     color:#fff; box-shadow: 0 4px 15px rgba(255, 0, 204, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     margin-top: 5px; border: 1px solid rgba(255, 150, 255, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.8); font-weight: 900;
     border-radius: 15px;
@@ -869,7 +869,7 @@ function reset(){
     bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [], 
     score: savedScore, lives: 3, cool: 0, spawnT: 0, shake: 0, t: 0,
     tempWeapon: null, tempWeaponTime: 0,
-    miniShipTimer: 0, miniShipCool: 0
+    miniShipCool: 0
   };
   currentBossIndex = Math.floor(savedScore / 1000);
   nextBossScore = (currentBossIndex + 1) * 1000;
@@ -973,9 +973,8 @@ function update(dt){
   if((keys.fire || touching) && S.cool <= 0) fire();
   for(const b of S.bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
 
-  // ═══════════ منطق مینی سفینه‌ها ═══════════
-  if (S.miniShipTimer > 0) {
-    S.miniShipTimer -= dt;
+  // ═══════════ منطق مینی سفینه‌ها (همیشه فعال) ═══════════
+  if (equippedMini > 0) {
     S.miniShipCool -= dt;
     const mData = getMiniById(equippedMini);
     const lvl = miniShipLevels[equippedMini] || 0;
@@ -985,7 +984,7 @@ function update(dt){
     if (S.miniShipCool <= 0) {
       S.miniShipCool = actualFireRate;
       for (let i = 0; i < 2; i++) {
-        let mX = p.x + (i === 0 ? -45 : 45);
+        let mX = p.x + (i === 0 ? -65 : 65); // فاصله بیشتر شد
         let mY = p.y + 15;
         S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed || 2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize || 3.5 });
       }
@@ -1030,7 +1029,6 @@ function update(dt){
           let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier; 
           if (e.isBoss) {
             isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion');
-            S.miniShipTimer = 40000; S.miniShipCool = 0; 
             if (Math.random() < 0.5) spawnPowerup(e.x, e.y);
           } else { SND.play('explosion'); if (Math.random() < 0.02) spawnPowerup(e.x, e.y); }
           saveGameData(); 
@@ -1134,12 +1132,12 @@ function draw(){
     }
   }
 
-  // ═══════════ رسم مینی سفینه‌ها ═══════════
-  if (S.miniShipTimer > 0) {
+  // ═══════════ رسم مینی سفینه‌ها (فاصله بیشتر) ═══════════
+  if (equippedMini > 0) {
     const p = S.player;
     const mData = getMiniById(equippedMini);
     for (let i = 0; i < 2; i++) {
-      let drawX = p.x + (i === 0 ? -45 : 45);
+      let drawX = p.x + (i === 0 ? -65 : 65); // فاصله بیشتر شد
       let drawY = p.y + 15;
       ctx.save(); ctx.translate(drawX, drawY); drawMiniShape(ctx, mData, 1); ctx.restore();
     }
@@ -1162,8 +1160,7 @@ function draw(){
   let currentMultiplier = 1 + Math.floor(S.score / 1000);
   if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 138); }
   let lineY = currentMultiplier > 1 ? 166 : 138;
-  if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); lineY += 28; }
-  if (S.miniShipTimer > 0) { ctx.fillStyle = '#ffd700'; ctx.fillText('🛸 مینی سفینه: ' + Math.ceil(S.miniShipTimer/1000) + 's', 18, lineY); }
+  if (S.tempWeapon) { ctx.fillStyle = S.tempWeapon.color; ctx.fillText('⚡ ' + S.tempWeapon.name + ' (' + Math.ceil(S.tempWeaponTime/1000) + 's)', 18, lineY); }
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 82);
 }
 
