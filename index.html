@@ -79,7 +79,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 #restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);font-weight:900;letter-spacing:2px;transition:0.3s}
 #restartBtn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(255,0,85,.8)}
 #syncIndicator{position:fixed;bottom:20px;left:20px;color:#0ff;font-size:24px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100;text-shadow:0 0 10px #0ff}
-
 #syncIndicator.syncing{opacity:1;animation:pulse 1s infinite alternate}
 @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.2)}}
 </style>
@@ -164,8 +163,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
       <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px;">
         <strong id="recoveryCodeDisplay" style="font-size:18px;color:#fff;">در حال تولید...</strong>
         <button onclick="copyRecoveryCode()" style="background:rgba(255,215,0,.2);border:1px solid #ffd700;border-radius:8px;padding:6px;cursor:pointer;color:#ffd700;">📋</button>
-
-</div>
+      </div>
     </div>
     <button class="save-btn" id="saveProfileBtn" style="width:100%;padding:14px;margin-bottom:10px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;position:relative;overflow:hidden;">ذخیره در فضای ابری</button>
     <button class="restore-btn" onclick="restoreAccount()" style="width:100%;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">بازیابی از دستگاه دیگر</button>
@@ -179,7 +177,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <div id="bonusCoins">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
 </div>
-
 <script>
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
@@ -210,9 +207,7 @@ const SND = {
   setEnabled(v) { this.enabled = v; localStorage.setItem('shooter_sound', v ? 'true' : 'false'); if (this.masterGain && this.ctx) this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime); },
   sweep(type, f0, f1, dur, vol, delay) { if (!this.ctx) return; const t = this.ctx.currentTime + (delay || 0); const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = type; osc.frequency.setValueAtTime(f0, t); osc.frequency.exponentialRampToValueAtTime(f1, t + dur); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); osc.connect(gain); gain.connect(this.masterGain); osc.start(t); osc.stop(t + dur + 0.02); },
   noise(dur, vol, filterFreq) { if (!this.ctx) return; const t = this.ctx.currentTime; const bufferSize = Math.floor(this.ctx.sampleRate * dur); const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; const src = this.ctx.createBufferSource(); src.buffer = buffer; const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(filterFreq || 2000, t); filter.frequency.exponentialRampToValueAtTime(200, t + dur); const gain = this.ctx.createGain(); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); src.connect(filter); filter.connect(gain); gain.connect(this.masterGain); src.start(t); src.stop(t + dur); },
-  play(name) { if (!this.ctx || !this.enabled) return; switch(name) { case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break; case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break; case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break; case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break; case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break; case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break; case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break; case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break; case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break; case
-
-'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break; case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break; } }
+  play(name) { if (!this.ctx || !this.enabled) return; switch(name) { case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break; case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break; case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break; case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break; case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break; case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break; case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break; case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break; case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break; case 'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break; case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break; } }
 };
 
 const SKINS = [
@@ -260,14 +255,14 @@ const DROP_WEAPONS = [
 ];
 
 const AVATARS = [
-  { id: 1, name: "سفینه", color: "#00ffcc", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg> },
-  { id: 2, name: "فضایی", color: "#ff00ff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg> },
-  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg> },
-  { id: 4, name: "ربات", color: "#ffcc00", svg: <svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg> },
-  { id: 5, name: "ماسک", color: "#ff3333", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg> },
-  { id: 6, name: "کریستال", color: "#00ff88", svg: <svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg> },
-  { id: 7, name: "روح", color: "#aaffff", svg: <svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg> },
-  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: <svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg> }
+  { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
+  { id: 2, name: "فضایی", color: "#ff00ff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg>` },
+  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 4, name: "ربات", color: "#ffcc00", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 5, name: "ماسک", color: "#ff3333", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg>` },
+  { id: 6, name: "کریستال", color: "#00ff88", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg>` },
+  { id: 7, name: "روح", color: "#aaffff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg>` },
+  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
 ];
 
 const SAVE_KEY = 'sepehr_save_v3';
@@ -333,7 +328,7 @@ function saveGameData() {
 }
 
 loadGameData();
-if(!profile  profile.name === 'بازیکن ناشناس'  !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
+if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
 
 setInterval(() => { saveGameData(); }, 30000);
 function handleExitSave() { saveGameData(); if (!isDead && typeof S !== 'undefined' && S && S.score > 0) saveScoreToLeaderboard(getEffectiveTotalScore(), true); }
@@ -351,7 +346,7 @@ function renderProfileUI() {
   document.getElementById('previewName').textContent = profile.name;
   document.getElementById('totalScoreVal').textContent = totalScore;
   document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
-  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => <div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}; padding: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer;" onclick="selectAvatar(${a.id})">${a.svg}</div>).join('');
+  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}; padding: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer;" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
   document.getElementById('soundToggle').classList.toggle('on', SND.enabled);
 }
 
@@ -382,7 +377,7 @@ document.getElementById('saveProfileBtn').onclick = async () => {
   const oldName = profile.name;
   profile = { name: newName, avatar: selectedAvatarId };
   saveGameData(); await saveScoreToLeaderboard(getEffectiveTotalScore());
-  showToast(oldName !== newName ? ✨ اسم شما به «${newName}» تغییر یافت و سیو شد! : '✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
+  showToast(oldName !== newName ? `✨ اسم شما به «${newName}» تغییر یافت و سیو شد!` : '✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
   btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; document.querySelector('.tab[data-tab="game"]').click();
 };
 
@@ -393,16 +388,16 @@ window.restoreAccount = async () => {
   if (!codeToRestore) return;
   showToast("⏳ در حال جستجوی اکانت...");
   try {
-    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY} } });
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
     const data = await res.json();
     if (data && data.length > 0 && data[0].save_data) {
       const remoteSave = data[0].save_data;
       if (remoteSave.recoveryCode !== codeToRestore) { showToast("❌ کد بازیابی اشتباه است! دسترسی رد شد."); return; }
       profile = remoteSave.profile || { name: data[0].name, avatar: data[0].avatar };
-      coins = remoteSave.coins  0; ownedWeapons = remoteSave.ownedWeapons  [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
-      ownedSkins = remoteSave.ownedSkins  [1]; equippedSkin = remoteSave.equippedSkin  1;
-      ownedMinis = remoteSave.ownedMinis  [1]; equippedMini = remoteSave.equippedMini  1;
-      weaponLevels = remoteSave.weaponLevels  {}; miniShipLevels = remoteSave.miniShipLevels  {};
+      coins = remoteSave.coins || 0; ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
+      ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
+      ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
+      weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
       totalScore = safeNum(remoteSave.totalScore, 0);
       currentRunScore = safeNum(remoteSave.currentRunScore, 0);
       localStorage.setItem('shooter_current_run_score', String(currentRunScore));
@@ -436,25 +431,24 @@ function renderShop() {
     list.innerHTML = WEAPONS.map(w => {
       const isOwned = ownedWeapons.includes(w.id); const isEquipped = equippedWeapon === w.id;
       const lvl = weaponLevels[w.id] || 0; const actualDmg = w.dmg + (lvl * 2); const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button> : <button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>;
-      let upgradeHtml = isOwned ? <button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button> : '';
-      return <div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? <div class="w-price">💰 ${w.cost}</div> : ''}${actionHtml}${upgradeHtml}</div></div>;
-
-}).join('');
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>`;
+      let upgradeHtml = isOwned ? `<button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
+      return `<div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? `<div class="w-price">💰 ${w.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div>`;
+    }).join('');
   } else if (currentShopTab === 'skins') {
     list.innerHTML = SKINS.map(sk => {
       const isOwned = ownedSkins.includes(sk.id); const isEquipped = equippedSkin === sk.id;
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button> : <button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>;
-      return <div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? <div class="s-price">💰 ${sk.cost}</div> : ''}${actionHtml}</div></div></div>;
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>`;
+      return `<div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? `<div class="s-price">💰 ${sk.cost}</div>` : ''}${actionHtml}</div></div></div>`;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.skin-preview').forEach(el => { drawSkinPreview(el, parseInt(el.dataset.skin)); }); }, 50);
   } else {
     list.innerHTML = MINI_SHIPS.map(m => {
       const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
       const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
-      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? <button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button> : <button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>;
-      let upgradeHtml = isOwned ? <button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button> : '';
-      return <div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="m-action">${!isOwned ? <div class="m-price">💰 ${m.cost}</div> : ''}${actionHtml}${upgradeHtml}</div></div></div>;
+      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button>` : `<button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>`;
+      let upgradeHtml = isOwned ? `<button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
+      return `<div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="m-action">${!isOwned ? `<div class="m-price">💰 ${m.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div></div>`;
     }).join('');
     setTimeout(() => { document.querySelectorAll('.mini-preview').forEach(el => { drawMiniPreview(el, parseInt(el.dataset.mini)); }); }, 50);
   }
@@ -475,15 +469,14 @@ function drawMiniPreview(container, miniId) {
   container.innerHTML = ''; container.appendChild(canvas);
 }
 
-window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🔫 سلاح «${w.name}» خریداری شد!); SND.play('purchase'); } };
-
-window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(⚡ ارتقا به لول ${lvl+1} انجام شد!); SND.play('upgrade'); } };
+window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
+window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
 window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🚀 اسکین «${sk.name}» خریداری شد!); SND.play('purchase'); } };
+window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
 window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(🛸 همراه «${m.name}» خریداری شد!); SND.play('purchase'); } };
+window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
 window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!); SND.play('upgrade'); } };
+window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
 
 function drawShipShape(c, skin, scale) {
   scale = scale || 1; c.save(); c.scale(scale, scale);
@@ -499,8 +492,7 @@ function drawShipShape(c, skin, scale) {
     c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
     c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
     c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
-
-c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
+    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
   } else if (t === 'phantom') {
     c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
     c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
@@ -539,8 +531,7 @@ function drawMiniShape(c, mini, scale) {
     c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
   } else if (mini.type === 'eye') {
     c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
-
-c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
     c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
     c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
   } else if (mini.type === 'gatling') {
@@ -561,8 +552,7 @@ c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
   }
   c.shadowBlur = 0; c.restore();
 }
-
-function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -699,7 +689,7 @@ function update(dt){
   if (S.score >= nextBossScore && !isBossActive && !isBossWarningActive) { isBossWarningActive = true; bossWarningTimer = 3000; dangerOverlay.classList.add('show'); bossWarning.classList.add('show'); SND.play('bossWarn'); }
   if (isBossWarningActive) { bossWarningTimer -= dt; if (bossWarningTimer <= 0) { spawnBoss(); isBossActive = true; isBossWarningActive = false; dangerOverlay.classList.remove('show'); bossWarning.classList.remove('show'); S.enemies = S.enemies.filter(e => e.isBoss); } }
 
-for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
+  for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Math.random()*W; } }
   const p = S.player; const sp = 0.9 * dt;
   if(keys.left) p.x -= sp; if(keys.right) p.x += sp; if(keys.up) p.y -= sp; if(keys.down) p.y += sp;
   if(touchX !== null && touchY !== null){ const dx = touchX - p.x; const dy = touchY - p.y; p.x += Math.max(-sp*1.6, Math.min(sp*1.6, dx)); p.y += Math.max(-sp*1.6, Math.min(sp*1.6, dy)); }
@@ -720,7 +710,7 @@ for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Mat
       for (let i = 0; i < 2; i++) {
         let mX = p.x + (i === 0 ? -65 : 65);
         let mY = p.y + 15;
-        S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed  2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize  3.5 });
+        S.bullets.push({ x: mX, y: mY - 10, vx: 0, vy: -(mData.bulletSpeed || 2.5), dmg: actualDmg, color: mData.bulletColor, size: mData.bulletSize || 3.5 });
       }
     }
   }
@@ -747,7 +737,7 @@ for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Mat
 
   for(let i = S.ebullets.length - 1; i >= 0; i--) {
     const eb = S.ebullets[i]; eb.x += eb.vx * dt; eb.y += eb.vy * dt;
-    if (eb.x < -20  eb.x > W + 20  eb.y < -20 || eb.y > H + 20) { S.ebullets.splice(i, 1); continue; }
+    if (eb.x < -20 || eb.x > W + 20 || eb.y < -20 || eb.y > H + 20) { S.ebullets.splice(i, 1); continue; }
     if (S.lives > 0 && S.player.inv <= 0) {
       const dx = eb.x - S.player.x, dy = eb.y - S.player.y, rr = eb.r + S.player.r + 3;
       if (dx*dx + dy*dy < rr*rr) { S.ebullets.splice(i, 1); S.lives--; S.shake = 220; S.player.inv = 1500; boom(S.player.x, S.player.y, 0, 15); SND.play('playerHit'); S.flash = 300; S.combo = 0; if(S.lives <= 0) triggerGameOver(); }
@@ -770,8 +760,7 @@ for(const s of S.stars){ s.y += s.z * dt * 0.12; if(s.y > H){ s.y = 0; s.x = Mat
           S.floatTexts.push({ x: e.x, y: e.y, text: '+' + addedScore, color: e.isBoss ? '#ff00ff' : '#ffd700', life: 1, vy: -1.5 });
           
           let coinMultiplier = 1 + Math.floor(S.score / 1000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
-
-if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
+          if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
           else { SND.play('explosion'); if (Math.random() < 0.02) spawnPowerup(e.x, e.y); }
           saveGameData();
         }
@@ -825,8 +814,7 @@ function drawBoss(c, e, bossLvl) {
     c.fillStyle = col2; c.beginPath(); c.arc(-r*1.2, 0, r*0.4, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(r*1.2, 0, r*0.4, 0, Math.PI*2); c.fill(); c.fillStyle = glow; c.beginPath(); c.arc(-r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(r*1.2, 0, r*0.2, 0, Math.PI*2); c.fill();
   } else if (lvl === 2) {
     c.fillStyle = col1; c.fillRect(-r*1.3, -r*0.8, r*2.6, r*1.6); c.strokeStyle = glow; c.lineWidth = 4; c.strokeRect(-r*1.3, -r*0.8, r*2.6, r*1.6);
-
-c.fillStyle = col2; c.fillRect(-r*0.9, -r*0.5, r*1.8, r*1.0); c.strokeStyle = '#fff'; c.lineWidth = 1; c.strokeRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
+    c.fillStyle = col2; c.fillRect(-r*0.9, -r*0.5, r*1.8, r*1.0); c.strokeStyle = '#fff'; c.lineWidth = 1; c.strokeRect(-r*0.9, -r*0.5, r*1.8, r*1.0);
     c.fillStyle = glow; c.fillRect(-r*1.3, -r*0.8, r*0.4, r*0.4); c.fillRect(r*0.9, -r*0.8, r*0.4, r*0.4); c.fillRect(-r*1.3, r*0.4, r*0.4, r*0.4); c.fillRect(r*0.9, r*0.4, r*0.4, r*0.4);
   } else if (lvl === 3) {
     c.fillStyle = col1; c.beginPath(); for(let i=0; i<16; i++){ let rad = i%2===0 ? r*1.6 : r*0.6; let ang = i * Math.PI/8 - Math.PI/2; let px = Math.cos(ang)*rad, py = Math.sin(ang)*rad; i===0 ? c.moveTo(px, py) : c.lineTo(px, py); } c.closePath(); c.fill(); c.strokeStyle = glow; c.lineWidth = 2; c.stroke();
@@ -882,8 +870,7 @@ function draw(){
     ctx.save(); ctx.translate(pu.x, pu.y);
     if (pu.isHeart) {
       const pulse = 1 + Math.sin(S.t * 0.15) * 0.12;
-
-ctx.scale(pulse, pulse);
+      ctx.scale(pulse, pulse);
       ctx.fillStyle = '#ffd700'; ctx.shadowBlur = 25; ctx.shadowColor = '#ffaa00';
       ctx.beginPath(); ctx.moveTo(0, 8); ctx.bezierCurveTo(-18, -6, -18, -22, 0, -10); ctx.bezierCurveTo(18, -22, 18, -6, 0, 8); ctx.fill();
       ctx.fillStyle = '#fff5cc'; ctx.shadowBlur = 0;
@@ -950,8 +937,7 @@ ctx.scale(pulse, pulse);
 
   ctx.font = '700 16px Vazirmatn, system-ui, sans-serif'; ctx.textAlign = 'left';
   ctx.fillStyle = '#7df9ff'; ctx.fillText('امتیاز این دست  ' + S.score, 18, 87);
-
-ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 115);
+  ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 115);
   let currentMultiplier = 1 + Math.floor(S.score / 1000);
   if (currentMultiplier > 1) { ctx.fillStyle = '#00ffcc'; ctx.fillText('🔥 ضریب سکه: x' + currentMultiplier, 18, 143); }
   let lineY = currentMultiplier > 1 ? 171 : 143;
@@ -969,7 +955,7 @@ ctx.fillStyle = '#ffd700'; ctx.fillText('💰 ' + coins, 18, 115);
 
 async function getScores(){
   try {
-    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY} } });
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=*&order=score.desc&limit=10`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
     if (res.ok) return await res.json();
     return { error: res.status };
   } catch(e) { return { error: e.message }; }
@@ -979,9 +965,9 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
   if(isNaN(newTotalScore) || newTotalScore < 0) return;
   const syncIcon = document.getElementById('syncIndicator'); if (syncIcon) syncIcon.classList.add('syncing');
   try {
-    const res = await fetch(${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': Bearer ${SUPABASE_KEY}, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore, recoveryCode } })
     });
     if (!res.ok && !isSilent) { const errorData = await res.text(); console.error("Save Error:", errorData); }
@@ -995,12 +981,12 @@ async function renderRank(){
   const list = document.getElementById('rankList');
   list.innerHTML = '<li class="empty">در حال دریافت رکوردها...</li>';
   const scores = await getScores();
-  if (scores.error) { list.innerHTML = <li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>; if (btn) btn.classList.remove('loading'); return; }
+  if (scores.error) { list.innerHTML = `<li class="error">خطا در دریافت اطلاعات (کد: ${scores.error})</li>`; if (btn) btn.classList.remove('loading'); return; }
   if(!scores || scores.length === 0){ list.innerHTML = '<li class="empty">هنوز رکوردی ثبت نشده — بازی کن!</li>'; if (btn) btn.classList.remove('loading'); return; }
   list.innerHTML = scores.map((s, i) => {
     let avatarHtml = '';
-    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = <div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>; }
-    else { avatarHtml = <div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>; }
+    if (typeof s.avatar === 'number') { const av = getAvatarById(s.avatar) || getAvatarById(1); avatarHtml = `<div class="avatar-svg" style="color: ${av.color}">${av.svg}</div>`; }
+    else { avatarHtml = `<div class="avatar-svg" style="font-size:20px; width:28px; height:28px; overflow:hidden; justify-content:center;">${s.avatar || '👾'}</div>`; }
     return '<li><span class="pos">' + (i+1) + '</span>' + avatarHtml + '<span class="name">' + (s.name || 'ناشناس') + '</span><span class="sc">' + s.score + '</span></li>';
   }).join('');
   if (btn) btn.classList.remove('loading');
@@ -1011,8 +997,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     SND.init(); SND.play('uiClick');
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
-
-document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
+    document.getElementById('shopPanel').classList.toggle('show', tab === 'shop');
     document.getElementById('rankPanel').classList.toggle('show', tab === 'rank');
     document.getElementById('profilePanel').classList.toggle('show', tab === 'profile');
     if(tab === 'shop') { renderShop(); }
