@@ -720,7 +720,7 @@ addEventListener('keyup', e => {
 });
 
 // مختصات دکمه موشک (پایین چپ)
-const btnX = 70, btnY = H - 90, btnR = 35;
+const btnX = 60, btnY = H - 80, btnR = 35;
 
 cvs.addEventListener('touchstart', e => { 
   e.preventDefault(); SND.init(); touching = true; const t = e.touches[0]; 
@@ -816,18 +816,18 @@ function update(dt){
     neb.y -= 0.05 * dt; if(neb.y < -neb.r) { neb.y = H + neb.r; neb.x = Math.random()*W; }
   }
 
-  // منطق موشک غول‌پیکر
+  // منطق موشک غول‌پیکر (پرواز آروم به سمت وسط و انفجار)
   if (S.rocketState === 'firing' && S.rocket) {
     let dx = W/2 - S.rocket.x;
     let dy = H/2 - S.rocket.y;
     let dist = Math.hypot(dx, dy);
     
-    if (dist < 25) {
+    if (dist < 30) {
       // انفجار عظیم در وسط صفحه
       S.rocketState = 'idle';
       S.rocket = null;
       S.flash = 600; 
-      S.shake = 500;
+      S.shake = 800;
       SND.play('bigExplosion');
       S.shockwaves.push({ x: W/2, y: H/2, r: 10, maxR: Math.max(W, H), life: 1 });
 
@@ -853,9 +853,11 @@ function update(dt){
       S.ebullets = []; 
       saveGameData();
     } else {
-      S.rocket.x += (dx/dist) * 20 * dt; 
-      S.rocket.y += (dy/dist) * 20 * dt;
-      if (S.t % 2 === 0) S.parts.push({ x: S.rocket.x, y: S.rocket.y, vx: (Math.random()-0.5)*3, vy: (Math.random()-0.5)*3, life: 1, hue: 30, r: 8 });
+      // حرکت آروم به سمت وسط (سرعت متوسط)
+      S.rocket.x += (dx/dist) * 12 * (dt/16); 
+      S.rocket.y += (dy/dist) * 12 * (dt/16);
+      // دنباله دود و آتش
+      if (S.t % 2 === 0) S.parts.push({ x: S.rocket.x, y: S.rocket.y, vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2, life: 1, hue: 30, r: 10 });
     }
   }
 
@@ -1057,19 +1059,24 @@ function draw(){
   if (S.rocket) {
     ctx.save(); ctx.translate(S.rocket.x, S.rocket.y);
     ctx.shadowBlur = 25; ctx.shadowColor = '#ff3333';
+    
+    // شعله آتش پشت موشک
+    let flameSize = 20 + Math.random() * 15;
+    let flameGrad = ctx.createLinearGradient(0, 15, 0, flameSize);
+    flameGrad.addColorStop(0, '#ffff00'); flameGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = flameGrad;
+    ctx.beginPath(); ctx.moveTo(-10, 15); ctx.lineTo(0, flameSize); ctx.lineTo(10, 15); ctx.fill();
+    
     // بدنه موشک
     ctx.fillStyle = '#eeeeee';
-    ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(15, 10); ctx.lineTo(-15, 10); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, -25); ctx.lineTo(15, 10); ctx.lineTo(-15, 10); ctx.closePath(); ctx.fill();
     // باله‌ها
     ctx.fillStyle = '#ff3333';
     ctx.beginPath(); ctx.moveTo(15, 10); ctx.lineTo(25, 25); ctx.lineTo(5, 15); ctx.fill();
     ctx.beginPath(); ctx.moveTo(-15, 10); ctx.lineTo(-25, 25); ctx.lineTo(-5, 15); ctx.fill();
     // شیشه کابین
     ctx.fillStyle = '#00ffff';
-    ctx.beginPath(); ctx.arc(0, -5, 4, 0, Math.PI*2); ctx.fill();
-    // شعله
-    ctx.fillStyle = '#ffaa00';
-    ctx.beginPath(); ctx.moveTo(-8, 10); ctx.lineTo(0, 20 + Math.random()*15); ctx.lineTo(8, 10); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -5, 5, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   }
 
@@ -1144,38 +1151,74 @@ function draw(){
   
   ctx.textAlign = 'right'; ctx.fillStyle = '#ff5c8a'; ctx.fillText('❤️'.repeat(Math.max(0, S.lives)), W - 18, 87);
 
-  // رسم دکمه موشک (پایین چپ)
-  ctx.beginPath(); ctx.arc(btnX, btnY, btnR, 0, Math.PI*2);
-  ctx.fillStyle = S.rocketCharge >= 100 ? 'rgba(255, 50, 50, 0.4)' : 'rgba(30, 30, 30, 0.6)';
+  // ===== رسم دکمه موشک (خوشگل و انیمیشنی) =====
+  const isReady = S.rocketCharge >= 100;
+  const pulseScale = isReady ? 1 + Math.sin(S.t * 0.15) * 0.05 : 1;
+  
+  ctx.save();
+  ctx.translate(btnX, btnY);
+  ctx.scale(pulseScale, pulseScale);
+  
+  // پس‌زمینه دکمه
+  ctx.beginPath(); ctx.arc(0, 0, btnR, 0, Math.PI*2);
+  ctx.fillStyle = isReady ? 'rgba(255, 50, 50, 0.2)' : 'rgba(20, 20, 20, 0.6)';
   ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = S.rocketCharge >= 100 ? '#ff3333' : '#444';
-  ctx.stroke();
-
-  if (S.rocketCharge > 0 && S.rocketCharge < 100) {
-    ctx.beginPath(); ctx.arc(btnX, btnY, btnR, -Math.PI/2, -Math.PI/2 + (Math.PI*2 * (S.rocketCharge/100)));
-    ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 4; ctx.stroke();
+  
+  // نوار شارژ نئونی
+  if (S.rocketCharge > 0) {
+    ctx.beginPath();
+    ctx.arc(0, 0, btnR, -Math.PI/2, -Math.PI/2 + (Math.PI*2 * (S.rocketCharge/100)));
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    const grad = ctx.createLinearGradient(-btnR, -btnR, btnR, btnR);
+    if (isReady) {
+      grad.addColorStop(0, '#ff3333'); grad.addColorStop(1, '#ff8800');
+      ctx.shadowBlur = 15; ctx.shadowColor = '#ff3333';
+    } else {
+      grad.addColorStop(0, '#00ffff'); grad.addColorStop(1, '#0055ff');
+      ctx.shadowBlur = 5; ctx.shadowColor = '#00ffff';
+    }
+    ctx.strokeStyle = grad;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
   }
 
-  // وکتور موشک روی دکمه
-  ctx.save(); ctx.translate(btnX, btnY); ctx.rotate(-Math.PI/4);
-  let iconColor = S.rocketCharge >= 100 ? '#ff3333' : '#777';
+  // حلقه دور دکمه
+  ctx.beginPath(); ctx.arc(0, 0, btnR, 0, Math.PI*2);
+  ctx.strokeStyle = isReady ? 'rgba(255, 51, 51, 0.8)' : 'rgba(0, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ===== وکتور موشک =====
+  ctx.save(); ctx.rotate(-Math.PI/4);
+  const iconColor = isReady ? '#ffffff' : '#888888';
+  
+  // بدنه موشک
   ctx.fillStyle = iconColor;
-  // بدنه
-  ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(10, -5, 8, 10); ctx.lineTo(0, 5); ctx.lineTo(-8, 10); ctx.quadraticCurveTo(-10, -5, 0, -15); ctx.fill();
-  // باله راست
-  ctx.beginPath(); ctx.moveTo(8, 5); ctx.lineTo(16, 16); ctx.lineTo(5, 10); ctx.fill();
-  // باله چپ
-  ctx.beginPath(); ctx.moveTo(-8, 5); ctx.lineTo(-16, 16); ctx.lineTo(-5, 10); ctx.fill();
-  // شیشه
-  ctx.fillStyle = S.rocketCharge >= 100 ? '#fff' : '#222';
-  ctx.beginPath(); ctx.arc(0, -5, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); 
+  ctx.moveTo(0, -20); 
+  ctx.quadraticCurveTo(12, -5, 10, 12); 
+  ctx.lineTo(0, 8); 
+  ctx.lineTo(-10, 12); 
+  ctx.quadraticCurveTo(-12, -5, 0, -20); 
+  ctx.fill();
+  
+  // باله‌های قرمز
+  ctx.fillStyle = isReady ? '#ff3333' : '#555555';
+  ctx.beginPath(); ctx.moveTo(10, 5); ctx.lineTo(20, 18); ctx.lineTo(8, 12); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-10, 5); ctx.lineTo(-20, 18); ctx.lineTo(-8, 12); ctx.fill();
+  
+  // شیشه کابین
+  ctx.fillStyle = isReady ? '#00ffff' : '#333333';
+  ctx.beginPath(); ctx.arc(0, -6, 4, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
   ctx.restore();
 
-  if (S.rocketCharge >= 100 && S.rocketState === 'idle') {
+  // متن زیر دکمه
+  if (isReady) {
     ctx.fillStyle = '#ff3333'; ctx.font = '900 12px Vazirmatn'; ctx.textAlign = 'center';
     ctx.shadowBlur = 10; ctx.shadowColor = '#ff3333';
-    ctx.fillText('آماده!', btnX, btnY + 25);
+    ctx.fillText('آماده!', btnX, btnY + 30);
     ctx.shadowBlur = 0;
   }
 }
