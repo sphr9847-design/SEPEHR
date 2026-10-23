@@ -313,10 +313,23 @@ const WEAPONS = [
   { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 2, cd: 80, size: 8, count: 7, spread: 45 }
 ];
 
-const DROP_WEAPONS = [];
-const dropColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ff8800", "#ff0088", "#88ff00", "#0088ff"];
-for(let i=1; i<=50; i++) { DROP_WEAPONS.push({ id: 'drop_' + i, name: 'قدرت ویژه ' + i, color: dropColors[i % dropColors.length], dmg: Math.floor(Math.random() * 3) + 2, cd: Math.floor(Math.random() * 40) + 20, size: Math.floor(Math.random() * 8) + 4, count: Math.floor(Math.random() * 4) + 1, spread: Math.floor(Math.random() * 45), isDrop: true }); }
-
+const DROP_WEAPONS = [
+  // 🚀 تکی‌های فوق سریع
+  { id: 'drop_1', name: 'لیزر مافوق سریع', color: '#00ffff', dmg: 4, cd: 10, size: 5, count: 1, spread: 0, isDrop: true },
+  { id: 'drop_2', name: 'شلیک بی‌وقفه', color: '#ff00aa', dmg: 2, cd: 8, size: 4, count: 1, spread: 0, isDrop: true },
+  { id: 'drop_3', name: 'توپ پلاسمای سنگین', color: '#ffffff', dmg: 12, cd: 30, size: 14, count: 1, spread: 0, isDrop: true },
+  
+  // 🔫 چندتایی‌های سریع
+  { id: 'drop_4', name: 'دوقلوی برق‌آسا', color: '#00ff00', dmg: 4, cd: 15, size: 5, count: 2, spread: 8, isDrop: true },
+  { id: 'drop_5', name: 'سه‌گانه نئونی', color: '#ffff00', dmg: 3, cd: 20, size: 5, count: 3, spread: 20, isDrop: true },
+  { id: 'drop_6', name: 'چهارگانه ویرانگر', color: '#ff8800', dmg: 3, cd: 25, size: 6, count: 4, spread: 30, isDrop: true },
+  { id: 'drop_7', name: 'شاتگان کوانتومی', color: '#ff3333', dmg: 2, cd: 30, size: 7, count: 5, spread: 45, isDrop: true },
+  
+  // ⚡ ترکیبی (هم سریع هم چندتایی)
+  { id: 'drop_8', name: 'مسلسل فضایی', color: '#00ccff', dmg: 2, cd: 12, size: 4, count: 2, spread: 10, isDrop: true },
+  { id: 'drop_9', name: 'توفان کهکشانی', color: '#ff00ff', dmg: 1, cd: 10, size: 4, count: 3, spread: 25, isDrop: true },
+  { id: 'drop_10', name: 'ابر سلاح کریستالی', color: '#e0ffff', dmg: 6, cd: 35, size: 8, count: 4, spread: 15, isDrop: true }
+];
 const AVATARS = [
   { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
   { id: 2, name: "فضایی", color: "#ff00ff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg>` },
