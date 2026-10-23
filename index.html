@@ -164,16 +164,13 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
   DANGER
   <div class="warn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
 </div>
-
 <div id="toastNotification"><span id="toastText">خرید موفق!</span></div>
-
 <div id="tabs">
   <button class="tab active" data-tab="game"><svg viewBox="0 0 24 24"><path d="M6 12h4m-2-2v4m7-1h.01M18 10h.01M7 18h10a4 4 0 0 0 4-4V8a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4z"/></svg>بازی</button>
   <button class="tab" data-tab="shop"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>فروشگاه</button>
   <button class="tab" data-tab="rank"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1-10 0V4M7 4H4v2a3 3 0 0 0 3 3h0M17 4h3v2a3 3 0 0 1-3 3h0"/></svg>رتبه‌ها</button>
   <button class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>پروفایل</button>
 </div>
-
 <div id="syncIndicator">☁️</div>
 <canvas id="c"></canvas>
 
@@ -193,8 +190,7 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
   <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn">
     <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="23 4 23 10 17 10"></polyline>
-      <polyline points="1 20 1 14 7 1
-       4"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
     </svg>
     بروزرسانی لیست
@@ -223,7 +219,6 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
       </div>
     </div>
   </div>
-
   <div class="form-group">
     <label>اسم شما (نام فرمانده):</label>
     <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
@@ -233,7 +228,6 @@ html,body{height:100%;overflow:hidden;background:#04060f;font-family:'Vazirmatn'
     <div class="avatar-grid" id="avatarGrid"></div>
   </div>
   <div class="sound-toggle on" id="soundToggle"><span>🔊 افکت‌های صوتی</span><div class="icon"></div></div>
-
   <div class="cloud-sync-box">
     <div class="cloud-sync-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>همگام‌سازی ابری</div>
     <div class="recovery-box">
@@ -339,6 +333,8 @@ let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 
 function generateRecoveryCode() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let code = 'SEPI-'; for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length)); return code; }
 
+function safeNum(v, fallback) { const n = parseFloat(v); return isFinite(n) ? n : fallback; }
+
 let profile = { name: defaultName, avatar: 1 };
 let coins = 0;
 let ownedWeapons = [1];
@@ -351,7 +347,7 @@ let weaponLevels = {};
 let miniShipLevels = {};
 let totalScore = 0;
 let recoveryCode = generateRecoveryCode();
-let currentRunScore = parseInt(localStorage.getItem('shooter_current_run_score') || '0');
+let currentRunScore = safeNum(localStorage.getItem('shooter_current_run_score'), 0);
 
 function getRunScore() { return (typeof S !== 'undefined' && S && !isDead) ? (S.score || 0) : 0; }
 function getEffectiveTotalScore() { return totalScore + getRunScore(); }
@@ -373,8 +369,8 @@ function loadGameData() {
       if (typeof d.equippedMini === 'number') equippedMini = d.equippedMini;
       if (d.weaponLevels) weaponLevels = d.weaponLevels;
       if (d.miniShipLevels) miniShipLevels = d.miniShipLevels;
-      if (typeof d.totalScore === 'number') totalScore = d.totalScore;
-      if (typeof d.currentRunScore === 'number') currentRunScore = d.currentRunScore;
+      totalScore = safeNum(d.totalScore, 0);
+      currentRunScore = safeNum(d.currentRunScore, 0);
       if (d.recoveryCode) recoveryCode = d.recoveryCode;
     }
   } catch(e) {}
@@ -382,7 +378,8 @@ function loadGameData() {
 
 function saveGameData() {
   try {
-    currentRunScore = getRunScore();
+    if (isNaN(totalScore) || !isFinite(totalScore)) totalScore = 0;
+    currentRunScore = safeNum(getRunScore(), 0);
     localStorage.setItem('shooter_current_run_score', String(currentRunScore));
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       v: 3, profile, coins, ownedWeapons, equippedWeapon,
@@ -465,8 +462,8 @@ window.restoreAccount = async () => {
       ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
       ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
       weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
-      totalScore = remoteSave.totalScore || 0;
-      currentRunScore = remoteSave.currentRunScore || 0;
+      totalScore = safeNum(remoteSave.totalScore, 0);
+      currentRunScore = safeNum(remoteSave.currentRunScore, 0);
       localStorage.setItem('shooter_current_run_score', String(currentRunScore));
       recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
       deviceId = data[0].dev_id; localStorage.setItem('shooter_device_id', deviceId);
@@ -543,7 +540,8 @@ window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.inc
 window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
 window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
 window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
- function drawShipShape(c, skin, scale) {
+
+function drawShipShape(c, skin, scale) {
   scale = scale || 1; c.save(); c.scale(scale, scale);
   const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
   const gg = (x0,y0,x1,y1,c1,c2,c3) => { const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,c1); if(c3){g.addColorStop(.5,c2);g.addColorStop(1,c3);}else{g.addColorStop(1,c2);} return g; };
@@ -617,7 +615,6 @@ function drawMiniShape(c, mini, scale) {
   }
   c.shadowBlur = 0; c.restore();
 }
-
 function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
@@ -634,7 +631,8 @@ const bossWarning = document.getElementById('bossWarning');
 const TOP_UI_HEIGHT = 60;
 
 function reset(){
-  let savedScore = currentRunScore;
+  let savedScore = safeNum(currentRunScore, 0);
+  if (savedScore < 0 || savedScore > 1000000) savedScore = 0;
   S = {
     player: {x: W/2, y: H - 90, r: 3, inv: 0},
     bullets: [], enemies: [], parts: [], stars: [], powerups: [], ebullets: [],
@@ -709,7 +707,7 @@ function spawnEnemy(){
 }
 
 function spawnBoss(){
-  const bossLvl = currentBossIndex; const hp = 200 + (bossLvl * 400);
+  const bossLvl = currentBossIndex; const hp = Math.min(150 + (bossLvl * 200), 2000);
   S.enemies.push({ x: W/2, y: -150, r: 60 + bossLvl * 5, vy: 2 + bossLvl * 0.5, vx: 0.15 + bossLvl * 0.02, hue: 280, rot: 0, rv: 0.01, hp: hp, maxHp: hp, isBoss: true, shootT: 0, patternIdx: 0 });
 }
 
@@ -758,7 +756,12 @@ function update(dt){
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
     const maxEnemies = 15 + Math.floor(S.score / 300);
-    if (!isBossActive && S.enemies.length < maxEnemies) { spawnEnemy(); S.spawnT = Math.max(250, 700 - S.score * 0.4); } else if (!isBossActive) { S.spawnT = 500; } else { S.spawnT = 1000; }
+    if (S.enemies.length < maxEnemies) { 
+      spawnEnemy(); 
+      S.spawnT = isBossActive ? 1200 : Math.max(250, 700 - S.score * 0.4); 
+    } else { 
+      S.spawnT = 500; 
+    }
   }
 
   for(let i = S.enemies.length - 1; i >= 0; i--){
@@ -786,7 +789,8 @@ function update(dt){
     const b = S.bullets[i];
     for(let j = S.enemies.length - 1; j >= 0; j--){
       const e = S.enemies[j]; const dx = b.x - e.x, dy = b.y - e.y;
-      if(dx*dx + dy*dy < (e.r + 4)**2 && e.y > TOP_UI_HEIGHT){
+      const hitR = e.isBoss ? e.r * 2.2 : e.r + 4;
+      if(dx*dx + dy*dy < hitR*hitR && e.y > TOP_UI_HEIGHT){
         S.bullets.splice(i, 1); e.hp -= b.dmg; boom(b.x, b.y, 180, 3);
         if(e.hp <= 0){
           boom(e.x, e.y, e.hue, e.isBoss ? 50 : 10); S.enemies.splice(j, 1); S.score += e.isBoss ? 500 : 10;
@@ -822,7 +826,8 @@ function update(dt){
   if(S.shake > 0) S.shake -= dt;
   S.bullets = S.bullets.filter(b => b.y > -20 && b.y < H + 20 && b.x > -20 && b.x < W + 20);
 }
- function drawBoss(c, e, bossLvl) {
+
+function drawBoss(c, e, bossLvl) {
   const r = e.r; const lvl = bossLvl % 5; let col1, col2, glow;
   if (lvl === 0) { col1 = '#2c003e'; col2 = '#7a00cc'; glow = '#d68cff'; }
   else if (lvl === 1) { col1 = '#3e0000'; col2 = '#990000'; glow = '#ff5c5c'; }
@@ -1000,4 +1005,4 @@ requestAnimationFrame(loop);
 renderShop();
 </script>
 </body>
-</html>
+</html>  
