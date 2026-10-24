@@ -433,7 +433,12 @@ checkQuestReset();
 if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
 
 setInterval(() => { saveGameData(); }, 30000);
-function handleExitSave() { saveGameData(); if (!isDead && typeof S !== 'undefined' && S && S.score > 0) saveScoreToLeaderboard(getEffectiveTotalScore(), true); }
+function handleExitSave() { 
+  saveGameData(); 
+  if (typeof S !== 'undefined' && S) {
+    saveScoreToLeaderboard(getEffectiveTotalScore(), true); 
+  }
+}
 window.addEventListener('beforeunload', handleExitSave);
 window.addEventListener('pagehide', handleExitSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) handleExitSave(); });
@@ -730,7 +735,6 @@ addEventListener('keyup', e => {
   if(e.key === ' ') keys.fire = false;
 });
 
-// مختصات دکمه موشک (پایین چپ)
 const btnX = 60, btnY = H - 80, btnR = 35;
 
 cvs.addEventListener('touchstart', e => { 
@@ -806,8 +810,17 @@ function boom(x, y, hue, n){
 }
 
 let lastSync = 0;
-function autoSync() { if(!isDead && S && S.score > 0) { let currentTotal = totalScore + S.score; if(currentTotal > lastSync + 10) { saveScoreToLeaderboard(currentTotal, true); lastSync = currentTotal; } } }
-setInterval(autoSync, 15000);
+async function autoSync() { 
+  if(!isDead && typeof S !== 'undefined' && S) { 
+    saveGameData(); // ذخیره لوکال
+    let currentTotal = totalScore + S.score; 
+    if(currentTotal > 0 && currentTotal > lastSync) { 
+      let success = await saveScoreToLeaderboard(currentTotal, true); 
+      if (success) lastSync = currentTotal;
+    } 
+  } 
+}
+setInterval(autoSync, 5000);
 
 function update(dt){
   if(S.lives <= 0) return;
@@ -1206,17 +1219,26 @@ async function getScores(){
 }
 
 async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
-  if(isNaN(newTotalScore) || newTotalScore < 0) return;
+  if(isNaN(newTotalScore) || newTotalScore < 0) return false;
   const syncIcon = document.getElementById('syncIndicator'); if (syncIcon) syncIcon.classList.add('syncing');
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore, recoveryCode } })
+      body: JSON.stringify({ dev_id: deviceId, name: profile.name, score: newTotalScore, avatar: profile.avatar, save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore, recoveryCode } }),
+      keepalive: true
     });
-    if (!res.ok && !isSilent) { const errorData = await res.text(); console.error("Save Error:", errorData); }
-  } catch(e) { if (!isSilent) console.error("Network Error:", e.message); }
-  if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+    if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+    if (!res.ok) {
+      if (!isSilent) { const errorData = await res.text(); console.error("Save Error:", errorData); }
+      return false;
+    }
+    return true;
+  } catch(e) { 
+    if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+    if (!isSilent) console.error("Network Error:", e.message); 
+    return false;
+  }
 }
 
 async function renderRank(){
