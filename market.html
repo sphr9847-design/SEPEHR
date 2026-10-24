@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================
-   RUBY MARKETS 2.3 — Live PnL Edition
+   RUBY MARKETS 2.4 — Quick PnL Badge
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -156,7 +156,43 @@ main{ max-width:1440px; margin:0 auto; padding:18px 16px; display:grid; grid-tem
 .section-title .live{ display:inline-flex; align-items:center; gap:6px; font-size:9.5px; color:var(--up); font-weight:700; letter-spacing:1.4px; margin-inline-start:8px; }
 .section-title .live::before{ content:''; width:5px; height:5px; border-radius:50%; background:var(--up); box-shadow:0 0 10px var(--up); animation:pulse 1.8s ease-in-out infinite; }
 @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
-.section-title .count{ font-family:var(--mono); font-size:10px; background:var(--panel-2); border:1px solid var(--line); color:var(--mut); padding:2px 8px; border-radius:100px; letter-spacing:0; margin-inline-start:auto; }
+.section-title .count{ font-family:var(--mono); font-size:10px; background:var(--panel-2); border:1px solid var(--line); color:var(--mut); padding:2px 8px; border-radius:100px; letter-spacing:0; margin-inline-start:8px; }
+
+/* ===== Quick PnL Badge ===== */
+.quick-pnl {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  margin-inline-start: auto;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 8px currentColor;
+}
+.quick-pnl.positive {
+  display: inline-flex;
+  background: rgba(46,230,142,.1);
+  color: var(--up);
+  border-color: rgba(46,230,142,.3);
+}
+.quick-pnl.negative {
+  display: inline-flex;
+  background: rgba(255,77,94,.1);
+  color: var(--dn);
+  border-color: rgba(255,77,94,.3);
+}
+.quick-pnl.neutral {
+  display: inline-flex;
+  background: var(--panel-2);
+  color: var(--mut);
+  border-color: var(--line);
+}
 
 /* ===== Coin Cards ===== */
 .market-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:13px; }
@@ -195,7 +231,6 @@ aside{ display:flex; flex-direction:column; gap:14px; }
 .port-total b{ font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.6px; margin-top:3px; font-variant-numeric:tabular-nums; }
 .port-total small{ font-family:var(--mono); font-size:11.5px; margin-top:3px; }
 
-/* Live PnL Box */
 .pnl-live-box{
   display:flex; align-items:center; gap:12px;
   padding:14px 16px; border-radius:var(--r-md);
@@ -452,6 +487,7 @@ label{ font-size:10.5px; color:var(--mut); letter-spacing:.9px; text-transform:u
   <section>
     <div class="section-title">
       بازار <span class="live">LIVE</span>
+      <span class="quick-pnl" id="quickPnl">+0.00</span>
       <span class="count" id="marketCount">8 دارایی</span>
     </div>
     <div class="market-grid" id="marketGrid"></div>
@@ -553,7 +589,7 @@ label{ font-size:10.5px; color:var(--mut); letter-spacing:.9px; text-transform:u
 
 <script>
 /* =========================================================
-   RUBY MARKETS 2.3
+   RUBY MARKETS 2.4
    ========================================================= */
 const START_CASH = 10000;
 const SAVE_KEY   = 'rubyMarket_v3';
@@ -970,6 +1006,27 @@ function flashPrice(el, dir){
 function renderFast(){
   const nw = netWorth();
   $('hdrWorth').textContent = fmtMoney(nw);
+
+  // Update the small PnL badge in section title
+  const qp = $('quickPnl');
+  const livePnl = livePnlAmount();
+  const hasHoldings = Object.keys(state.holdings).length > 0;
+  
+  if (!hasHoldings) {
+    qp.style.display = 'none';
+  } else {
+    qp.style.display = 'inline-flex';
+    if (livePnl > 0) {
+      qp.className = 'quick-pnl positive';
+      qp.textContent = '▲ ' + fmtMoney(livePnl);
+    } else if (livePnl < 0) {
+      qp.className = 'quick-pnl negative';
+      qp.textContent = '▼ ' + fmtMoney(Math.abs(livePnl));
+    } else {
+      qp.className = 'quick-pnl neutral';
+      qp.textContent = '0.00';
+    }
+  }
 
   const cards = document.querySelectorAll('.coin');
   cards.forEach(card => {
