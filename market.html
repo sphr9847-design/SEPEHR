@@ -17,7 +17,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.0 — PWA & Tabbed UI
+   RUBY MARKETS 3.1 — PWA, Tabs & Old Profile
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -82,38 +82,50 @@ header{
 .tk b{color:var(--txt); font-weight:600}
 .tk i{font-style:normal; font-size:10px}
 
-/* Top Layout */
-.profile-hero{ max-width:1440px; margin:16px auto 0; padding:0 16px; }
+/* ===== PROFILE HERO (Reverted to Old Design) ===== */
+.profile-hero{ max-width:1440px; margin:20px auto 0; padding:0 16px; }
 .profile-card{
   background: radial-gradient(600px 200px at 80% 0%, rgba(255,184,77,.08) 0%, transparent 60%), radial-gradient(500px 300px at 15% 100%, rgba(255,45,85,.1) 0%, transparent 60%), linear-gradient(180deg,var(--panel-2) 0%,var(--panel) 100%);
   border:1px solid var(--line); border-radius:var(--r-2xl);
-  padding:20px; box-shadow:var(--shadow-lg);
-  display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:center; position:relative; overflow:hidden;
+  padding:26px 28px; box-shadow:var(--shadow-lg);
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  grid-template-areas: "avatar info stats" "xpxpxp xpxpxp xpxpxp";
+  gap:20px 28px; align-items:center; position:relative; overflow:hidden;
 }
 .profile-card::before{ content:''; position:absolute; top:0; left:8%; right:8%; height:1px; background:linear-gradient(90deg,transparent,var(--accent) 50%,transparent); }
 
 .avatar-wrap{ grid-area:avatar; position:relative; z-index:2; }
-.avatar-big{ width:76px; height:76px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#5a1a2e 0%,#2a0712 80%); display:grid; place-items:center; font-size:34px; border:2.5px solid var(--panel); position:relative; z-index:2; box-shadow:inset 0 0 30px rgba(255,45,85,.2); }
-.level-badge{ position:absolute; bottom:-6px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--accent-2),#ff9a1f); color:#2a0712; font-weight:800; font-size:11px; padding:3px 10px; border-radius:100px; border:2px solid var(--panel); font-family:var(--mono); z-index:3; white-space:nowrap; }
+.avatar-ring{ position:absolute; inset:-8px; border-radius:50%; background:conic-gradient(from 0deg,var(--accent),var(--accent-2),var(--accent-3),var(--accent)); opacity:.55; animation:spinRing 10s linear infinite; will-change:transform; }
+@keyframes spinRing{ to{ transform:rotate(360deg); } }
+.avatar-big{ width:84px; height:84px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#5a1a2e 0%,#2a0712 80%); display:grid; place-items:center; font-size:38px; border:2.5px solid var(--panel); position:relative; z-index:2; box-shadow:inset 0 0 30px rgba(255,45,85,.2); }
+.level-badge{ position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--accent-2),#ff9a1f); color:#2a0712; font-weight:800; font-size:12px; padding:4px 12px; border-radius:100px; border:2px solid var(--panel); font-family:var(--mono); box-shadow:0 4px 16px -2px rgba(255,184,77,.6); z-index:3; white-space:nowrap; }
 
-.profile-info{ min-width:0; }
-.profile-name{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-.profile-name h2{ font-size:18px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.edit-name{ background:transparent; border:none; color:var(--mut); cursor:pointer; font-size:14px; padding:2px 6px; border-radius:6px; }
-.profile-tagline{ color:var(--accent-2); font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px; }
-.profile-tagline::before{ content:''; width:5px; height:5px; background:var(--accent-2); transform:rotate(45deg); }
+.profile-info{ grid-area:info; min-width:0; }
+.profile-name{ display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.profile-name h2{ font-size:22px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.edit-name{ background:transparent; border:none; color:var(--mut); cursor:pointer; font-size:14px; padding:3px 8px; border-radius:7px; transition:.2s; font-family:inherit; }
+.edit-name:hover{ color:var(--accent); background:var(--accent-soft); }
+.profile-tagline{ color:var(--accent-2); font-size:13px; font-weight:600; display:flex; align-items:center; gap:7px; }
+.profile-tagline::before{ content:''; width:6px; height:6px; background:var(--accent-2); transform:rotate(45deg); box-shadow:0 0 8px var(--accent-2); }
 
-.profile-stats{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; padding-top:16px; border-top:1px solid var(--line); margin-top:4px; }
-.pstat{ display:flex; flex-direction:column; gap:2px; text-align:center; }
-.pstat span{ font-size:9.5px; color:var(--mut); letter-spacing:.5px; }
-.pstat b{ font-family:var(--mono); font-size:13px; font-weight:700; }
-@media(min-width:600px){ .profile-stats{ grid-template-columns:repeat(4, auto); gap:24px; text-align:right; } .pstat b{ font-size:15px; } }
+.profile-stats{ grid-area:stats; display:grid; grid-template-columns:repeat(4, auto); gap:22px; padding-inline-start:28px; border-inline-start:1px solid var(--line); }
+.pstat{ display:flex; flex-direction:column; gap:4px; }
+.pstat span{ font-size:10px; color:var(--mut); letter-spacing:1px; text-transform:uppercase; font-weight:600; }
+.pstat b{ font-family:var(--mono); font-size:15.5px; font-weight:700; letter-spacing:-.4px; font-variant-numeric:tabular-nums; }
 
-.xp-wrap{ grid-column:1 / -1; margin-top:12px; padding-top:12px; border-top:1px dashed var(--line); }
-.xp-labels{ display:flex; justify-content:space-between; font-size:10px; color:var(--mut); font-family:var(--mono); margin-bottom:6px; }
-.xp-labels b{ color:var(--accent-2); }
-.xp-bar{ height:7px; border-radius:100px; background:var(--panel-3); border:1px solid var(--line); overflow:hidden; }
-.xp-fill{ height:100%; background:linear-gradient(90deg,var(--accent) 0%,var(--accent-3) 50%,var(--accent-2) 100%); border-radius:100px; transition:width .8s cubic-bezier(.2,.8,.3,1); }
+.xp-wrap{ grid-area:xp; margin-top:6px; padding-top:16px; border-top:1px dashed var(--line); }
+.xp-labels{ display:flex; justify-content:space-between; font-size:11px; color:var(--mut); font-family:var(--mono); margin-bottom:7px; }
+.xp-labels b{ color:var(--accent-2); font-weight:600; }
+.xp-bar{ height:9px; border-radius:100px; background:var(--panel-3); border:1px solid var(--line); overflow:hidden; }
+.xp-fill{ height:100%; background:linear-gradient(90deg,var(--accent) 0%,var(--accent-3) 50%,var(--accent-2) 100%); border-radius:100px; transition:width .8s cubic-bezier(.2,.8,.3,1); box-shadow:0 0 16px rgba(255,45,85,.5); }
+
+@media(max-width:900px){
+  .profile-card{ grid-template-columns:auto 1fr; grid-template-areas: "avatar info" "stats stats" "xp xp"; padding:20px; gap:16px 20px; }
+  .profile-stats{ padding-inline-start:0; padding-top:16px; border-inline-start:none; border-top:1px solid var(--line); grid-template-columns:repeat(2, 1fr); gap:14px; }
+  .avatar-big{ width:70px; height:70px; font-size:32px; }
+  .profile-name h2{ font-size:18px; }
+}
 
 /* Featured */
 .featured-wrap{ max-width:1440px; margin:12px auto 0; padding:0 16px; }
@@ -324,6 +336,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 <section class="profile-hero">
   <div class="profile-card">
     <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
       <div class="avatar-big" id="avatarBig">💎</div>
       <div class="level-badge" id="levelBadge">LV 1</div>
     </div>
@@ -472,7 +485,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.0
+   RUBY MARKETS 3.1
    ========================================================= */
 const START_CASH = 10000;
 const SAVE_KEY   = 'rubyMarket_v3';
