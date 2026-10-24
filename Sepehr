@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎲 بازار فیک — شبیه‌ساز ترید</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b12; --panel:#111621; --line:#1d2635;
+  --txt:#e8eefb; --mut:#78879e; --up:#16c784; --dn:#ea3943; --acc:#7c5cff;
+}
+body{
+  background:
+    radial-gradient(1000px 500px at 75% -10%, #1d1445 0%, transparent 60%),
+    radial-gradient(800px 400px at 10% 110%, #0d2a2a 0%, transparent 60%),
+    var(--bg);
+  color:var(--txt); font-family:Vazirmatn,Tahoma,sans-serif;
+  min-height:100vh; padding-bottom:40px;
+}
+.up{color:var(--up)} .down{color:var(--dn)}
+
+/* ===== Header ===== */
+header{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding:12px 20px; background:rgba(8,11,18,.85);
+  backdrop-filter:blur(14px); border-bottom:1px solid var(--line);
+}
+.brand{font-weight:800; font-size:18px; letter-spacing:.3px; white-space:nowrap}
+.brand span{background:linear-gradient(90deg,#7c5cff,#16c784); -webkit-background-clip:text; background-clip:text; color:transparent}
+.stats{display:flex; gap:8px; margin-inline-start:auto; flex-wrap:wrap}
+.stat{
+  background:var(--panel); border:1px solid var(--line); border-radius:11px;
+  padding:6px 12px; display:flex; flex-direction:column; min-width:100px;
+}
+.stat span{font-size:10px; color:var(--mut)}
+.stat b{font-size:15px; font-variant-numeric:tabular-nums}
+#reset{
+  background:#1a1f2e; color:var(--mut); border:1px solid var(--line);
+  padding:9px 14px; border-radius:11px; cursor:pointer; font-family:inherit; font-size:13px;
+}
+#reset:hover{color:var(--dn); border-color:var(--dn)}
+
+/* ===== Ticker ===== */
+.ticker{
+  direction:ltr; overflow:hidden; border-bottom:1px solid var(--line);
+  background:#0a0e17; padding:7px 0; user-select:none;
+}
+.ticker-track{display:flex; width:max-content; animation:tick 45s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{
+  display:inline-flex; align-items:center; gap:6px; padding:0 18px;
+  font-size:12.5px; border-right:1px solid var(--line); white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.tk b{color:var(--txt); font-weight:600}
+.tk i{font-style:normal; font-size:11px}
+
+/* ===== Layout ===== */
+main{max-width:1400px; margin:0 auto; padding:16px; display:grid; grid-template-columns:1fr 340px; gap:16px}
+@media(max-width:920px){ main{grid-template-columns:1fr} }
+.section-title{font-size:13px; color:var(--mut); margin-bottom:10px; font-weight:600}
+
+/* ===== Coin cards ===== */
+.market-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:12px}
+.coin{
+  background:linear-gradient(180deg,#141a27,#0f141d);
+  border:1px solid var(--line); border-radius:15px; padding:13px;
+  cursor:pointer; transition:.18s; position:relative; overflow:hidden;
+}
+.coin:hover{border-color:var(--acc); transform:translateY(-3px); box-shadow:0 10px 30px -12px #7c5cff66}
+.coin:active{transform:translateY(-1px)}
+.coin-head{display:flex; align-items:center; gap:9px; margin-bottom:9px}
+.coin-icon{font-size:20px; width:32px; height:32px; display:grid; place-items:center;
+  background:#1b2233; border-radius:9px}
+.coin-name{display:flex; flex-direction:column; line-height:1.2}
+.coin-name b{font-size:13.5px}
+.coin-name span{font-size:10px; color:var(--mut); letter-spacing:.6px}
+.spark{width:100%; height:38px; display:block; margin:4px 0 8px; opacity:.9}
+.coin-price{display:flex; align-items:baseline; justify-content:space-between; gap:6px}
+.coin-price b{font-size:15px; font-variant-numeric:tabular-nums}
+.chg{font-size:11.5px; font-weight:600; font-variant-numeric:tabular-nums}
+.owned{font-size:10.5px; color:var(--acc); margin-top:5px; height:13px}
+
+/* ===== Side panels ===== */
+aside{display:flex; flex-direction:column; gap:16px}
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:15px; padding:14px}
+.hold-item{
+  display:flex; align-items:center; gap:9px; padding:9px 0;
+  border-bottom:1px solid #161d29; font-size:12.5px;
+}
+.hold-item:last-child{border-bottom:none}
+.hold-item .hi-ic{font-size:16px}
+.hold-item .hi-main{flex:1; min-width:0}
+.hold-item .hi-main b{display:block; font-size:12.5px}
+.hold-item .hi-main span{font-size:10.5px; color:var(--mut); font-variant-numeric:tabular-nums}
+.hold-item .hi-val{text-align:left; font-variant-numeric:tabular-nums}
+.hold-item .hi-val b{display:block; font-size:12.5px}
+.hold-item .hi-val span{font-size:10.5px}
+.empty{color:var(--mut); font-size:12px; text-align:center; padding:18px 0; line-height:1.9}
+
+.news-item{
+  font-size:12px; padding:8px 0; border-bottom:1px solid #161d29;
+  color:#b9c4d6; line-height:1.7;
+  animation:slideIn .35s ease;
+}
+.news-item:last-child{border-bottom:none}
+.news-item .nt{color:var(--mut); font-size:10px; margin-left:6px}
+@keyframes slideIn{from{opacity:0; transform:translateY(-6px)}to{opacity:1; transform:none}}
+
+/* ===== Modal ===== */
+.modal{
+  position:fixed; inset:0; background:rgba(4,6,11,.78); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center; padding:16px; z-index:100;
+  animation:fadeIn .18s ease;
+}
+.modal[hidden]{display:none !important}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet{
+  background:linear-gradient(180deg,#151b28,#0e131c);
+  border:1px solid #263047; border-radius:20px; width:100%; max-width:460px;
+  padding:20px; position:relative; max-height:92vh; overflow-y:auto;
+  animation:pop .22s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes pop{from{transform:scale(.94); opacity:0}to{transform:scale(1); opacity:1}}
+.close{
+  position:absolute; top:14px; left:14px; background:#1b2233; border:none; color:var(--mut);
+  width:30px; height:30px; border-radius:9px; cursor:pointer; font-size:14px;
+}
+.close:hover{color:var(--txt); background:#252e42}
+.m-head{display:flex; align-items:center; gap:12px; margin-bottom:14px}
+.m-icon{font-size:26px; width:46px; height:46px; display:grid; place-items:center;
+  background:#1b2233; border-radius:13px}
+.m-name{font-size:15px; font-weight:600}
+.m-name small{color:var(--mut); font-size:11px; letter-spacing:.6px; margin-inline-start:4px}
+.m-price{display:flex; align-items:baseline; gap:9px; margin-top:2px}
+.m-price b{font-size:20px; font-variant-numeric:tabular-nums}
+.big{width:100%; height:180px; display:block; margin-bottom:12px}
+.hold-row{
+  display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--mut);
+  background:#0c111a; border:1px solid #1a2231; border-radius:11px;
+  padding:9px 12px; margin-bottom:14px; font-variant-numeric:tabular-nums;
+}
+.hold-row b{color:var(--txt)}
+
+.tabs{display:flex; background:#0c111a; border:1px solid #1a2231; border-radius:12px; padding:4px; margin-bottom:14px}
+.tab{
+  flex:1; padding:9px; border:none; background:none; color:var(--mut);
+  border-radius:9px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600;
+  transition:.15s;
+}
+.tab.active[data-mode="buy"]{background:var(--up); color:#04150e}
+.tab.active[data-mode="sell"]{background:var(--dn); color:#1a0406}
+
+label{font-size:11.5px; color:var(--mut); display:block; margin-bottom:6px}
+#qty{
+  width:100%; background:#0c111a; border:1px solid #1f2837; border-radius:11px;
+  padding:12px 14px; color:var(--txt); font-family:inherit; font-size:16px;
+  direction:ltr; text-align:center; font-variant-numeric:tabular-nums;
+}
+#qty:focus{outline:none; border-color:var(--acc)}
+.quick{display:flex; gap:8px; margin:9px 0 12px}
+.quick button{
+  flex:1; background:#151d2b; border:1px solid #1f2837; color:var(--mut);
+  padding:7px; border-radius:9px; cursor:pointer; font-family:inherit; font-size:12px;
+}
+.quick button:hover{color:var(--txt); border-color:var(--acc)}
+.total-row{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:13px; padding:10px 2px; border-top:1px solid #1a2231;
+  font-variant-numeric:tabular-nums;
+}
+.total-row span{color:var(--mut)}
+.total-row b{font-size:15px}
+.action{
+  width:100%; padding:14px; border:none; border-radius:12px; cursor:pointer;
+  font-family:inherit; font-size:15px; font-weight:800; margin-top:8px; transition:.15s;
+}
+.action.buy{background:var(--up); color:#04150e}
+.action.sell{background:var(--dn); color:#1a0406}
+.action:hover{filter:brightness(1.12)}
+.action:active{transform:scale(.985)}
+
+/* ===== Toast ===== */
+#toasts{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:200;
+  display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none}
+.toast{
+  background:#1a2233; border:1px solid #2b364d; color:var(--txt);
+  padding:10px 18px; border-radius:11px; font-size:13px;
+  box-shadow:0 12px 34px -12px #000; animation:toastIn .3s ease;
+}
+.toast.good{border-color:#16c78466}
+.toast.bad{border-color:#ea394366}
+@keyframes toastIn{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">🎲 بازار <span>فیک</span></div>
+  <div class="stats">
+    <div class="stat"><span>دارایی کل</span><b id="netWorth">0</b></div>
+    <div class="stat"><span>نقدینگی</span><b id="cash">0</b></div>
+    <div class="stat"><span>سود / ضرر</span><b id="pnl">0</b></div>
+  </div>
+  <button id="reset">ریست بازار</button>
+</header>
+
+<div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+<main>
+  <section>
+    <div class="section-title">بازار — روی هر ارز بزن تا معامله کنی</div>
+    <div class="market-grid" id="marketGrid"></div>
+  </section>
+
+  <aside>
+    <div class="panel">
+      <div class="section-title">💼 پورتفوی من</div>
+      <div id="portfolio"></div>
+    </div>
+    <div class="panel">
+      <div class="section-title">📰 اخبار بازار</div>
+      <div id="news"></div>
+    </div>
+  </aside>
+</main>
+
+<!-- Modal -->
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <button class="close" id="closeModal">✕</button>
+    <div class="m-head">
+      <div class="m-icon" id="mIcon">🪙</div>
+      <div>
+        <div class="m-name" id="mName">—</div>
+        <div class="m-price"><b id="mPrice">0</b><span class="chg" id="mChg">0%</span></div>
+      </div>
+    </div>
+    <canvas class="big" id="bigChart"></canvas>
+    <div class="hold-row" id="holdRow"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-mode="buy">خرید</button>
+      <button class="tab" data-mode="sell">فروش</button>
+    </div>
+
+    <label>مقدار</label>
+    <input type="number" id="qty" placeholder="0" step="any" min="0">
+    <div class="quick">
+      <button data-p="0.25">۲۵٪</button>
+      <button data-p="0.5">۵۰٪</button>
+      <button data-p="1">۱۰۰٪</button>
+    </div>
+    <div class="total-row"><span>مجموع</span><b id="total">0</b></div>
+    <button class="action buy" id="actionBtn">خرید</button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* =========================================================
+   بازار فیک — شبیه‌ساز معاملات
+   ========================================================= */
+const START_CASH = 10000;
+const SAVE_KEY   = 'fakeMarket_v1';
+
+const COINS = [
+  { id:'plk', name:'پولک',       sym:'PLK',  icon:'🪙', base:120,  vol:0.030 },
+  { id:'zrk', name:'زروک',       sym:'ZRK',  icon:'💎', base:45,   vol:0.055 },
+  { id:'blf', name:'بلوف‌کوین',   sym:'BLF',  icon:'🎭', base:8.5,  vol:0.075 },
+  { id:'shr', name:'شیرینی',     sym:'SHR',  icon:'🍩', base:2.4,  vol:0.065 },
+  { id:'pnr', name:'پنیرکوین',   sym:'PNR',  icon:'🧀', base:0.85, vol:0.090 },
+  { id:'mun', name:'ماه‌کوین',    sym:'MOON', icon:'🌙', base:340,  vol:0.045 },
+  { id:'cat', name:'گربه‌کوین',   sym:'MEOW', icon:'🐱', base:15,   vol:0.080 },
+  { id:'sib', name:'سیب‌کوین',   sym:'SIB',  icon:'🍎', base:1.6,  vol:0.050 },
+];
+
+const GOOD_EVENTS = [
+  '🐋 نهنگ‌ها دارن {n} می‌خرن!',
+  '🔥 {n} توی توییتر ترند شد',
+  '🏦 یه صرافی بزرگ {n} رو لیست کرد',
+  '🤖 ربات‌های خریدار به {n} حمله کردن',
+  '📈 تحلیلگرها می‌گن {n} تا ماه دیگه ۱۰ برابر می‌شه',
+];
+const BAD_EVENTS = [
+  '😱 شایعه هک صرافی، {n} داره می‌ریزه',
+  '🐻 نهنگ‌ها دارن {n} رو خالی می‌کنن',
+  '📉 یه تحلیلگر معروف گفت {n} حبابه',
+  '🚨 سازمان مالیات به {n} گیر داده',
+  '💀 یه کیف پول بزرگ {n} رو فروخت',
+];
+
+/* ---------- State ---------- */
+let state, market, tickerMap = {}, news = [];
+let activeId = null, mode = 'buy', tickCount = 0;
+
+/* ---------- Helpers ---------- */
+const $ = id => document.getElementById(id);
+const fmtPrice = p => p >= 1000 ? p.toLocaleString('en-US',{maximumFractionDigits:2})
+                   : p >= 100  ? p.toFixed(2)
+                   : p >= 1    ? p.toFixed(3)
+                   :             p.toFixed(4);
+const fmtMoney = n => n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+const coinById = id => market.find(m => m.id === id);
+
+function toast(msg, type){
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => { el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(10px)'; }, 2200);
+  setTimeout(() => el.remove(), 2600);
+}
+
+/* ---------- Init market ---------- */
+function initMarket(){
+  market = COINS.map(c => {
+    const price = c.base * (0.75 + Math.random() * 0.5);
+    const history = [];
+    let p = price;
+    for (let i = 0; i < 80; i++) {
+      p = Math.max(0.0001, p * (1 + (Math.random() - 0.5) * c.vol * 1.5));
+      history.push(p);
+    }
+    history[history.length - 1] = price;
+    return { ...c, price, history, pulse: 0, chg: 0 };
+  });
+  market.forEach(m => m.chg = (m.price / m.history[0] - 1) * 100);
+}
+
+/* ---------- Persistence ---------- */
+function save(){
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      cash: state.cash,
+      holdings: state.holdings,
+      market: market.map(m => ({ id:m.id, price:m.price, history:m.history, pulse:m.pulse }))
+    }));
+  } catch(e){}
+}
+function load(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (!d || !d.market) return false;
+    state.cash = d.cash ?? START_CASH;
+    state.holdings = d.holdings || {};
+    d.market.forEach(sm => {
+      const m = coinById(sm.id);
+      if (m && Array.isArray(sm.history) && sm.history.length > 5) {
+        m.price = sm.price; m.history = sm.history; m.pulse = sm.pulse || 0;
+        m.chg = (m.price / m.history[0] - 1) * 100;
+      }
+    });
+    return true;
+  } catch(e){ return false; }
+}
+
+/* ---------- Chart drawing ---------- */
+function prepCanvas(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 200, h = cv.clientHeight || 40;
+  if (cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)) {
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  return { ctx, w, h };
+}
+
+function drawSpark(cv, hist){
+  const { ctx, w, h } = prepCanvas(cv);
+  const mn = Math.min(...hist), mx = Math.max(...hist);
+  const rng = (mx - mn) || 1;
+  const up = hist[hist.length-1] >= hist[0];
+  const col = up ? '#16c784' : '#ea3943';
+  const pad = 3;
+
+  const pt = i => ({
+    x: (i / (hist.length - 1)) * w,
+    y: h - pad - ((hist[i] - mn) / rng) * (h - pad*2)
+  });
+
+  // fill
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0, up ? 'rgba(22,199,132,.32)' : 'rgba(234,57,67,.32)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  for (let i=0;i<hist.length;i++){ const p = pt(i); ctx.lineTo(p.x, p.y); }
+  ctx.lineTo(w, h); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  // line
+  ctx.beginPath();
+  for (let i=0;i<hist.length;i++){ const p = pt(i); i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y); }
+  ctx.strokeStyle = col; ctx.lineWidth = 1.8;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+function drawBig(cv, hist){
+  const { ctx, w, h } = prepCanvas(cv);
+  const mn = Math.min(...hist), mx = Math.max(...hist);
+  const rng = (mx - mn) || 1;
+  const up = hist[hist.length-1] >= hist[0];
+  const col = up ? '#16c784' : '#ea3943';
+  const padTop = 12, padBot = 12;
+
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,.05)';
+  ctx.lineWidth = 1;
+  for (let i=0;i<=4;i++){
+    const y = padTop + (i/4)*(h-padTop-padBot);
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+
+  const pt = i => ({
+    x: (i / (hist.length - 1)) * w,
+    y: h - padBot - ((hist[i] - mn) / rng) * (h - padTop - padBot)
+  });
+
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0, up ? 'rgba(22,199,132,.30)' : 'rgba(234,57,67,.30)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath(); ctx.moveTo(0,h);
+  for (let i=0;i<hist.length;i++){ const p = pt(i); ctx.lineTo(p.x,p.y); }
+  ctx.lineTo(w,h); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+
+  ctx.beginPath();
+  for (let i=0;i<hist.length;i++){ const p = pt(i); i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y); }
+  ctx.strokeStyle = col; ctx.lineWidth = 2.2; ctx.lineJoin='round'; ctx.stroke();
+
+  // last point dot
+  const last = pt(hist.length-1);
+  ctx.beginPath(); ctx.arc(last.x, last.y, 3.5, 0, Math.PI*2);
+  ctx.fillStyle = col; ctx.fill();
+  ctx.beginPath(); ctx.arc(last.x, last.y, 7, 0, Math.PI*2);
+  ctx.fillStyle = col + '33'; ctx.fill();
+}
+
+/* ---------- Build DOM ---------- */
+function buildMarket(){
+  const grid = $('marketGrid');
+  grid.innerHTML = '';
+  market.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'coin';
+    el.dataset.id = m.id;
+    el.innerHTML = `
+      <div class="coin-head">
+        <div class="coin-icon">${m.icon}</div>
+        <div class="coin-name"><b>${m.name}</b><span>${m.sym}</span></div>
+      </div>
+      <canvas class="spark"></canvas>
+      <div class="coin-price">
+        <b class="price">0</b>
+        <span class="chg">0%</span>
+      </div>
+      <div class="owned"></div>
+    `;
+    el.addEventListener('click', () => openModal(m.id));
+    grid.appendChild(el);
+  });
+}
+
+function buildTicker(){
+  const track = $('tickerTrack');
+  track.innerHTML = '';
+  tickerMap = {};
+  market.forEach(m => tickerMap[m.id] = []);
+  const nodes = market.map(m => {
+    const el = document.createElement('span');
+    el.className = 'tk';
+    el.dataset.id = m.id;
+    el.innerHTML = `${m.icon} ${m.sym} <b>0</b> <i>0%</i>`;
+    return el;
+  });
+  nodes.forEach(n => track.appendChild(n));
+  nodes.forEach(n => track.appendChild(n.cloneNode(true)));
+  track.querySelectorAll('.tk').forEach(el => tickerMap[el.dataset.id].push(el));
+}
+
+/* ---------- Render ---------- */
+function holdingsValue(){
+  return Object.entries(state.holdings).reduce((sum, [id, h]) => {
+    const m = coinById(id);
+    return sum + (m ? h.qty * m.price : 0);
+  }, 0);
+}
+
+function render(){
+  const hv = holdingsValue();
+  const net = state.cash + hv;
+  const pnl = net - START_CASH;
+
+  $('netWorth').textContent = fmtMoney(net);
+  $('cash').textContent = fmtMoney(state.cash);
+  const pnlEl = $('pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + fmtMoney(pnl);
+  pnlEl.className = pnl >= 0 ? 'up' : 'down';
+
+  // coins
+  document.querySelectorAll('.coin').forEach(card => {
+    const m = coinById(card.dataset.id);
+    if (!m) return;
+    const priceEl = card.querySelector('.price');
+    const chgEl = card.querySelector('.chg');
+    const ownEl = card.querySelector('.owned');
+    const spark = card.querySelector('.spark');
+
+    priceEl.textContent = fmtPrice(m.price);
+    chgEl.textContent = (m.chg >= 0 ? '+' : '') + m.chg.toFixed(2) + '%';
+    chgEl.className = 'chg ' + (m.chg >= 0 ? 'up' : 'dow
