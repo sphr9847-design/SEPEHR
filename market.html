@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================
-   RUBY MARKETS 2.1 — Optimized Premium
+   RUBY MARKETS 2.2 — Custom Name Modal
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -28,7 +28,6 @@
   --accent-2:#ffb84d;
   --accent-3:#ff6b9d;
   --accent-soft:rgba(255,45,85,.14);
-  --gold-soft:rgba(255,184,77,.14);
   --up:#2ee68e;
   --up-soft:rgba(46,230,142,.12);
   --dn:#ff4d5e;
@@ -45,7 +44,6 @@
 
 html{ scroll-behavior:smooth; }
 body{
-  /* Static gradients — no animation, zero cost */
   background:
     radial-gradient(ellipse 800px 700px at 92% -10%, rgba(255,45,85,.22) 0%, transparent 55%),
     radial-gradient(ellipse 700px 600px at 0% 110%, rgba(255,184,77,.14) 0%, transparent 55%),
@@ -667,7 +665,7 @@ aside{ display:flex; flex-direction:column; gap:14px; }
   letter-spacing:.4px; opacity:.7;
 }
 
-/* ===== Modal ===== */
+/* ===== Modal (Generic) ===== */
 .modal{
   position:fixed; inset:0; background:rgba(10,2,5,.88);
   backdrop-filter:blur(8px);
@@ -751,14 +749,18 @@ label{
   text-transform:uppercase; font-weight:700;
   display:block; margin-bottom:7px;
 }
-#qty{
+#qty, #newNameInput {
   width:100%; background:var(--bg-2); border:1px solid var(--line);
   border-radius:var(--r-md); padding:13px 15px; color:var(--txt);
   font-family:var(--mono); font-size:17px;
   direction:ltr; text-align:center; font-variant-numeric:tabular-nums;
   transition:border-color .2s;
 }
-#qty:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+#newNameInput {
+  font-family:'Vazirmatn', Tahoma, sans-serif;
+  direction:rtl; text-align:center;
+}
+#qty:focus, #newNameInput:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
 
 .quick{ display:flex; gap:8px; margin:10px 0 13px; }
 .quick button{
@@ -780,7 +782,7 @@ label{
 .total-row span{ color:var(--mut); }
 .total-row b{ font-family:var(--mono); font-size:16px; font-weight:700; }
 
-/* ===== Action buttons — premium ===== */
+/* ===== Action buttons ===== */
 .action{
   width:100%;
   padding:16px 20px;
@@ -805,10 +807,7 @@ label{
   content:'';
   position:absolute;
   inset:0;
-  background:linear-gradient(120deg,
-    transparent 25%,
-    rgba(255,255,255,.28) 50%,
-    transparent 75%);
+  background:linear-gradient(120deg, transparent 25%, rgba(255,255,255,.28) 50%, transparent 75%);
   transform:translateX(-120%);
   transition:transform .8s cubic-bezier(.2,.8,.3,1);
   pointer-events:none;
@@ -818,7 +817,6 @@ label{
   width:18px; height:18px;
   display:inline-flex; align-items:center; justify-content:center;
 }
-.action .btn-text{ display:inline-block; }
 .action.buy{
   background:linear-gradient(135deg,#2ee68e 0%,#1db377 45%,#0e8a5b 100%);
   color:#032a1a;
@@ -980,6 +978,7 @@ label{
   </aside>
 </main>
 
+<!-- Modal: Trade -->
 <div class="modal" id="modal" hidden>
   <div class="sheet">
     <button class="close" id="closeModal">✕</button>
@@ -1010,11 +1009,33 @@ label{
   </div>
 </div>
 
+<!-- Modal: Change Name -->
+<div class="modal" id="nameModal" hidden>
+  <div class="sheet" style="max-width:400px">
+    <button class="close" id="closeNameModal">✕</button>
+    <div class="m-head">
+      <div class="m-icon">👤</div>
+      <div>
+        <div class="m-name">تغییر نام</div>
+        <div style="font-size:12px; color:var(--mut); margin-top:4px">یه اسم جدید برای خودت انتخاب کن</div>
+      </div>
+    </div>
+    <label>نام جدید</label>
+    <input type="text" id="newNameInput" placeholder="مثلاً شاه‌یاقوت" maxlength="24">
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="action sell" id="cancelNameBtn" style="flex:1; margin-top:0; padding:12px;">لغو</button>
+      <button class="action buy" id="saveNameBtn" style="flex:2; margin-top:0; padding:12px;">
+        <span class="btn-text">ذخیره</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toasts"></div>
 
 <script>
 /* =========================================================
-   RUBY MARKETS 2.1
+   RUBY MARKETS 2.2
    ========================================================= */
 const START_CASH = 10000;
 const SAVE_KEY   = 'rubyMarket_v3';
@@ -1068,7 +1089,6 @@ const ICON_DOWN = '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke=
 let state, market, tickerMap = {}, news = [], bots = [], trades = [];
 let activeId = null, mode = 'buy', tickCount = 0;
 let prevPrices = {};
-let modalDirty = false;
 
 const $ = id => document.getElementById(id);
 const fmtPrice = p => p >= 1000 ? p.toLocaleString('en-US',{maximumFractionDigits:2})
@@ -1177,7 +1197,6 @@ function prepCanvas(cv){
   return { ctx, w, h };
 }
 
-/* Smooth sparkline with bezier */
 function drawSpark(cv, hist){
   const { ctx, w, h } = prepCanvas(cv);
   const mn = Math.min(...hist), mx = Math.max(...hist);
@@ -1218,7 +1237,6 @@ function drawSpark(cv, hist){
   ctx.stroke();
 }
 
-/* Premium big chart */
 function drawBig(cv, hist){
   const { ctx, w, h } = prepCanvas(cv);
   const mn = Math.min(...hist), mx = Math.max(...hist);
@@ -1233,14 +1251,12 @@ function drawBig(cv, hist){
   const xs = i => (i / (n - 1)) * cw;
   const ys = i => h - padB - ((hist[i] - mn) / rng) * (h - padT - padB);
 
-  /* Background subtle vertical gradient */
   const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
   bgGrad.addColorStop(0, 'rgba(255,45,85,.025)');
   bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, cw, h);
 
-  /* Grid lines (horizontal, dashed) */
   ctx.strokeStyle = 'rgba(255,255,255,.045)';
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
@@ -1250,7 +1266,6 @@ function drawBig(cv, hist){
   }
   ctx.setLineDash([]);
 
-  /* Area fill */
   const grad = ctx.createLinearGradient(0, padT, 0, h - padB);
   grad.addColorStop(0, `rgba(${colRgb},.42)`);
   grad.addColorStop(0.4, `rgba(${colRgb},.18)`);
@@ -1268,7 +1283,6 @@ function drawBig(cv, hist){
   ctx.fillStyle = grad;
   ctx.fill();
 
-  /* Glow line */
   ctx.shadowColor = col;
   ctx.shadowBlur = 14;
 
@@ -1285,10 +1299,8 @@ function drawBig(cv, hist){
   ctx.stroke();
   ctx.shadowBlur = 0;
 
-  /* Last point */
   const lastX = xs(n-1), lastY = ys(n-1);
 
-  /* Dashed horizontal from last point to right axis */
   ctx.strokeStyle = `rgba(${colRgb},.45)`;
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
@@ -1298,7 +1310,6 @@ function drawBig(cv, hist){
   ctx.stroke();
   ctx.setLineDash([]);
 
-  /* Pulsing halo around last point */
   ctx.beginPath();
   ctx.arc(lastX, lastY, 9, 0, Math.PI*2);
   ctx.fillStyle = `rgba(${colRgb},.18)`;
@@ -1308,7 +1319,6 @@ function drawBig(cv, hist){
   ctx.fillStyle = `rgba(${colRgb},.35)`;
   ctx.fill();
 
-  /* Solid dot with white border */
   ctx.beginPath();
   ctx.arc(lastX, lastY, 3.5, 0, Math.PI*2);
   ctx.fillStyle = col;
@@ -1317,7 +1327,6 @@ function drawBig(cv, hist){
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  /* Right-axis price label */
   ctx.font = '700 12px JetBrains Mono, monospace';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
@@ -1344,14 +1353,12 @@ function drawBig(cv, hist){
   ctx.fillStyle = col;
   ctx.fillText(labelText, pillX + 7, lastY + 1);
 
-  /* Min / Max labels on right axis */
   ctx.font = '500 10px JetBrains Mono, monospace';
   ctx.fillStyle = 'rgba(163,123,137,.65)';
   ctx.fillText(fmtPrice(mx), cw + 6, padT);
   ctx.fillText(fmtPrice(mn), cw + 6, h - padB);
 }
 
-/* ============ DOM builds ============ */
 function buildMarket(){
   const grid = $('marketGrid');
   grid.innerHTML = '';
@@ -1421,7 +1428,6 @@ function winRate(){
   return t > 0 ? (state.wins / t) * 100 : 0;
 }
 
-/* ============ Fast render ============ */
 function flashPrice(el, dir){
   try {
     el.animate(
@@ -1439,7 +1445,6 @@ function renderFast(){
   const nw = netWorth();
   $('hdrWorth').textContent = fmtMoney(nw);
 
-  /* Coin cards */
   const cards = document.querySelectorAll('.coin');
   cards.forEach(card => {
     const m = coinById(card.dataset.id);
@@ -1467,7 +1472,6 @@ function renderFast(){
     drawSpark(spark, m.history);
   });
 
-  /* Ticker */
   market.forEach(m => {
     (tickerMap[m.id] || []).forEach(el => {
       el.querySelector('b').textContent = fmtPrice(m.price);
@@ -1477,7 +1481,6 @@ function renderFast(){
     });
   });
 
-  /* Featured */
   let best = null, bestAbs = -1;
   market.forEach(m => {
     const a = Math.abs(m.chg);
@@ -1494,7 +1497,6 @@ function renderFast(){
     $('featured').dataset.id = best.id;
   }
 
-  /* Modal price + chart */
   if (activeId) {
     const m = coinById(activeId);
     if (m) {
@@ -1518,7 +1520,6 @@ function renderFast(){
   }
 }
 
-/* ============ Slow render ============ */
 function renderPortfolio(){
   const pf = $('portfolio');
   const entries = Object.entries(state.holdings).filter(([,h]) => h.qty > 1e-9);
@@ -1663,7 +1664,6 @@ function render(){
   renderRankTable();
 }
 
-/* ============ Simulation ============ */
 function tick(){
   market.forEach(m => {
     const reversion = ((m.base - m.price) / m.base) * 0.006;
@@ -1685,7 +1685,6 @@ function tick(){
   tickCount++;
   renderFast();
 
-  /* Heavy renders every 4 ticks */
   if (tickCount % 4 === 0) {
     renderPortfolio();
     renderRankTable();
@@ -1710,7 +1709,6 @@ function triggerEvent(){
   toast(text, good ? 'good' : 'bad');
 }
 
-/* ============ Trading ============ */
 function buy(m, qty){
   if (!(qty > 0)) return toast('مقدار نامعتبره', 'bad');
   const cost = qty * m.price;
@@ -1773,7 +1771,6 @@ function addXp(amount){
   }
 }
 
-/* ============ Modal ============ */
 function openModal(id){
   activeId = id;
   mode = 'buy';
@@ -1797,7 +1794,44 @@ function updateActionButton(){
     `<span class="btn-text">${mode === 'buy' ? 'خرید' : 'فروش'}</span>`;
 }
 
-/* ============ Wiring ============ */
+/* ===== Name Modal Logic ===== */
+function openNameModal() {
+  $('newNameInput').value = state.username;
+  $('nameModal').hidden = false;
+  setTimeout(() => {
+    $('newNameInput').focus();
+    $('newNameInput').select();
+  }, 50);
+}
+
+function closeNameModal() {
+  $('nameModal').hidden = true;
+}
+
+function saveNewName() {
+  const name = $('newNameInput').value.trim();
+  if (!name) {
+    toast('اسم نمی‌تونه خالی باشه', 'bad');
+    return;
+  }
+  state.username = name.slice(0, 24);
+  save(); render();
+  closeNameModal();
+  toast('اسم عوض شد ✅', 'good');
+}
+
+$('editName').addEventListener('click', openNameModal);
+$('closeNameModal').addEventListener('click', closeNameModal);
+$('cancelNameBtn').addEventListener('click', closeNameModal);
+$('saveNameBtn').addEventListener('click', saveNewName);
+$('nameModal').addEventListener('click', (e) => {
+  if (e.target.id === 'nameModal') closeNameModal();
+});
+$('newNameInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') saveNewName();
+});
+
+/* ===== Other wiring ===== */
 document.querySelectorAll('.stab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.stab').forEach(x => x.classList.remove('active'));
@@ -1813,13 +1847,6 @@ document.querySelectorAll('.stab').forEach(t => {
   });
 });
 
-$('editName').addEventListener('click', () => {
-  const name = prompt('اسم جدیدت چیه؟', state.username);
-  if (!name || !name.trim()) return;
-  state.username = name.trim().slice(0, 24);
-  save(); render();
-  toast('اسم عوض شد ✅', 'good');
-});
 $('profileChip').addEventListener('click', () => {
   document.querySelector('.stab[data-tab="portfolio"]').click();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1832,7 +1859,12 @@ $('featured').addEventListener('click', () => {
 
 $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeNameModal();
+  }
+});
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1881,7 +1913,6 @@ window.addEventListener('resize', () => {
   renderFast();
 });
 
-/* ============ Boot ============ */
 state = {
   cash: START_CASH,
   holdings: {},
