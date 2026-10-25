@@ -17,7 +17,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.1 — PWA, Tabs & Old Profile
+   RUBY MARKETS 3.2 — Enhanced Leaderboard
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -82,7 +82,7 @@ header{
 .tk b{color:var(--txt); font-weight:600}
 .tk i{font-style:normal; font-size:10px}
 
-/* ===== PROFILE HERO (Reverted to Old Design) ===== */
+/* ===== PROFILE HERO ===== */
 .profile-hero{ max-width:1440px; margin:20px auto 0; padding:0 16px; }
 .profile-card{
   background: radial-gradient(600px 200px at 80% 0%, rgba(255,184,77,.08) 0%, transparent 60%), radial-gradient(500px 300px at 15% 100%, rgba(255,45,85,.1) 0%, transparent 60%), linear-gradient(180deg,var(--panel-2) 0%,var(--panel) 100%);
@@ -250,29 +250,139 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .news-item:last-child{ border-bottom:none; }
 .news-item .nt{ font-family:var(--mono); font-size:10px; color:var(--mut); margin-left:6px; }
 
-/* Rank Table */
-.rank-header{ display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:12px; }
-.rank-title{ font-size:14px; font-weight:700; }
-.rank-sub{ font-size:10px; color:var(--mut); margin-top:2px; }
-.rank-count{ font-family:var(--mono); font-size:10px; background:var(--panel-3); padding:3px 8px; border-radius:100px; border:1px solid var(--line); color:var(--accent-2); }
-.rank-table{ width:100%; border-collapse:collapse; font-size:11px; }
-.rank-table thead th{ font-size:9.5px; color:var(--mut); font-weight:700; padding:6px 4px; border-bottom:1px solid var(--line); text-align:right; }
-.rank-table thead th:first-child{ text-align:center; width:36px; }
-.rank-table thead th:last-child{ text-align:left; }
-.rank-table tbody td{ padding:8px 4px; border-bottom:1px solid var(--line-soft); font-family:var(--mono); font-size:11px; vertical-align:middle; }
-.rank-table tbody tr:last-child td{ border-bottom:none; }
-.rank-table tbody tr.me td{ background:rgba(255,45,85,.1); }
-.rank-pos{ display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--mut); }
-.rank-pos.top1{ font-size:16px; color:#ffd166; text-shadow:0 0 10px rgba(255,209,102,.6); }
-.rank-pos.top2{ font-size:15px; color:#dde3ea; }
-.rank-pos.top3{ font-size:15px; color:#e08a52; }
-.rank-user{ display:flex; align-items:center; gap:6px; }
-.rank-user .rank-av{ width:24px; height:24px; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius:50%; font-size:12px; }
-.rank-user .rank-name{ font-family:'Vazirmatn',Tahoma,sans-serif; font-weight:500; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.rank-worth{ font-weight:700; color:var(--accent-2); }
-.rank-trades{ color:var(--mut); font-size:10px; text-align:left; }
-.rank-sep td{ padding:4px 0; text-align:center; color:var(--mut); font-size:10px; border-bottom:none; }
-.rank-footer{ text-align:center; font-size:9.5px; color:var(--mut); padding-top:10px; opacity:.7; }
+/* =========================================================
+   ENHANCED RANKING TABLE
+   ========================================================= */
+#view-rank .panel {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.rank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.rank-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--txt);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rank-title::before {
+  content: '🏆';
+  font-size: 22px;
+}
+.rank-sub {
+  font-size: 11px;
+  color: var(--mut);
+  margin-top: 4px;
+}
+.rank-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--panel-3);
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  color: var(--accent-2);
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.rank-table thead th {
+  font-size: 11px;
+  color: var(--mut);
+  font-weight: 700;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rank-table thead th:first-child { text-align: center; width: 50px; }
+.rank-table thead th:last-child { text-align: left; }
+
+.rank-table tbody td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--mono);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.rank-table tbody tr:last-child td { border-bottom: none; }
+
+/* Top 3 Rows Highlight */
+.rank-table tbody tr.row-1 td { background: linear-gradient(90deg, rgba(255,209,102,.12) 0%, transparent 100%); }
+.rank-table tbody tr.row-2 td { background: linear-gradient(90deg, rgba(221,227,234,.08) 0%, transparent 100%); }
+.rank-table tbody tr.row-3 td { background: linear-gradient(90deg, rgba(224,138,82,.08) 0%, transparent 100%); }
+
+/* My Row Highlight */
+.rank-table tbody tr.me td {
+  background: linear-gradient(90deg, rgba(255,45,85,.18) 0%, rgba(255,184,77,.08) 100%) !important;
+  border-top: 1.5px solid rgba(255,45,85,.5);
+  border-bottom: 1.5px solid rgba(255,45,85,.5);
+}
+.rank-table tbody tr.me td:first-child { border-right: 1.5px solid rgba(255,45,85,.5); border-radius: 0 8px 8px 0; }
+.rank-table tbody tr.me td:last-child { border-left: 1.5px solid rgba(255,45,85,.5); border-radius: 8px 0 0 8px; }
+
+.rank-pos {
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: var(--mut);
+}
+.rank-pos.top1 { font-size: 22px; text-shadow: 0 0 16px rgba(255,209,102,.8); }
+.rank-pos.top2 { font-size: 20px; text-shadow: 0 0 12px rgba(221,227,234,.6); }
+.rank-pos.top3 { font-size: 20px; text-shadow: 0 0 12px rgba(224,138,82,.6); }
+
+.rank-user { display: flex; align-items: center; gap: 10px; }
+.rank-user .rank-av {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%);
+  border-radius: 50%; border: 1px solid rgba(255,45,85,.3);
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 4px 10px -4px rgba(0,0,0,.5);
+}
+.rank-user .rank-name {
+  font-family: 'Vazirmatn', Tahoma, sans-serif;
+  font-size: 13.5px; font-weight: 600;
+  max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rank-worth { font-weight: 800; color: var(--accent-2); font-size: 13.5px; }
+.rank-trades { color: var(--mut); font-size: 11.5px; text-align: left; }
+
+.rank-sep td {
+  padding: 8px 0; text-align: center;
+  color: var(--mut); letter-spacing: 4px; font-size: 14px;
+  border-bottom: none;
+}
+
+.rank-footer {
+  text-align: center; font-size: 10.5px;
+  color: var(--mut); padding-top: 16px;
+  opacity: 0.8; letter-spacing: 0.5px;
+}
+
+/* Mobile Tweak for Table */
+@media (max-width: 480px) {
+  #view-rank .panel { padding: 16px 12px; }
+  .rank-title { font-size: 16px; }
+  .rank-table thead th { padding: 10px 4px; }
+  .rank-table tbody td { padding: 12px 4px; }
+  .rank-user .rank-av { width: 30px; height: 30px; font-size: 15px; }
+  .rank-user .rank-name { font-size: 12px; max-width: 90px; }
+  .rank-worth { font-size: 12px; }
+  .rank-trades, .rank-table th:last-child { display: none; } /* Hide trades on mobile */
+}
 
 /* Modal */
 .modal{ position:fixed; inset:0; background:rgba(10,2,5,.9); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:16px; z-index:100; }
@@ -412,7 +522,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
   <!-- تب رتبه‌بندی -->
   <div class="view" id="view-rank">
-    <div class="panel" style="max-width:700px; margin:0 auto;">
+    <div class="panel">
       <div class="rank-header">
         <div>
           <div class="rank-title">رتبه‌بندی معامله‌گران</div>
@@ -485,7 +595,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.1
+   RUBY MARKETS 3.2
    ========================================================= */
 const START_CASH = 10000;
 const SAVE_KEY   = 'rubyMarket_v3';
@@ -863,7 +973,28 @@ function renderRankTable(){
   const myRank = list.findIndex(x => x.isMe) + 1; const top = list.slice(0, 8); const iAmInTop = top.some(x => x.isMe);
   const medal = r => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : r;
   const posCls = r => r === 1 ? 'top1' : r === 2 ? 'top2' : r === 3 ? 'top3' : '';
-  const rowHtml = (p, rank) => `<tr class="${p.isMe ? 'me' : ''}"><td><div class="rank-pos ${posCls(rank)}">${medal(rank)}</div></td><td><div class="rank-user"><div class="rank-av">${p.emoji}</div><div class="rank-name">${p.name}</div></div></td><td class="rank-worth">${fmtMoney(p.worth)}</td><td class="rank-trades">${p.trades}</td></tr>`;
+  
+  const rowHtml = (p, rank) => {
+    let rowClass = p.isMe ? 'me' : '';
+    if (rank === 1) rowClass += ' row-1';
+    if (rank === 2) rowClass += ' row-2';
+    if (rank === 3) rowClass += ' row-3';
+    
+    return `
+      <tr class="${rowClass}">
+        <td><div class="rank-pos ${posCls(rank)}">${medal(rank)}</div></td>
+        <td>
+          <div class="rank-user">
+            <div class="rank-av">${p.emoji}</div>
+            <div class="rank-name">${p.name}</div>
+          </div>
+        </td>
+        <td class="rank-worth">${fmtMoney(p.worth)}</td>
+        <td class="rank-trades">${p.trades}</td>
+      </tr>
+    `;
+  };
+  
   let html = top.map((p, i) => rowHtml(p, i + 1)).join('');
   if (!iAmInTop) { html += `<tr class="rank-sep"><td colspan="4">· · ·</td></tr>`; html += rowHtml(list[myRank - 1], myRank); }
   $('rankBody').innerHTML = html; $('rankCount').textContent = list.length + ' نفر';
