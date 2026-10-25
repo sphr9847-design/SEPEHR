@@ -17,7 +17,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.2 — Enhanced Leaderboard
+   RUBY MARKETS 3.3 — Top Notifications & Premium Ticks
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -253,126 +253,41 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 /* =========================================================
    ENHANCED RANKING TABLE
    ========================================================= */
-#view-rank .panel {
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 24px 20px;
-}
+#view-rank .panel { max-width: 850px; margin: 0 auto; padding: 24px 20px; }
+.rank-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.rank-title { font-size: 18px; font-weight: 800; color: var(--txt); display: flex; align-items: center; gap: 8px; }
+.rank-title::before { content: '🏆'; font-size: 22px; }
+.rank-sub { font-size: 11px; color: var(--mut); margin-top: 4px; }
+.rank-count { font-family: var(--mono); font-size: 12px; background: var(--panel-3); padding: 4px 12px; border-radius: 100px; border: 1px solid var(--line); color: var(--accent-2); }
 
-.rank-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 12px;
-}
-.rank-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--txt);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.rank-title::before {
-  content: '🏆';
-  font-size: 22px;
-}
-.rank-sub {
-  font-size: 11px;
-  color: var(--mut);
-  margin-top: 4px;
-}
-.rank-count {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--panel-3);
-  padding: 4px 12px;
-  border-radius: 100px;
-  border: 1px solid var(--line);
-  color: var(--accent-2);
-}
-
-.rank-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.rank-table thead th {
-  font-size: 11px;
-  color: var(--mut);
-  font-weight: 700;
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--line);
-  text-align: right;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+.rank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rank-table thead th { font-size: 11px; color: var(--mut); font-weight: 700; padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: right; text-transform: uppercase; letter-spacing: 0.5px; }
 .rank-table thead th:first-child { text-align: center; width: 50px; }
 .rank-table thead th:last-child { text-align: left; }
-
-.rank-table tbody td {
-  padding: 14px 10px;
-  border-bottom: 1px solid var(--line-soft);
-  font-family: var(--mono);
-  font-size: 13px;
-  vertical-align: middle;
-}
+.rank-table tbody td { padding: 14px 10px; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); font-size: 13px; vertical-align: middle; }
 .rank-table tbody tr:last-child td { border-bottom: none; }
 
-/* Top 3 Rows Highlight */
 .rank-table tbody tr.row-1 td { background: linear-gradient(90deg, rgba(255,209,102,.12) 0%, transparent 100%); }
 .rank-table tbody tr.row-2 td { background: linear-gradient(90deg, rgba(221,227,234,.08) 0%, transparent 100%); }
 .rank-table tbody tr.row-3 td { background: linear-gradient(90deg, rgba(224,138,82,.08) 0%, transparent 100%); }
 
-/* My Row Highlight */
-.rank-table tbody tr.me td {
-  background: linear-gradient(90deg, rgba(255,45,85,.18) 0%, rgba(255,184,77,.08) 100%) !important;
-  border-top: 1.5px solid rgba(255,45,85,.5);
-  border-bottom: 1.5px solid rgba(255,45,85,.5);
-}
+.rank-table tbody tr.me td { background: linear-gradient(90deg, rgba(255,45,85,.18) 0%, rgba(255,184,77,.08) 100%) !important; border-top: 1.5px solid rgba(255,45,85,.5); border-bottom: 1.5px solid rgba(255,45,85,.5); }
 .rank-table tbody tr.me td:first-child { border-right: 1.5px solid rgba(255,45,85,.5); border-radius: 0 8px 8px 0; }
 .rank-table tbody tr.me td:last-child { border-left: 1.5px solid rgba(255,45,85,.5); border-radius: 8px 0 0 8px; }
 
-.rank-pos {
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 14px; color: var(--mut);
-}
+.rank-pos { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: var(--mut); }
 .rank-pos.top1 { font-size: 22px; text-shadow: 0 0 16px rgba(255,209,102,.8); }
 .rank-pos.top2 { font-size: 20px; text-shadow: 0 0 12px rgba(221,227,234,.6); }
 .rank-pos.top3 { font-size: 20px; text-shadow: 0 0 12px rgba(224,138,82,.6); }
 
 .rank-user { display: flex; align-items: center; gap: 10px; }
-.rank-user .rank-av {
-  width: 36px; height: 36px;
-  display: grid; place-items: center;
-  background: radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%);
-  border-radius: 50%; border: 1px solid rgba(255,45,85,.3);
-  font-size: 18px; flex-shrink: 0;
-  box-shadow: 0 4px 10px -4px rgba(0,0,0,.5);
-}
-.rank-user .rank-name {
-  font-family: 'Vazirmatn', Tahoma, sans-serif;
-  font-size: 13.5px; font-weight: 600;
-  max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
+.rank-user .rank-av { width: 36px; height: 36px; display: grid; place-items: center; background: radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius: 50%; border: 1px solid rgba(255,45,85,.3); font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px -4px rgba(0,0,0,.5); }
+.rank-user .rank-name { font-family: 'Vazirmatn', Tahoma, sans-serif; font-size: 13.5px; font-weight: 600; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rank-worth { font-weight: 800; color: var(--accent-2); font-size: 13.5px; }
 .rank-trades { color: var(--mut); font-size: 11.5px; text-align: left; }
+.rank-sep td { padding: 8px 0; text-align: center; color: var(--mut); letter-spacing: 4px; font-size: 14px; border-bottom: none; }
+.rank-footer { text-align: center; font-size: 10.5px; color: var(--mut); padding-top: 16px; opacity: 0.8; letter-spacing: 0.5px; }
 
-.rank-sep td {
-  padding: 8px 0; text-align: center;
-  color: var(--mut); letter-spacing: 4px; font-size: 14px;
-  border-bottom: none;
-}
-
-.rank-footer {
-  text-align: center; font-size: 10.5px;
-  color: var(--mut); padding-top: 16px;
-  opacity: 0.8; letter-spacing: 0.5px;
-}
-
-/* Mobile Tweak for Table */
 @media (max-width: 480px) {
   #view-rank .panel { padding: 16px 12px; }
   .rank-title { font-size: 16px; }
@@ -381,7 +296,7 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
   .rank-user .rank-av { width: 30px; height: 30px; font-size: 15px; }
   .rank-user .rank-name { font-size: 12px; max-width: 90px; }
   .rank-worth { font-size: 12px; }
-  .rank-trades, .rank-table th:last-child { display: none; } /* Hide trades on mobile */
+  .rank-trades, .rank-table th:last-child { display: none; }
 }
 
 /* Modal */
@@ -419,13 +334,122 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 .action.buy{ background:linear-gradient(135deg,#2ee68e 0%,#1db377 100%); color:#032a1a; box-shadow:0 8px 20px -8px rgba(46,230,142,.6); }
 .action.sell{ background:linear-gradient(135deg,#ff4d5e 0%,#c92240 100%); color:#fff; box-shadow:0 8px 20px -8px rgba(255,77,94,.6); }
 
-/* Toast */
-#toasts{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; }
-.toast{ background:var(--panel-3); border:1px solid var(--line); color:var(--txt); padding:10px 16px; border-radius:10px; font-size:12px; box-shadow:var(--shadow-md); animation:toastIn .3s ease; }
-.toast.good{ border-color:rgba(46,230,142,.4); }
-.toast.bad{ border-color:rgba(255,77,94,.4); }
-.toast.levelup{ border-color:var(--accent-2); background:linear-gradient(135deg,var(--panel-3),rgba(255,184,77,.2)); font-weight:700; }
-@keyframes toastIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none} }
+/* =========================================================
+   TOASTS — Top & Animated Ticks
+   ========================================================= */
+#toasts {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+  width: 100%;
+  padding: 0 16px;
+  max-width: 420px;
+}
+
+.toast {
+  background: rgba(30, 10, 20, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 45, 85, 0.2);
+  color: var(--txt);
+  padding: 12px 20px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.9), 0 0 20px rgba(255,45,85,0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toastDrop .5s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+@keyframes toastDrop {
+  0% { opacity: 0; transform: translateY(-40px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast.good {
+  border-color: rgba(46, 230, 142, 0.4);
+  box-shadow: 0 15px 35px -10px rgba(0,0,0,0.9), 0 0 20px rgba(46, 230, 142, 0.25);
+}
+
+.toast.bad {
+  border-color: rgba(255, 77, 94, 0.4);
+  box-shadow: 0 15px 35px -10px rgba(0,0,0,0.9), 0 0 20px rgba(255, 77, 94, 0.25);
+}
+
+.toast.levelup {
+  border-color: var(--accent-2);
+  background: linear-gradient(135deg, rgba(52, 14, 40, 0.95), rgba(255, 184, 77, 0.15));
+  box-shadow: 0 15px 35px -10px rgba(0,0,0,0.9), 0 0 30px rgba(255, 184, 77, 0.4);
+  padding: 14px 24px;
+}
+
+/* The Glowing Icon Wrapper */
+.toast-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.toast.good .toast-icon-wrap {
+  background: var(--up-soft);
+  border: 1.5px solid rgba(46, 230, 142, 0.5);
+  box-shadow: inset 0 0 10px rgba(46, 230, 142, 0.3), 0 0 15px rgba(46, 230, 142, 0.4);
+}
+
+.toast.bad .toast-icon-wrap {
+  background: var(--dn-soft);
+  border: 1.5px solid rgba(255, 77, 94, 0.5);
+  box-shadow: inset 0 0 10px rgba(255, 77, 94, 0.3), 0 0 15px rgba(255, 77, 94, 0.4);
+}
+
+/* The SVG Check/Cross */
+.toast-icon-svg {
+  width: 16px;
+  height: 16px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.5;
+  fill: none;
+}
+
+.toast.good .toast-icon-svg {
+  stroke: var(--up);
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawCheck .6s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards .15s;
+  filter: drop-shadow(0 0 5px var(--up));
+}
+
+.toast.bad .toast-icon-svg {
+  stroke: var(--dn);
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawCheck .6s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards .15s;
+  filter: drop-shadow(0 0 5px var(--dn));
+}
+
+@keyframes drawCheck {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
 </style>
 </head>
 <body>
@@ -595,11 +619,15 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.2
+   RUBY MARKETS 3.3
    ========================================================= */
 const START_CASH = 10000;
 const SAVE_KEY   = 'rubyMarket_v3';
 const HISTORY_LEN = 60;
+
+// SVG Icons for Toasts
+const SVG_CHECK = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
+const SVG_CROSS = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
 const COINS = [
   { id:'xau',  name:'طلا',      sym:'XAU',  icon:'🥇', base:240,   vol:0.020 },
@@ -661,9 +689,29 @@ const coinById = id => market.find(m => m.id === id);
 function toast(msg, type){
   const el = document.createElement('div');
   el.className = 'toast' + (type ? ' ' + type : '');
-  el.textContent = msg;
+  
+  // حذف ایموجی‌های تکراری از ابتدای متن (چون به جاش تیک انیمیشنی گذاشتیم)
+  const cleanMsg = msg.replace(/^[^\p{L}\p{N}\s.:()\-FC]+/u, '').trim();
+  
+  if (type === 'good' || type === 'bad') {
+    el.innerHTML = `
+      <div class="toast-icon-wrap">
+        ${type === 'good' ? SVG_CHECK : SVG_CROSS}
+      </div>
+      <span>${cleanMsg}</span>
+    `;
+  } else {
+    el.textContent = msg;
+  }
+  
   $('toasts').appendChild(el);
-  setTimeout(() => { el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(10px)'; }, 2200);
+  
+  // انیمیشن خروج
+  setTimeout(() => { 
+    el.style.transition = 'all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.3)'; 
+    el.style.opacity = '0'; 
+    el.style.transform = 'translateY(-20px) scale(0.9)'; 
+  }, 2200);
   setTimeout(() => el.remove(), 2600);
 }
 
