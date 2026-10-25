@@ -16,7 +16,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.8 — Beautiful Icons & Fixed Ranges
+   RUBY MARKETS 4.0 — Pro SVG Icons & Save System
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -132,7 +132,7 @@ header{
 }
 .featured-tag{ background:linear-gradient(135deg,var(--accent-2),#ff9a1f); color:#2a0712; font-size:10px; font-weight:800; padding:4px 10px; border-radius:100px; white-space:nowrap; justify-self:start; }
 .featured-coin{ display:flex; align-items:center; gap:10px; min-width:0; grid-row:2; }
-.featured-icon{ width:36px; height:36px; font-size:18px; display:grid; place-items:center; border-radius:50%; border:1.5px solid var(--icon-color); box-shadow: 0 0 15px -3px var(--icon-color); background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2); }
+.featured-icon{ width:36px; height:36px; display:grid; place-items:center; flex-shrink:0; }
 .featured-name b{ display:block; font-size:13px; font-weight:600; }
 .featured-name span{ font-family:var(--mono); font-size:10px; color:var(--mut); }
 .featured-price{ font-family:var(--mono); font-size:16px; font-weight:700; text-align:left; grid-column:2; grid-row:1; }
@@ -187,16 +187,40 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .coin:active{ transform:scale(.97); }
 .coin-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 
-/* آیکون‌های شیشه‌ای و درخشان */
-.coin-icon{ 
-  font-size:16px; width:38px; height:38px; display:grid; place-items:center; 
-  border-radius:50%; flex-shrink:0; 
-  border: 1px solid var(--icon-color);
-  box-shadow: 0 0 15px -3px var(--icon-color), inset 0 0 10px rgba(255,255,255,0.1);
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* =========================================
+   CUSTOM SVG ICON STYLING (PRO LOOK)
+   ========================================= */
+.coin-icon {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.3);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px -4px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.1);
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.3s;
 }
-.coin:hover .coin-icon { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 25px -2px var(--icon-color); }
+.coin:hover .coin-icon {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(0,0,0,0.9), inset 0 2px 4px rgba(255,255,255,0.2);
+}
+.coin-icon svg {
+  width: 26px; height: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+/* Glow effect behind icon */
+.coin-icon::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: var(--icon-color);
+  opacity: 0.3;
+  filter: blur(10px);
+  z-index: -1;
+  transition: opacity 0.3s;
+}
+.coin:hover .coin-icon::before { opacity: 0.6; }
 
 .coin-name{ display:flex; flex-direction:column; line-height:1.2; min-width:0; flex:1; }
 .coin-name b{ font-size:12.5px; font-weight:600; }
@@ -235,7 +259,8 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .alloc-seg{ height:100%; }
 .hold-item{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:12px; }
 .hold-item:last-child{ border-bottom:none; }
-.hold-item .hi-ic{ font-size:16px; width:34px; height:34px; display:grid; place-items:center; border-radius:50%; border: 1px solid var(--icon-color); box-shadow: inset 0 0 10px var(--icon-color); background: rgba(0,0,0,0.2); }
+.hold-item .hi-ic{ width:34px; height:34px; display:grid; place-items:center; background:rgba(0,0,0,0.2); border-radius:50%; }
+.hold-item .hi-ic svg{ width:22px; height:22px; }
 .hold-item .hi-main{ flex:1; min-width:0; }
 .hold-item .hi-main b{ display:block; font-size:12px; font-weight:600; }
 .hold-item .hi-main span{ font-family:var(--mono); font-size:10px; color:var(--mut); }
@@ -305,7 +330,8 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 @keyframes pop{ from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1} }
 .close{ position:absolute; top:12px; left:12px; background:var(--panel-3); border:none; color:var(--mut); width:30px; height:30px; border-radius:var(--r-sm); cursor:pointer; font-size:14px; }
 .m-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-.m-icon{ font-size:24px; width:50px; height:50px; display:grid; place-items:center; border-radius:16px; border:1.5px solid var(--icon-color); box-shadow: 0 0 20px -4px var(--icon-color); background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2); }
+.m-icon{ width:50px; height:50px; display:grid; place-items:center; }
+.m-icon svg{ width:34px; height:34px; }
 .m-name{ font-size:15px; font-weight:600; display:flex; align-items:center; gap:6px; }
 .m-name small{ color:var(--mut); font-family:var(--mono); font-size:10px; }
 .m-price{ display:flex; align-items:baseline; gap:8px; margin-top:2px; }
@@ -396,7 +422,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
   <div class="featured" id="featured">
     <div class="featured-tag">TOP MOVER</div>
     <div class="featured-coin">
-      <div class="featured-icon" id="featIcon">🥇</div>
+      <div class="featured-icon" id="featIcon"></div>
       <div class="featured-name"><b id="featName">—</b><span id="featSym">—</span></div>
     </div>
     <div class="featured-price" id="featPrice">—</div>
@@ -450,7 +476,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
   <div class="sheet">
     <button class="close" id="closeModal">✕</button>
     <div class="m-head">
-      <div class="m-icon" id="mIcon">🥇</div>
+      <div class="m-icon" id="mIcon"></div>
       <div>
         <div class="m-name" id="mName">—</div>
         <div class="m-price"><b id="mPrice">0</b><span class="chg" id="mChg">0%</span></div>
@@ -496,28 +522,36 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.8
+   RUBY MARKETS 4.0
    ========================================================= */
 const START_CASH = 100000;
-const SAVE_KEY   = 'rubyMarket_v4';
+const SAVE_KEY   = 'rubyMarket_v5'; // کلید نسخه جدید برای ذخیره‌سازی
 const HISTORY_LEN = 60;
 
 const SVG_CHECK = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
 const SVG_CROSS = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
-/* 
-  ارزها با کف، سقف و رنگ اختصاصی برای آیکون
-  تتر اصلاح شد (کف 10K سقف 50K)
-*/
+// آیکون‌های SVG فوق‌العاده باکیفیت برای هر دارایی
+const ASSET_ICONS = {
+  xau: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#FFA500"/><stop offset="100%" stop-color="#B8860B"/></linearGradient></defs><path d="M4 10h16v8H4z" fill="url(#goldG)"/><path d="M6 6h12l2 4H4l2-4z" fill="#FFEA00"/><rect x="8" y="12" width="8" height="4" rx="1" fill="#fff" opacity="0.3"/></svg>`,
+  xag: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="silverG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0E0E0"/><stop offset="100%" stop-color="#9E9E9E"/></linearGradient></defs><path d="M4 10h16v8H4z" fill="url(#silverG)"/><path d="M6 6h12l2 4H4l2-4z" fill="#F5F5F5"/><rect x="8" y="12" width="8" height="4" rx="1" fill="#fff" opacity="0.4"/></svg>`,
+  usd: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="20" height="12" rx="2" fill="#2ECC71"/><path d="M12 8v8m-2-6h3a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3h3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`,
+  eur: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="20" height="12" rx="2" fill="#3498DB"/><path d="M14 9.5a4 4 0 00-4 0M8 12h6m-6 2h6m-2.5 2.5a4 4 0 01-4 0" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  usdt: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#26A17B"/><path d="M14.5 7h-5v2h2v1c-2 .1-3.5.5-3.5 1s1.5.9 3.5 1v4h2v-4c2-.1 3.5-.5 3.5-1s-1.5-.9-3.5-1V9h2V7z" fill="#fff"/></svg>`,
+  btc: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#F7931A"/><path d="M15.5 11c.3-1.5-.6-2.5-1.9-2.8l.4-1.6-1.2-.3-.4 1.6c-.3-.1-.6-.1-.9-.2l.4-1.6-1.2-.3-.4 1.6-1.8-.4-.3 1.3s.9.2.9.2c.5.1.6.5.5 1l-.6 2.4c0 .1-.1.2-.1.3l-1 3.8c-.1.2-.2.4-.5.3 0 0-.9-.2-.9-.2l-.5 1.4 1.7.4c.3.1.6.1.9.2l-.4 1.6 1.2.3.4-1.6c.3.1.6.1.9.2l-.4 1.6 1.2.3.4-1.6c1.8.3 3.1.2 3.6-1.4.4-1.3-.1-2-1-2.5.7-.2 1.3-.7 1.5-1.7zm-2.6 3.4c-.3 1.3-2.5.6-3.2.4l.6-2.4c.7.2 3 .5 2.6 2zm.3-3.6c-.3 1.2-2.1.6-2.7.4l.5-2.1c.6.2 2.5.4 2.2 1.7z" fill="#fff"/></svg>`,
+  eth: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#627EEA"/><path d="M12 3v13.5l6-3.5L12 3z" fill="#fff" opacity=".6"/><path d="M12 3L6 13l6 3.5V3z" fill="#fff"/><path d="M12 16.5v4.5l6-7.5-6 3z" fill="#fff" opacity=".6"/><path d="M12 21v-4.5l-6-3 6 7.5z" fill="#fff"/></svg>`,
+  oil: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#8E44AD" opacity=".4"/><path d="M12 4c-4 5-5 8-5 11a5 5 0 0010 0c0-3-1-6-5-11z" fill="#8E44AD"/><path d="M12 8c-2 3-2.5 5-2.5 7a2.5 2.5 0 005 0c0-2-.5-4-2.5-7z" fill="#9B59B6"/></svg>`
+};
+
 const COINS = [
-  { id:'xau',  name:'طلا',      sym:'XAU',  icon:'🪙', base:45000,  min:10000, max:100000, vol:0.020, color:'#ffd700' },
-  { id:'xag',  name:'نقره',     sym:'XAG',  icon:'🥈', base:22000,  min:5000,  max:50000,  vol:0.030, color:'#c0c0c0' },
-  { id:'usd',  name:'دلار',     sym:'USD',  icon:'💵', base:32000,  min:15000, max:60000,  vol:0.012, color:'#2ecc71' },
-  { id:'eur',  name:'یورو',     sym:'EUR',  icon:'💶', base:40000,  min:18000, max:75000,  vol:0.015, color:'#3498db' },
-  { id:'usdt', name:'تتر',      sym:'USDT', icon:'💎', base:15000,  min:10000, max:50000,  vol:0.005, color:'#26a17b' },
-  { id:'btc',  name:'بیت‌کوین',  sym:'BTC',  icon:'🟠', base:90000,  min:20000, max:200000, vol:0.055, color:'#f7931a' },
-  { id:'eth',  name:'اتریوم',    sym:'ETH',  icon:'💠', base:12000,  min:3000,  max:30000,  vol:0.060, color:'#627eea' },
-  { id:'oil',  name:'نفت',      sym:'OIL',  icon:'🛢️', base:5000,   min:1500,  max:12000,  vol:0.045, color:'#8e44ad' },
+  { id:'xau',  name:'طلا',      sym:'XAU',  base:45000,  min:10000, max:100000, vol:0.020, color:'#FFD700' },
+  { id:'xag',  name:'نقره',     sym:'XAG',  base:22000,  min:5000,  max:50000,  vol:0.030, color:'#C0C0C0' },
+  { id:'usd',  name:'دلار',     sym:'USD',  base:32000,  min:15000, max:60000,  vol:0.012, color:'#2ECC71' },
+  { id:'eur',  name:'یورو',     sym:'EUR',  base:40000,  min:18000, max:75000,  vol:0.015, color:'#3498DB' },
+  { id:'usdt', name:'تتر',      sym:'USDT', base:15000,  min:10000, max:50000,  vol:0.005, color:'#26A17B' },
+  { id:'btc',  name:'بیت‌کوین',  sym:'BTC',  base:90000,  min:20000, max:200000, vol:0.055, color:'#F7931A' },
+  { id:'eth',  name:'اتریوم',    sym:'ETH',  base:12000,  min:3000,  max:30000,  vol:0.060, color:'#627EEA' },
+  { id:'oil',  name:'نفت',      sym:'OIL',  base:5000,   min:1500,  max:12000,  vol:0.045, color:'#8E44AD' },
 ];
 
 const AVATARS = ['💎','🔮','🦊','🐉','🦅','👽','🤖','🦁','🐯','🦉','🐺','🐻','👑','🗿'];
@@ -739,10 +773,9 @@ function buildMarket(){
     const el = document.createElement('div');
     el.className = 'coin';
     el.dataset.id = m.id;
-    // استفاده از متغیر رنگ برای آیکون
     el.innerHTML = `
       <div class="coin-head">
-        <div class="coin-icon" style="--icon-color: ${m.color}">${m.icon}</div>
+        <div class="coin-icon" style="--icon-color: ${m.color}">${ASSET_ICONS[m.id]}</div>
         <div class="coin-name"><b>${m.name}</b><span>${m.sym}</span></div>
         <button class="star-btn ${m.watch?'on':''}" data-star="${m.id}">${m.watch?'★':'☆'}</button>
       </div>
@@ -771,7 +804,8 @@ function buildTicker(){
   tickerMap = {}; market.forEach(m => tickerMap[m.id] = []);
   const nodes = market.map(m => {
     const el = document.createElement('span'); el.className = 'tk'; el.dataset.id = m.id;
-    el.innerHTML = `${m.icon} ${m.sym} <b>0</b> <i>0%</i>`; return el;
+    el.innerHTML = `<span style="display:inline-block;width:12px;height:12px;vertical-align:middle;margin-right:4px">${ASSET_ICONS[m.id]}</span> ${m.sym} <b>0</b> <i>0%</i>`; 
+    return el;
   });
   nodes.forEach(n => track.appendChild(n)); nodes.forEach(n => track.appendChild(n.cloneNode(true)));
   track.querySelectorAll('.tk').forEach(el => tickerMap[el.dataset.id].push(el));
@@ -819,8 +853,7 @@ function renderFast(){
   let best = null, bestAbs = -1;
   market.forEach(m => { const a = Math.abs(m.chg); if (a > bestAbs) { bestAbs = a; best = m; } });
   if (best) {
-    $('featIcon').textContent = best.icon; 
-    $('featIcon').style.setProperty('--icon-color', best.color);
+    $('featIcon').innerHTML = ASSET_ICONS[best.id];
     $('featName').textContent = best.name; $('featSym').textContent = best.sym;
     $('featPrice').textContent = fmtPrice(best.price);
     const chgEl = $('featChg'); chgEl.textContent = (best.chg >= 0 ? '▲ +' : '▼ ') + Math.abs(best.chg).toFixed(2) + '%';
@@ -854,7 +887,7 @@ function renderPortfolio(){
   html += entries.map(([id, h]) => {
     const m = coinById(id); if (!m) return '';
     const val = h.qty * m.price; const cost = h.qty * h.avg; const p = ((val - cost) / (cost || 1)) * 100;
-    return `<div class="hold-item"><div class="hi-ic" style="--icon-color:${m.color}">${m.icon}</div><div class="hi-main"><b>${m.name}</b><span>${h.qty.toFixed(3)} ${m.sym} · ${fmtPrice(m.price)}</span></div><div class="hi-val"><b>${fmtMoney(val)}</b><span class="${p>=0?'up':'down'}">${p>=0?'+':''}${p.toFixed(1)}%</span></div></div>`;
+    return `<div class="hold-item"><div class="hi-ic" style="filter: drop-shadow(0 0 8px ${m.color}66)">${ASSET_ICONS[m.id]}</div><div class="hi-main"><b>${m.name}</b><span>${h.qty.toFixed(3)} ${m.sym} · ${fmtPrice(m.price)}</span></div><div class="hi-val"><b>${fmtMoney(val)}</b><span class="${p>=0?'up':'down'}">${p>=0?'+':''}${p.toFixed(1)}%</span></div></div>`;
   }).join('');
 
   if (trades.length) {
@@ -965,7 +998,15 @@ function sell(m, qty){
 
 function addXp(amount){ const prevLevel = calcLevel(state.xp); state.xp += amount; const newLevel = calcLevel(state.xp); if (newLevel > prevLevel) { setTimeout(() => { toast(`🎉 لِوِل آپ! رسیدی به لِوِل ${newLevel}`, 'levelup'); }, 400); } }
 
-function openModal(id){ activeId = id; mode = 'buy'; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'buy')); $('qty').value = ''; $('modal').hidden = false; const m = coinById(id); if (!m) return; $('mIcon').textContent = m.icon; $('mIcon').style.setProperty('--icon-color', m.color); $('mName').innerHTML = `${m.name} <small>${m.sym}</small>`; updateActionButton(); renderFast(); }
+function openModal(id){ 
+  activeId = id; mode = 'buy'; 
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'buy')); 
+  $('qty').value = ''; $('modal').hidden = false; 
+  const m = coinById(id); if (!m) return; 
+  $('mIcon').innerHTML = ASSET_ICONS[m.id]; 
+  $('mName').innerHTML = `${m.name} <small>${m.sym}</small>`; 
+  updateActionButton(); renderFast(); 
+}
 function closeModal(){ activeId = null; $('modal').hidden = true; }
 function updateActionButton(){ const btn = $('actionBtn'); btn.className = 'action ' + mode; btn.innerHTML = (mode === 'buy' ? ICON_UP : ICON_DOWN) + `<span>${mode === 'buy' ? 'خرید' : 'فروش'}</span>`; }
 
