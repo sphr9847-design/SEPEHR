@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>پیاده‌روی در طبیعت — HDR</title>
+<title>سپی — پیاده‌روی در طبیعت</title>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#05080c;
     font-family:"Segoe UI",Tahoma,system-ui,sans-serif;color:#dbe9f5}
@@ -40,8 +40,8 @@
 
 <div id="overlay">
   <div class="card">
-    <h1>پیاده‌روی در طبیعت</h1>
-    <p class="sub">دموی سه‌بعدی — HDR + Three.js</p>
+    <h1>سپی</h1>
+    <p class="sub">پیاده‌روی در طبیعت — HDR + Three.js</p>
     <ul class="keys">
       <li><b>W A S D</b><span>حرکت</span></li>
       <li><b>Shift</b><span>دویدن</span></li>
@@ -59,8 +59,8 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    "three": "https://esm.sh/three@0.160.0",
+    "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
   }
 }
 </script>
@@ -84,7 +84,7 @@ function tryEnableStart() {
 }
 
 /* ============================================================
-   1) RENDERER
+   RENDERER
    ============================================================ */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
@@ -105,7 +105,7 @@ camera.position.set(0, 4, 12);
 const uTime = { value: 0 };
 
 /* ============================================================
-   2) NOISE
+   NOISE
    ============================================================ */
 function hash2(x, y) {
   const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
@@ -140,12 +140,10 @@ function terrainHeight(x, z) {
 }
 
 /* ============================================================
-   3) HDR محیطی + نور خورشید
+   HDR + نور
    ============================================================ */
-// جهت دستی خورشید برای سایه‌ها
 const sunDir = new THREE.Vector3(0.4, 0.7, 0.5).normalize();
 
-// نور جهت‌دار اصلی (سایه‌ساز)
 const sun = new THREE.DirectionalLight(0xfff0d6, 3.1);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -159,10 +157,8 @@ sun.shadow.bias = -0.0006;
 sun.shadow.normalBias = 0.035;
 scene.add(sun, sun.target);
 
-// نور محیطی مکمل
 scene.add(new THREE.HemisphereLight(0xbcd8ff, 0x3d4a28, 0.25));
 
-// بارگذاری HDR
 const hdrUrl = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_puresky_1k.hdr';
 
 new RGBELoader().load(
@@ -178,7 +174,6 @@ new RGBELoader().load(
     scene.environment = envMap;
     scene.background  = envMap;
     scene.backgroundBlurriness = 0.06;
-    scene.fog.color.set(0x9ec1d6);
 
     hdrTexture.dispose();
     pmrem.dispose();
@@ -196,7 +191,7 @@ new RGBELoader().load(
 );
 
 /* ============================================================
-   4) زمین
+   زمین
    ============================================================ */
 const SEG = 300;
 const groundGeo = new THREE.PlaneGeometry(WORLD, WORLD, SEG, SEG);
@@ -236,7 +231,7 @@ ground.receiveShadow = true;
 scene.add(ground);
 
 /* ============================================================
-   5) چمن اینستنسی با موج باد
+   چمن
    ============================================================ */
 const BLADE_H = 0.85;
 const bladeGeo = new THREE.BufferGeometry();
@@ -325,7 +320,7 @@ grass.receiveShadow = true;
 scene.add(grass);
 
 /* ============================================================
-   6) درخت‌ها و صخره‌ها
+   درخت‌ها و صخره‌ها
    ============================================================ */
 const trunkGeo = new THREE.CylinderGeometry(0.15, 0.34, 1, 7, 1);
 trunkGeo.translate(0, 0.5, 0);
@@ -416,7 +411,7 @@ rocks.frustumCulled = false;
 scene.add(rocks);
 
 /* ============================================================
-   7) شخصیت
+   شخصیت
    ============================================================ */
 const MODEL_YAW_OFFSET = Math.PI;
 const MODEL_SCALE = 1.0;
@@ -453,7 +448,7 @@ function playAction(name, fade = 0.22) {
 }
 
 /* ============================================================
-   8) کنترل بازیکن + دوربین
+   کنترل بازیکن + دوربین
    ============================================================ */
 const player = {
   pos: new THREE.Vector3(0, 0, 0),
@@ -497,7 +492,7 @@ addEventListener('resize', () => {
 });
 
 /* ============================================================
-   9) حلقه اصلی
+   حلقه اصلی
    ============================================================ */
 const clock = new THREE.Clock();
 const fwd = new THREE.Vector3();
@@ -603,7 +598,7 @@ function tick() {
 }
 
 /* ============================================================
-   10) راه‌اندازی
+   راه‌اندازی
    ============================================================ */
 (async function init() {
   renderer.setAnimationLoop(tick);
