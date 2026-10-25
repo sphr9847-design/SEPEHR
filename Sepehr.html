@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>پیاده‌روی در طبیعت — Three.js</title>
+<title>پیاده‌روی در طبیعت — HDR</title>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#05080c;
     font-family:"Segoe UI",Tahoma,system-ui,sans-serif;color:#dbe9f5}
@@ -41,7 +41,7 @@
 <div id="overlay">
   <div class="card">
     <h1>پیاده‌روی در طبیعت</h1>
-    <p class="sub">دموی سه‌بعدی — Three.js + WebGL2</p>
+    <p class="sub">دموی سه‌بعدی — HDR + Three.js</p>
     <ul class="keys">
       <li><b>W A S D</b><span>حرکت</span></li>
       <li><b>Shift</b><span>دویدن</span></li>
@@ -68,11 +68,20 @@
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Sky } from 'three/addons/objects/Sky.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 const overlay = document.getElementById('overlay');
 const playBtn = document.getElementById('playBtn');
 const errEl   = document.getElementById('err');
+
+let hdrReady  = false;
+let charReady = false;
+function tryEnableStart() {
+  if (hdrReady && charReady) {
+    playBtn.disabled = false;
+    playBtn.textContent = 'شروع';
+  }
+}
 
 /* ============================================================
    1) RENDERER
@@ -83,10 +92,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.58;
+renderer.toneMappingExposure = 0.85;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9ec1d6);
 scene.fog = new THREE.FogExp2(0x9ec1d6, 0.0048);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 3000);
@@ -119,45 +129,23 @@ function fbm(x, y, oct = 4) {
   return s / norm;
 }
 
-/* ارتفاع زمین — هم برای ساخت مش و هم برای فیزیک */
 const WORLD = 560;
 function terrainHeight(x, z) {
   const s = 0.0042;
   let h = fbm(x * s + 12.3, z * s + 5.7, 5) * 64 - 26;
   h += fbm(x * s * 4.3 + 81.1, z * s * 4.3 + 41.9, 3) * 6.5;
   h += fbm(x * s * 12.0 + 3.3, z * s * 12.0 + 77.2, 2) * 1.4;
-  // صاف کردن ناحیه شروع
   h *= THREE.MathUtils.smoothstep(Math.hypot(x, z), 14, 72);
   return h;
 }
 
 /* ============================================================
-   3) آسمان + نور + محیط (IBL)
+   3) HDR محیطی + نور خورشید
    ============================================================ */
-const sky = new Sky();
-sky.scale.setScalar(20000);
-const su = sky.material.uniforms;
-su.turbidity.value = 6.5;
-su.rayleigh.value = 2.4;
-su.mieCoefficient.value = 0.004;
-su.mieDirectionalG.value = 0.82;
+// جهت دستی خورشید برای سایه‌ها
+const sunDir = new THREE.Vector3(0.4, 0.7, 0.5).normalize();
 
-const sunDir = new THREE.Vector3().setFromSphericalCoords(
-  1,
-  THREE.MathUtils.degToRad(90 - 13),          // ارتفاع خورشید
-  THREE.MathUtils.degToRad(140)                // آزیموت
-);
-su.sunPosition.value.copy(sunDir);
-
-// ساخت Environment Map از آسمان → رفلکشن و نور محیطی PBR
-const pmrem = new THREE.PMREMGenerator(renderer);
-pmrem.compileEquirectangularShader();
-const envScene = new THREE.Scene();
-envScene.add(sky);
-scene.environment = pmrem.fromScene(envScene).texture;
-scene.add(sky);          // از envScene خارج و به صحنه اصلی منتقل می‌شود
-pmrem.dispose();
-
+// نور جهت‌دار اصلی (سایه‌ساز)
 const sun = new THREE.DirectionalLight(0xfff0d6, 3.1);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -171,7 +159,41 @@ sun.shadow.bias = -0.0006;
 sun.shadow.normalBias = 0.035;
 scene.add(sun, sun.target);
 
-scene.add(new THREE.HemisphereLight(0xbcd8ff, 0x3d4a28, 0.45));
+// نور محیطی مکمل
+scene.add(new THREE.HemisphereLight(0xbcd8ff, 0x3d4a28, 0.25));
+
+// بارگذاری HDR
+const hdrUrl = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_puresky_1k.hdr';
+
+new RGBELoader().load(
+  hdrUrl,
+  (hdrTexture) => {
+    hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+    hdrTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    const envMap = pmrem.fromEquirectangular(hdrTexture).texture;
+
+    scene.environment = envMap;
+    scene.background  = envMap;
+    scene.backgroundBlurriness = 0.06;
+    scene.fog.color.set(0x9ec1d6);
+
+    hdrTexture.dispose();
+    pmrem.dispose();
+
+    hdrReady = true;
+    tryEnableStart();
+  },
+  undefined,
+  (err) => {
+    console.warn('HDR بارگذاری نشد، ادامه بدون HDR:', err);
+    errEl.textContent = 'HDR بارگذاری نشد — ادامه با آسمان ساده.';
+    hdrReady = true;
+    tryEnableStart();
+  }
+);
 
 /* ============================================================
    4) زمین
@@ -187,7 +209,6 @@ for (let i = 0; i < gPos.count; i++) {
 }
 groundGeo.computeVertexNormals();
 
-// رنگ‌آمیزی بر اساس شیب و ارتفاع
 const gNrm = groundGeo.attributes.normal;
 const colors = new Float32Array(gPos.count * 3);
 const cGrass = new THREE.Color(0x53783a);
@@ -275,7 +296,6 @@ grass.receiveShadow = true;
     const r = Math.sqrt(Math.random()) * GRASS_RADIUS;
     const x = Math.cos(a) * r, z = Math.sin(a) * r;
 
-    // شیب
     const e = 0.7;
     nrm.set(
       terrainHeight(x - e, z) - terrainHeight(x + e, z),
@@ -323,7 +343,7 @@ const leafGeo = new THREE.IcosahedronGeometry(1, 1);
 
 const TREES = 130;
 const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.95 });
-const leafMat  = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, flatShading: false });
+const leafMat  = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85 });
 
 const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, TREES);
 const leaves = new THREE.InstancedMesh(leafGeo, leafMat, TREES * 3);
@@ -373,7 +393,6 @@ leaves.frustumCulled = false;
 }
 scene.add(trunks, leaves);
 
-// صخره‌ها
 const ROCK_COUNT = 110;
 const rockGeo = new THREE.DodecahedronGeometry(1, 0);
 const rockMat = new THREE.MeshStandardMaterial({ color: 0x7a7a72, roughness: 0.92, flatShading: true });
@@ -399,8 +418,8 @@ scene.add(rocks);
 /* ============================================================
    7) شخصیت
    ============================================================ */
-const MODEL_YAW_OFFSET = Math.PI;  // اگر کاراکتر پشت‌به‌حرکت بود → 0
-const MODEL_SCALE = 1.0;           // قد مدل حدود ۱.۸ متر
+const MODEL_YAW_OFFSET = Math.PI;
+const MODEL_SCALE = 1.0;
 
 const avatar = new THREE.Group();
 scene.add(avatar);
@@ -495,7 +514,6 @@ function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
   uTime.value += dt;
 
-  /* ---- ورودی ---- */
   const f = (keys.has('KeyW') || keys.has('ArrowUp')    ? 1 : 0)
           - (keys.has('KeyS') || keys.has('ArrowDown')  ? 1 : 0);
   const r = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0)
@@ -508,14 +526,12 @@ function tick() {
   wish.set(0, 0, 0).addScaledVector(fwd, f).addScaledVector(rgt, r);
   if (wish.lengthSq() > 0) wish.normalize();
 
-  /* ---- فیزیک افقی ---- */
   const maxSpeed = running ? 7.2 : 3.1;
   const accel = player.onGround ? 13 : 3.5;
   const k = 1 - Math.exp(-accel * dt);
   player.vel.x += (wish.x * maxSpeed - player.vel.x) * k;
   player.vel.z += (wish.z * maxSpeed - player.vel.z) * k;
 
-  /* ---- پرش و گرانش ---- */
   const wasGrounded = player.onGround;
   if (keys.has('Space') && player.onGround) {
     player.vel.y = 7.6;
@@ -525,14 +541,12 @@ function tick() {
 
   player.pos.addScaledVector(player.vel, dt);
 
-  /* ---- برخورد با زمین ---- */
   const gh = terrainHeight(player.pos.x, player.pos.z);
   if (player.pos.y <= gh + 0.02) {
     player.pos.y = gh;
     if (player.vel.y < 0) player.vel.y = 0;
     player.onGround = true;
   } else if (wasGrounded && player.vel.y <= 0 && player.pos.y - gh < 0.9) {
-    // چسبیدن به زمین در سراشیبی
     player.pos.y = gh;
     player.vel.y = 0;
     player.onGround = true;
@@ -540,7 +554,6 @@ function tick() {
     player.onGround = false;
   }
 
-  // مرز دنیا
   const rad = Math.hypot(player.pos.x, player.pos.z);
   if (rad > 235) {
     const s = 235 / rad;
@@ -548,7 +561,6 @@ function tick() {
     player.vel.x *= 0.4; player.vel.z *= 0.4;
   }
 
-  /* ---- شخصیت ---- */
   avatar.position.copy(player.pos);
   const speed = Math.hypot(player.vel.x, player.vel.z);
   if (speed > 0.35) {
@@ -569,7 +581,6 @@ function tick() {
     mixer.update(dt);
   }
 
-  /* ---- دوربین سوم‌شخص ---- */
   camTarget.copy(player.pos).add(new THREE.Vector3(0, 1.55, 0));
   const cosP = Math.cos(cam.pitch);
   camPos.set(
@@ -578,14 +589,12 @@ function tick() {
     Math.cos(cam.yaw) * cosP
   ).multiplyScalar(cam.dist).add(camTarget);
 
-  // جلوگیری از عبور دوربین از زمین
   const camGround = terrainHeight(camPos.x, camPos.z) + 1.2;
   if (camPos.y < camGround) camPos.y = camGround;
 
   camera.position.lerp(camPos, 1 - Math.exp(-14 * dt));
   camera.lookAt(camTarget);
 
-  /* ---- سایه دنبال بازیکن ---- */
   sun.position.copy(player.pos).add(sunOffset);
   sun.target.position.copy(player.pos);
   sun.target.updateMatrixWorld();
@@ -622,13 +631,13 @@ function tick() {
     }
     if (actions.Idle) { actions.Idle.play(); currentAction = actions.Idle; }
 
-    playBtn.disabled = false;
-    playBtn.textContent = 'شروع';
+    charReady = true;
+    tryEnableStart();
   } catch (e) {
     console.error(e);
-    errEl.textContent = 'مدل شخصیت بارگذاری نشد. اتصال اینترنت را بررسی کن.';
-    playBtn.disabled = false;
-    playBtn.textContent = 'ادامه بدون شخصیت';
+    errEl.textContent = 'مدل شخصیت بارگذاری نشد — ادامه بدون شخصیت.';
+    charReady = true;
+    tryEnableStart();
   }
 })();
 </script>
