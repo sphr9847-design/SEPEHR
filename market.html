@@ -16,7 +16,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.6 — Range Bound Assets (Fixed)
+   RUBY MARKETS 3.8 — Beautiful Icons & Fixed Ranges
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -132,7 +132,7 @@ header{
 }
 .featured-tag{ background:linear-gradient(135deg,var(--accent-2),#ff9a1f); color:#2a0712; font-size:10px; font-weight:800; padding:4px 10px; border-radius:100px; white-space:nowrap; justify-self:start; }
 .featured-coin{ display:flex; align-items:center; gap:10px; min-width:0; grid-row:2; }
-.featured-icon{ width:36px; height:36px; font-size:18px; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius:50%; border:1.5px solid rgba(255,45,85,.4); }
+.featured-icon{ width:36px; height:36px; font-size:18px; display:grid; place-items:center; border-radius:50%; border:1.5px solid var(--icon-color); box-shadow: 0 0 15px -3px var(--icon-color); background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2); }
 .featured-name b{ display:block; font-size:13px; font-weight:600; }
 .featured-name span{ font-family:var(--mono); font-size:10px; color:var(--mut); }
 .featured-price{ font-family:var(--mono); font-size:16px; font-weight:700; text-align:left; grid-column:2; grid-row:1; }
@@ -186,7 +186,18 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .coin{ background: radial-gradient(300px 120px at 50% 0%, rgba(255,45,85,.05) 0%, transparent 60%), linear-gradient(180deg,var(--panel-2) 0%,var(--panel) 100%); border:1px solid var(--line); border-radius:var(--r-lg); padding:13px; cursor:pointer; position:relative; overflow:hidden; transition:transform .2s; contain:content; }
 .coin:active{ transform:scale(.97); }
 .coin-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.coin-icon{ font-size:16px; width:34px; height:34px; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius:50%; border:1px solid rgba(255,45,85,.25); flex-shrink:0; }
+
+/* آیکون‌های شیشه‌ای و درخشان */
+.coin-icon{ 
+  font-size:16px; width:38px; height:38px; display:grid; place-items:center; 
+  border-radius:50%; flex-shrink:0; 
+  border: 1px solid var(--icon-color);
+  box-shadow: 0 0 15px -3px var(--icon-color), inset 0 0 10px rgba(255,255,255,0.1);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.coin:hover .coin-icon { transform: scale(1.1) rotate(5deg); box-shadow: 0 0 25px -2px var(--icon-color); }
+
 .coin-name{ display:flex; flex-direction:column; line-height:1.2; min-width:0; flex:1; }
 .coin-name b{ font-size:12.5px; font-weight:600; }
 .coin-name span{ font-family:var(--mono); font-size:8.5px; letter-spacing:1px; color:var(--mut); }
@@ -199,19 +210,7 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .chg.up{ background:var(--up-soft); color:var(--up); }
 .chg.down{ background:var(--dn-soft); color:var(--dn); }
 
-/* H/L Row */
-.hl-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 5px;
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--mut);
-  opacity: 0.7;
-  letter-spacing: 0.1px;
-  line-height: 1.4;
-}
+.hl-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; font-family: var(--mono); font-size: 9px; color: var(--mut); opacity: 0.7; letter-spacing: 0.1px; line-height: 1.4; }
 .hl-row span { white-space: nowrap; }
 .hl-row b { font-weight: 700; opacity: 0.85; }
 
@@ -236,7 +235,7 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .alloc-seg{ height:100%; }
 .hold-item{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:12px; }
 .hold-item:last-child{ border-bottom:none; }
-.hold-item .hi-ic{ font-size:16px; width:32px; height:32px; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius:50%; }
+.hold-item .hi-ic{ font-size:16px; width:34px; height:34px; display:grid; place-items:center; border-radius:50%; border: 1px solid var(--icon-color); box-shadow: inset 0 0 10px var(--icon-color); background: rgba(0,0,0,0.2); }
 .hold-item .hi-main{ flex:1; min-width:0; }
 .hold-item .hi-main b{ display:block; font-size:12px; font-weight:600; }
 .hold-item .hi-main span{ font-family:var(--mono); font-size:10px; color:var(--mut); }
@@ -253,10 +252,6 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 .trade-badge.sell{ background:var(--dn-soft); color:var(--dn); }
 .trade-main{ flex:1; font-family:var(--mono); }
 .trade-pnl{ font-family:var(--mono); font-weight:600; }
-
-.news-item{ font-size:12px; padding:10px 0; border-bottom:1px solid var(--line-soft); color:var(--txt-2); line-height:1.7; }
-.news-item:last-child{ border-bottom:none; }
-.news-item .nt{ font-family:var(--mono); font-size:10px; color:var(--mut); margin-left:6px; }
 
 #view-rank .panel { max-width: 850px; margin: 0 auto; padding: 24px 20px; }
 .rank-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
@@ -310,7 +305,7 @@ main{ max-width:1440px; margin:0 auto; padding:16px; }
 @keyframes pop{ from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1} }
 .close{ position:absolute; top:12px; left:12px; background:var(--panel-3); border:none; color:var(--mut); width:30px; height:30px; border-radius:var(--r-sm); cursor:pointer; font-size:14px; }
 .m-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-.m-icon{ font-size:24px; width:46px; height:46px; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#4a1424,#22060f 80%); border-radius:14px; border:1.5px solid rgba(255,45,85,.3); }
+.m-icon{ font-size:24px; width:50px; height:50px; display:grid; place-items:center; border-radius:16px; border:1.5px solid var(--icon-color); box-shadow: 0 0 20px -4px var(--icon-color); background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%), rgba(0,0,0,0.2); }
 .m-name{ font-size:15px; font-weight:600; display:flex; align-items:center; gap:6px; }
 .m-name small{ color:var(--mut); font-family:var(--mono); font-size:10px; }
 .m-price{ display:flex; align-items:baseline; gap:8px; margin-top:2px; }
@@ -413,7 +408,6 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
   <div class="stabs">
     <button class="stab active" data-tab="market"><span class="stab-icon">📊</span> بازار</button>
     <button class="stab" data-tab="portfolio"><span class="stab-icon">💼</span> پورتفوی</button>
-    <button class="stab" data-tab="news"><span class="stab-icon">📰</span> اخبار</button>
     <button class="stab" data-tab="rank"><span class="stab-icon">🏆</span> رتبه</button>
   </div>
 </nav>
@@ -431,12 +425,6 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
   <div class="view" id="view-portfolio">
     <div class="panel" style="max-width:600px; margin:0 auto;">
       <div id="portfolio"></div>
-    </div>
-  </div>
-
-  <div class="view" id="view-news">
-    <div class="panel" style="max-width:600px; margin:0 auto;">
-      <div id="news"></div>
     </div>
   </div>
 
@@ -508,7 +496,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.6
+   RUBY MARKETS 3.8
    ========================================================= */
 const START_CASH = 100000;
 const SAVE_KEY   = 'rubyMarket_v4';
@@ -517,30 +505,19 @@ const HISTORY_LEN = 60;
 const SVG_CHECK = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
 const SVG_CROSS = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
+/* 
+  ارزها با کف، سقف و رنگ اختصاصی برای آیکون
+  تتر اصلاح شد (کف 10K سقف 50K)
+*/
 const COINS = [
-  { id:'xau',  name:'طلا',      sym:'XAU',  icon:'🥇', base:45000,  min:10000, max:100000, vol:0.020 },
-  { id:'xag',  name:'نقره',     sym:'XAG',  icon:'🥈', base:22000,  min:5000,  max:50000,  vol:0.030 },
-  { id:'usd',  name:'دلار',     sym:'USD',  icon:'💵', base:32000,  min:15000, max:60000,  vol:0.012 },
-  { id:'eur',  name:'یورو',     sym:'EUR',  icon:'💶', base:40000,  min:18000, max:75000,  vol:0.015 },
-  { id:'usdt', name:'تتر',      sym:'USDT', icon:'💚', base:10750,  min:10000, max:11500,  vol:0.002 },
-  { id:'btc',  name:'بیت‌کوین',  sym:'BTC',  icon:'🟠', base:90000,  min:20000, max:200000, vol:0.055 },
-  { id:'eth',  name:'اتریوم',    sym:'ETH',  icon:'💠', base:12000,  min:3000,  max:30000,  vol:0.060 },
-  { id:'oil',  name:'نفت',      sym:'OIL',  icon:'🛢️', base:5000,   min:1500,  max:12000,  vol:0.045 },
-];
-
-const GOOD_EVENTS = [
-  '📈 تقاضای {n} به شدت بالا رفته',
-  '🏦 بانک مرکزی خرید {n} رو افزایش داد',
-  '🌍 تنش‌های جهانی، {n} رو پرواز داد',
-  '🔥 تحلیلگرها {n} رو صعودی می‌بینن',
-  '💰 سرمایه‌گذاران بزرگ به سمت {n} هجوم آوردن',
-];
-const BAD_EVENTS = [
-  '📉 فشار فروش روی {n} سنگین شده',
-  '😰 خبرهای منفی، {n} رو ریزشی کرد',
-  '🐻 رکود اقتصادی، {n} رو تحت فشار گذاشت',
-  '💀 سیاست‌های جدید، {n} رو ضعیف کرد',
-  '🚨 هشدار تحلیلگران درباره {n}',
+  { id:'xau',  name:'طلا',      sym:'XAU',  icon:'🪙', base:45000,  min:10000, max:100000, vol:0.020, color:'#ffd700' },
+  { id:'xag',  name:'نقره',     sym:'XAG',  icon:'🥈', base:22000,  min:5000,  max:50000,  vol:0.030, color:'#c0c0c0' },
+  { id:'usd',  name:'دلار',     sym:'USD',  icon:'💵', base:32000,  min:15000, max:60000,  vol:0.012, color:'#2ecc71' },
+  { id:'eur',  name:'یورو',     sym:'EUR',  icon:'💶', base:40000,  min:18000, max:75000,  vol:0.015, color:'#3498db' },
+  { id:'usdt', name:'تتر',      sym:'USDT', icon:'💎', base:15000,  min:10000, max:50000,  vol:0.005, color:'#26a17b' },
+  { id:'btc',  name:'بیت‌کوین',  sym:'BTC',  icon:'🟠', base:90000,  min:20000, max:200000, vol:0.055, color:'#f7931a' },
+  { id:'eth',  name:'اتریوم',    sym:'ETH',  icon:'💠', base:12000,  min:3000,  max:30000,  vol:0.060, color:'#627eea' },
+  { id:'oil',  name:'نفت',      sym:'OIL',  icon:'🛢️', base:5000,   min:1500,  max:12000,  vol:0.045, color:'#8e44ad' },
 ];
 
 const AVATARS = ['💎','🔮','🦊','🐉','🦅','👽','🤖','🦁','🐯','🦉','🐺','🐻','👑','🗿'];
@@ -562,7 +539,7 @@ const ALLOC_COLORS = ['#ff2d55','#ffb84d','#2ee68e','#ff6b9d','#7c5cff','#5eead4
 const ICON_UP   = '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
 const ICON_DOWN = '<svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
 
-let state, market, tickerMap = {}, news = [], bots = [], trades = [];
+let state, market, tickerMap = {}, bots = [], trades = [];
 let activeId = null, mode = 'buy', tickCount = 0;
 let prevPrices = {};
 
@@ -762,9 +739,10 @@ function buildMarket(){
     const el = document.createElement('div');
     el.className = 'coin';
     el.dataset.id = m.id;
+    // استفاده از متغیر رنگ برای آیکون
     el.innerHTML = `
       <div class="coin-head">
-        <div class="coin-icon">${m.icon}</div>
+        <div class="coin-icon" style="--icon-color: ${m.color}">${m.icon}</div>
         <div class="coin-name"><b>${m.name}</b><span>${m.sym}</span></div>
         <button class="star-btn ${m.watch?'on':''}" data-star="${m.id}">${m.watch?'★':'☆'}</button>
       </div>
@@ -841,7 +819,9 @@ function renderFast(){
   let best = null, bestAbs = -1;
   market.forEach(m => { const a = Math.abs(m.chg); if (a > bestAbs) { bestAbs = a; best = m; } });
   if (best) {
-    $('featIcon').textContent = best.icon; $('featName').textContent = best.name; $('featSym').textContent = best.sym;
+    $('featIcon').textContent = best.icon; 
+    $('featIcon').style.setProperty('--icon-color', best.color);
+    $('featName').textContent = best.name; $('featSym').textContent = best.sym;
     $('featPrice').textContent = fmtPrice(best.price);
     const chgEl = $('featChg'); chgEl.textContent = (best.chg >= 0 ? '▲ +' : '▼ ') + Math.abs(best.chg).toFixed(2) + '%';
     chgEl.className = 'featured-chg ' + (best.chg >= 0 ? 'up' : 'down'); $('featured').dataset.id = best.id;
@@ -874,7 +854,7 @@ function renderPortfolio(){
   html += entries.map(([id, h]) => {
     const m = coinById(id); if (!m) return '';
     const val = h.qty * m.price; const cost = h.qty * h.avg; const p = ((val - cost) / (cost || 1)) * 100;
-    return `<div class="hold-item"><div class="hi-ic">${m.icon}</div><div class="hi-main"><b>${m.name}</b><span>${h.qty.toFixed(3)} ${m.sym} · ${fmtPrice(m.price)}</span></div><div class="hi-val"><b>${fmtMoney(val)}</b><span class="${p>=0?'up':'down'}">${p>=0?'+':''}${p.toFixed(1)}%</span></div></div>`;
+    return `<div class="hold-item"><div class="hi-ic" style="--icon-color:${m.color}">${m.icon}</div><div class="hi-main"><b>${m.name}</b><span>${h.qty.toFixed(3)} ${m.sym} · ${fmtPrice(m.price)}</span></div><div class="hi-val"><b>${fmtMoney(val)}</b><span class="${p>=0?'up':'down'}">${p>=0?'+':''}${p.toFixed(1)}%</span></div></div>`;
   }).join('');
 
   if (trades.length) {
@@ -883,8 +863,6 @@ function renderPortfolio(){
   }
   pf.innerHTML = html;
 }
-
-function renderNews(){ $('news').innerHTML = news.length ? news.map(n => `<div class="news-item"><span class="nt">${n.t}</span>${n.text}</div>`).join('') : '<div class="empty">بازار آرومه...</div>'; }
 
 function renderProfileStats(){
   const nw = netWorth(); const pnl = nw - START_CASH; const lv = levelProgress(state.xp); const livePnl = livePnlAmount();
@@ -933,7 +911,7 @@ function renderRankTable(){
   $('rankBody').innerHTML = html; $('rankCount').textContent = list.length + ' نفر';
 }
 
-function render(){ renderFast(); renderProfileStats(); renderPortfolio(); renderNews(); renderRankTable(); }
+function render(){ renderFast(); renderProfileStats(); renderPortfolio(); renderRankTable(); }
 
 function tick(){
   market.forEach(m => {
@@ -942,19 +920,10 @@ function tick(){
     m.pulse *= 0.88;
     m.history.push(m.price); if (m.history.length > HISTORY_LEN) m.history.shift(); m.chg = (m.price / m.history[0] - 1) * 100;
   });
-  if (Math.random() < 0.07) triggerEvent();
   bots.forEach(b => { const drift = (Math.random() - 0.48) * 0.005; b.worth = Math.max(150000, b.worth * (1 + drift)); });
   tickCount++; renderFast();
   if (tickCount % 4 === 0) { renderProfileStats(); renderPortfolio(); renderRankTable(); }
   if (tickCount % 8 === 0) save();
-}
-
-function triggerEvent(){
-  const m = market[Math.floor(Math.random() * market.length)]; const good = Math.random() < 0.5;
-  const impact = (0.008 + Math.random() * 0.013) * (good ? 1 : -1); m.pulse += impact;
-  const pool = good ? GOOD_EVENTS : BAD_EVENTS; const text = pool[Math.floor(Math.random() * pool.length)].replace('{n}', m.name);
-  const now = new Date(); const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-  news.unshift({ text, t }); if (news.length > 8) news.pop(); renderNews(); toast(text, good ? 'good' : 'bad');
 }
 
 function buy(m, qty){
@@ -996,7 +965,7 @@ function sell(m, qty){
 
 function addXp(amount){ const prevLevel = calcLevel(state.xp); state.xp += amount; const newLevel = calcLevel(state.xp); if (newLevel > prevLevel) { setTimeout(() => { toast(`🎉 لِوِل آپ! رسیدی به لِوِل ${newLevel}`, 'levelup'); }, 400); } }
 
-function openModal(id){ activeId = id; mode = 'buy'; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'buy')); $('qty').value = ''; $('modal').hidden = false; const m = coinById(id); if (!m) return; $('mIcon').textContent = m.icon; $('mName').innerHTML = `${m.name} <small>${m.sym}</small>`; updateActionButton(); renderFast(); }
+function openModal(id){ activeId = id; mode = 'buy'; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'buy')); $('qty').value = ''; $('modal').hidden = false; const m = coinById(id); if (!m) return; $('mIcon').textContent = m.icon; $('mIcon').style.setProperty('--icon-color', m.color); $('mName').innerHTML = `${m.name} <small>${m.sym}</small>`; updateActionButton(); renderFast(); }
 function closeModal(){ activeId = null; $('modal').hidden = true; }
 function updateActionButton(){ const btn = $('actionBtn'); btn.className = 'action ' + mode; btn.innerHTML = (mode === 'buy' ? ICON_UP : ICON_DOWN) + `<span>${mode === 'buy' ? 'خرید' : 'فروش'}</span>`; }
 
@@ -1014,7 +983,6 @@ document.querySelectorAll('.stab').forEach(t => {
     document.getElementById('view-' + tab).classList.add('active');
     if (tab === 'rank') renderRankTable();
     if (tab === 'portfolio') renderPortfolio();
-    if (tab === 'news') renderNews();
   });
 });
 
@@ -1033,7 +1001,7 @@ state = { cash: START_CASH, holdings: {}, username: '', avatar: AVATARS[Math.flo
 initMarket(); initBots(); const restored = load();
 if (!state.username) { state.username = 'معامله‌گر' + Math.floor(1000 + Math.random() * 9000); }
 buildTicker(); buildMarket(); updateActionButton(); render();
-if (restored) { const now = new Date(); const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'); news.unshift({ text: 'بازار از جایی که مونده بود ادامه پیدا کرد 💾', t }); renderNews(); }
+if (restored) { const now = new Date(); const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'); toast('بازار از جایی که مونده بود ادامه پیدا کرد', 'good'); }
 
 setInterval(tick, 1000);
 
