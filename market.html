@@ -16,7 +16,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 3.5 — Range Bound Assets
+   RUBY MARKETS 3.6 — Range Bound Assets (Fixed)
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -508,7 +508,7 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 3.5 — Range Bound Assets
+   RUBY MARKETS 3.6
    ========================================================= */
 const START_CASH = 100000;
 const SAVE_KEY   = 'rubyMarket_v4';
@@ -517,7 +517,6 @@ const HISTORY_LEN = 60;
 const SVG_CHECK = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
 const SVG_CROSS = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
-/* ارزها با کف و سقف اختصاصی */
 const COINS = [
   { id:'xau',  name:'طلا',      sym:'XAU',  icon:'🥇', base:45000,  min:10000, max:100000, vol:0.020 },
   { id:'xag',  name:'نقره',     sym:'XAG',  icon:'🥈', base:22000,  min:5000,  max:50000,  vol:0.030 },
@@ -575,7 +574,6 @@ const fmtPrice = p => p >= 1000 ? p.toLocaleString('en-US',{maximumFractionDigit
 const fmtMoney = n => n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
 const coinById = id => market.find(m => m.id === id);
 
-/* فرمت اعداد کف و سقف به صورت خلاصه */
 const fmtHL = n => {
   if (n >= 1000) {
     const k = n / 1000;
@@ -908,9 +906,142 @@ function renderRankTable(){
   const myRank = list.findIndex(x => x.isMe) + 1; const top = list.slice(0, 8); const iAmInTop = top.some(x => x.isMe);
   const medal = r => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : r;
   const posCls = r => r === 1 ? 'top1' : r === 2 ? 'top2' : r === 3 ? 'top3' : '';
+  
   const rowHtml = (p, rank) => {
     let rowClass = p.isMe ? 'me' : '';
     if (rank === 1) rowClass += ' row-1';
     if (rank === 2) rowClass += ' row-2';
     if (rank === 3) rowClass += ' row-3';
-    return `<tr class="${rowClass}"><td><div class="rank-pos ${posCls(rank)}">${medal(rank)}</div></td><td
+    
+    return `
+      <tr class="${rowClass}">
+        <td><div class="rank-pos ${posCls(rank)}">${medal(rank)}</div></td>
+        <td>
+          <div class="rank-user">
+            <div class="rank-av">${p.emoji}</div>
+            <div class="rank-name">${p.name}</div>
+          </div>
+        </td>
+        <td class="rank-worth">${fmtMoney(p.worth)}</td>
+        <td class="rank-trades">${p.trades}</td>
+      </tr>
+    `;
+  };
+  
+  let html = top.map((p, i) => rowHtml(p, i + 1)).join('');
+  if (!iAmInTop) { html += `<tr class="rank-sep"><td colspan="4">· · ·</td></tr>`; html += rowHtml(list[myRank - 1], myRank); }
+  $('rankBody').innerHTML = html; $('rankCount').textContent = list.length + ' نفر';
+}
+
+function render(){ renderFast(); renderProfileStats(); renderPortfolio(); renderNews(); renderRankTable(); }
+
+function tick(){
+  market.forEach(m => {
+    const reversion = ((m.base - m.price) / m.base) * 0.006; const noise = (Math.random() - 0.5) * m.vol * 1.5;
+    m.price = Math.max(m.min, Math.min(m.max, m.price * (1 + noise + reversion + m.pulse))); 
+    m.pulse *= 0.88;
+    m.history.push(m.price); if (m.history.length > HISTORY_LEN) m.history.shift(); m.chg = (m.price / m.history[0] - 1) * 100;
+  });
+  if (Math.random() < 0.07) triggerEvent();
+  bots.forEach(b => { const drift = (Math.random() - 0.48) * 0.005; b.worth = Math.max(150000, b.worth * (1 + drift)); });
+  tickCount++; renderFast();
+  if (tickCount % 4 === 0) { renderProfileStats(); renderPortfolio(); renderRankTable(); }
+  if (tickCount % 8 === 0) save();
+}
+
+function triggerEvent(){
+  const m = market[Math.floor(Math.random() * market.length)]; const good = Math.random() < 0.5;
+  const impact = (0.008 + Math.random() * 0.013) * (good ? 1 : -1); m.pulse += impact;
+  const pool = good ? GOOD_EVENTS : BAD_EVENTS; const text = pool[Math.floor(Math.random() * pool.length)].replace('{n}', m.name);
+  const now = new Date(); const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  news.unshift({ text, t }); if (news.length > 8) news.pop(); renderNews(); toast(text, good ? 'good' : 'bad');
+}
+
+function buy(m, qty){
+  if (!(qty > 0)) return toast('مقدار نامعتبره', 'bad'); 
+  const cost = qty * m.price; 
+  if (cost > state.cash + 1e-9) return toast('نقدینگی کافی نداری 💸', 'bad');
+  
+  state.cash -= cost; const h = state.holdings[m.id] || { qty: 0, avg: 0 }; h.avg = (h.qty * h.avg + cost) / (h.qty + qty); h.qty += qty; state.holdings[m.id] = h;
+  addXp(5); state.tradesCount++; trades.unshift({ type:'buy', sym:m.sym, qty, price:m.price, time: Date.now() }); if (trades.length > 20) trades.pop();
+  
+  toast(`✅ ${qty.toFixed(3)} ${m.sym} خریدی`, 'good'); 
+  save(); render();
+}
+
+function sell(m, qty){
+  const h = state.holdings[m.id]; 
+  if (!h || qty <= 0) return toast('مقدار نامعتبره', 'bad'); 
+  if (qty > h.qty + 1e-9) return toast('بیشتر از موجودیت نمی‌تونی بفروشی', 'bad');
+  
+  const revenue = qty * m.price; 
+  const profit = (m.price - h.avg) * qty; 
+  state.cash += revenue; 
+  h.qty -= qty; 
+  if (h.qty <= 1e-9) delete state.holdings[m.id];
+  
+  state.tradesCount++; 
+  if (profit > 0) { state.wins++; addXp(10 + Math.min(60, Math.floor(profit))); if (profit > state.bestGain) state.bestGain = profit; }
+  else if (profit < 0) { state.losses++; addXp(3); if (profit < state.bestGain) state.bestGain = profit; }
+  
+  trades.unshift({ type:'sell', sym:m.sym, qty, price:m.price, pnl: profit, time: Date.now() }); 
+  if (trades.length > 20) trades.pop();
+  
+  const pStr = (profit >= 0 ? '+' : '') + fmtMoney(profit); 
+  const msgType = profit >= 0 ? 'good' : 'bad';
+  toast(`💰 ${qty.toFixed(3)} ${m.sym} فروختی (${pStr})`, msgType); 
+  
+  save(); render();
+}
+
+function addXp(amount){ const prevLevel = calcLevel(state.xp); state.xp += amount; const newLevel = calcLevel(state.xp); if (newLevel > prevLevel) { setTimeout(() => { toast(`🎉 لِوِل آپ! رسیدی به لِوِل ${newLevel}`, 'levelup'); }, 400); } }
+
+function openModal(id){ activeId = id; mode = 'buy'; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'buy')); $('qty').value = ''; $('modal').hidden = false; const m = coinById(id); if (!m) return; $('mIcon').textContent = m.icon; $('mName').innerHTML = `${m.name} <small>${m.sym}</small>`; updateActionButton(); renderFast(); }
+function closeModal(){ activeId = null; $('modal').hidden = true; }
+function updateActionButton(){ const btn = $('actionBtn'); btn.className = 'action ' + mode; btn.innerHTML = (mode === 'buy' ? ICON_UP : ICON_DOWN) + `<span>${mode === 'buy' ? 'خرید' : 'فروش'}</span>`; }
+
+function openNameModal() { $('newNameInput').value = state.username; $('nameModal').hidden = false; setTimeout(() => { $('newNameInput').focus(); $('newNameInput').select(); }, 50); }
+function closeNameModal() { $('nameModal').hidden = true; }
+function saveNewName() { const name = $('newNameInput').value.trim(); if (!name) { toast('اسم نمی‌تونه خالی باشه', 'bad'); return; } state.username = name.slice(0, 24); save(); render(); closeNameModal(); toast('اسم عوض شد ✅', 'good'); }
+$('editName').addEventListener('click', openNameModal); $('closeNameModal').addEventListener('click', closeNameModal); $('cancelNameBtn').addEventListener('click', closeNameModal); $('saveNameBtn').addEventListener('click', saveNewName); $('nameModal').addEventListener('click', (e) => { if (e.target.id === 'nameModal') closeNameModal(); }); $('newNameInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveNewName(); });
+
+document.querySelectorAll('.stab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.stab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.dataset.tab;
+    document.getElementById('view-' + tab).classList.add('active');
+    if (tab === 'rank') renderRankTable();
+    if (tab === 'portfolio') renderPortfolio();
+    if (tab === 'news') renderNews();
+  });
+});
+
+$('profileChip').addEventListener('click', () => { document.querySelector('.stab[data-tab="portfolio"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+$('featured').addEventListener('click', () => { const id = $('featured').dataset.id; if (id) openModal(id); });
+$('closeModal').addEventListener('click', closeModal); $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeNameModal(); } });
+
+document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', () => { mode = tab.dataset.mode; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); $('qty').value = ''; updateActionButton(); renderFast(); }); });
+$('qty').addEventListener('input', () => { const m = coinById(activeId); if (!m) return; const qty = parseFloat($('qty').value) || 0; $('total').textContent = fmtMoney(qty * m.price) + ' FC'; });
+document.querySelectorAll('.quick button').forEach(b => { b.addEventListener('click', () => { const m = coinById(activeId); if (!m) return; const p = parseFloat(b.dataset.p); const h = state.holdings[m.id]; const max = mode === 'buy' ? (state.cash / m.price) : (h ? h.qty : 0); const val = Math.floor(max * p * 10000) / 10000; $('qty').value = val > 0 ? val : ''; $('total').textContent = fmtMoney(val * m.price) + ' FC'; }); });
+$('actionBtn').addEventListener('click', () => { const m = coinById(activeId); if (!m) return; const qty = parseFloat($('qty').value) || 0; if (mode === 'buy') buy(m, qty); else sell(m, qty); $('qty').value = ''; });
+window.addEventListener('resize', () => { if (activeId) { const m = coinById(activeId); if (m) drawBig($('bigChart'), m.history); } renderFast(); });
+
+state = { cash: START_CASH, holdings: {}, username: '', avatar: AVATARS[Math.floor(Math.random()*AVATARS.length)], xp: 0, tradesCount: 0, wins: 0, losses: 0, bestGain: 0 };
+initMarket(); initBots(); const restored = load();
+if (!state.username) { state.username = 'معامله‌گر' + Math.floor(1000 + Math.random() * 9000); }
+buildTicker(); buildMarket(); updateActionButton(); render();
+if (restored) { const now = new Date(); const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'); news.unshift({ text: 'بازار از جایی که مونده بود ادامه پیدا کرد 💾', t }); renderNews(); }
+
+setInterval(tick, 1000);
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed', err));
+  });
+}
+</script>
+</body>
+</html>
