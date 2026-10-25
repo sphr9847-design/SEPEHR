@@ -16,7 +16,7 @@
 
 <style>
 /* =========================================================
-   RUBY MARKETS 4.0 — Pro SVG Icons & Save System
+   RUBY MARKETS 4.1 — Pro SVG Icons & Save Recovery
    ========================================================= */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
@@ -133,6 +133,7 @@ header{
 .featured-tag{ background:linear-gradient(135deg,var(--accent-2),#ff9a1f); color:#2a0712; font-size:10px; font-weight:800; padding:4px 10px; border-radius:100px; white-space:nowrap; justify-self:start; }
 .featured-coin{ display:flex; align-items:center; gap:10px; min-width:0; grid-row:2; }
 .featured-icon{ width:36px; height:36px; display:grid; place-items:center; flex-shrink:0; }
+.featured-icon svg{ width:32px; height:32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 .featured-name b{ display:block; font-size:13px; font-weight:600; }
 .featured-name span{ font-family:var(--mono); font-size:10px; color:var(--mut); }
 .featured-price{ font-family:var(--mono); font-size:16px; font-weight:700; text-align:left; grid-column:2; grid-row:1; }
@@ -522,16 +523,16 @@ label{ font-size:10px; color:var(--mut); font-weight:700; display:block; margin-
 
 <script>
 /* =========================================================
-   RUBY MARKETS 4.0
+   RUBY MARKETS 4.1
    ========================================================= */
 const START_CASH = 100000;
-const SAVE_KEY   = 'rubyMarket_v5'; // کلید نسخه جدید برای ذخیره‌سازی
+const SAVE_KEY   = 'rubyMarket_v5'; // کلید جدید
+const OLD_KEYS   = ['rubyMarket_v4', 'rubyMarket_v3', 'rubyMarket_v2']; // کلیدهای قدیمی برای بازیابی
 const HISTORY_LEN = 60;
 
 const SVG_CHECK = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`;
 const SVG_CROSS = `<svg class="toast-icon-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
-// آیکون‌های SVG فوق‌العاده باکیفیت برای هر دارایی
 const ASSET_ICONS = {
   xau: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#FFA500"/><stop offset="100%" stop-color="#B8860B"/></linearGradient></defs><path d="M4 10h16v8H4z" fill="url(#goldG)"/><path d="M6 6h12l2 4H4l2-4z" fill="#FFEA00"/><rect x="8" y="12" width="8" height="4" rx="1" fill="#fff" opacity="0.3"/></svg>`,
   xag: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="silverG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0E0E0"/><stop offset="100%" stop-color="#9E9E9E"/></linearGradient></defs><path d="M4 10h16v8H4z" fill="url(#silverG)"/><path d="M6 6h12l2 4H4l2-4z" fill="#F5F5F5"/><rect x="8" y="12" width="8" height="4" rx="1" fill="#fff" opacity="0.4"/></svg>`,
@@ -639,10 +640,21 @@ function save(){
 
 function load(){
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    let raw = localStorage.getItem(SAVE_KEY);
+    let isMigrated = false;
+    
+    // سیستم بازیابی: اگر کلید جدید نبود، دنبال کلیدهای قدیمی بگرد
+    if (!raw) {
+      for (const oldKey of OLD_KEYS) {
+        raw = localStorage.getItem(oldKey);
+        if (raw) { isMigrated = true; break; }
+      }
+    }
+    
     if (!raw) return false;
     const d = JSON.parse(raw);
     if (!d) return false;
+    
     state.cash = d.cash ?? START_CASH;
     state.holdings = d.holdings || {};
     state.username = d.username || '';
@@ -653,16 +665,33 @@ function load(){
     state.losses = d.losses || 0;
     state.bestGain = d.bestGain || 0;
     trades = Array.isArray(d.trades) ? d.trades : [];
+    
     if (Array.isArray(d.watchlist)) market.forEach(m => m.watch = d.watchlist.includes(m.id));
+    
     if (Array.isArray(d.market)) {
       d.market.forEach(sm => {
         const m = coinById(sm.id);
-        if (m && Array.isArray(sm.history) && sm.history.length > 5) {
+        if (m) {
           m.price = Math.max(m.min, Math.min(m.max, sm.price));
-          m.history = sm.history; m.pulse = sm.pulse || 0;
+          // ساخت تاریخچه جدید بر اساس قیمت جدید تا نمودار خراب نشود
+          m.history = [];
+          let p = m.price * (0.85 + Math.random() * 0.2);
+          p = Math.max(m.min, Math.min(m.max, p));
+          for (let i = 0; i < HISTORY_LEN; i++) {
+            p = p * (1 + (Math.random() - 0.5) * m.vol * 1.5);
+            p = Math.max(m.min, Math.min(m.max, p));
+            m.history.push(p);
+          }
+          m.history[m.history.length - 1] = m.price;
           m.chg = (m.price / m.history[0] - 1) * 100;
+          m.pulse = sm.pulse || 0;
         }
       });
+    }
+    
+    if (isMigrated) {
+      save(); // ذخیره در کلید جدید
+      setTimeout(() => toast('حساب قبلی با موفقیت بازیابی شد ✅', 'good'), 1000);
     }
     return true;
   } catch(e){ return false; }
