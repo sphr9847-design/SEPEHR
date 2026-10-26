@@ -2,36 +2,20 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آزمایشگاه XSS (آسیب‌پذیر)</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; background-color: #f0f0f0; }
-        .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { padding: 10px; width: 80%; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        #output { margin-top: 20px; padding: 15px; border: 2px dashed #ff0000; background: #ffe6e6; min-height: 50px; text-align: right; }
-    </style>
+    <title>آزمایشگاه XSS (امن شده)</title>
 </head>
-<body>
-
-    <div class="box">
-        <h2>سایت آسیب‌پذیر من</h2>
-        <p>یک متن یا کد وارد کنید:</p>
-        
-        <input type="text" id="userInput" placeholder="مثلا: سلام">
-        <button onclick="showText()">ارسال</button>
-        
-        <div id="output">خروجی اینجا نمایش داده می‌شود...</div>
-    </div>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h2>سایت امن شده من</h2>
+    <input type="text" id="userInput" placeholder="کد رو اینجا بذار...">
+    <button onclick="showText()">ارسال</button>
+    <div id="output" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;"></div>
 
     <script>
         function showText() {
-            // گرفتن متن از کاربر
             let input = document.getElementById('userInput').value;
             
-            // 🔴 نقطه آسیب‌پذیری: استفاده از innerHTML
-            // مرورگر هر کدی را داخل این تگ اجرا می‌کند!
-            document.getElementById('output').innerHTML = input; 
+            // ✅ استفاده از innerText به جای innerHTML
+            document.getElementById('output').innerText = input; 
         }
     </script>
 </body>
