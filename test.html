@@ -3,30 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آزمایشگاه XSS</title>
+    <title>آزمایشگاه Stored XSS (بخش نظرات)</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        input { padding: 10px; width: 80%; }
-        button { padding: 10px 20px; }
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 80px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .comment { background: #f9f9f9; border-right: 4px solid #28a745; padding: 10px; margin-bottom: 10px; border-radius: 5px; word-wrap: break-word; }
+        .comment strong { color: #333; }
     </style>
 </head>
 <body>
 
-    <h2>سایت آسیب‌پذیر من</h2>
-    <input type="text" id="userInput" placeholder="کد رو اینجا بذار...">
-    <button onclick="showText()">ارسال</button>
-    <div id="output" style="margin-top: 20px;"></div>
+    <div class="container">
+        <h2>💬 بخش نظرات سایت</h2>
+        
+        <textarea id="commentInput" placeholder="نظر خود را بنویسید..."></textarea>
+        <button onclick="addComment()">ارسال نظر</button>
+        
+        <hr style="margin: 20px 0;">
+        
+        <h3>نظرات کاربران:</h3>
+        <div id="commentsList"></div>
+    </div>
 
     <script>
-        // 🔴 این بخش جدید است: چک کردن دائمی بودن هک
-        if (localStorage.getItem('hacked') === 'true') {
-            document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px;">HACKED PERMANENTLY!</h1>';
+        // ۱. تابع نمایش نظرات (اینجا نقطه آسیب‌پذیری است)
+        function renderComments() {
+            let comments = JSON.parse(localStorage.getItem('site_comments')) || [];
+            let list = document.getElementById('commentsList');
+            list.innerHTML = ''; // پاک کردن لیست قبلی
+
+            comments.forEach((c, index) => {
+                let div = document.createElement('div');
+                div.className = 'comment';
+                
+                // 🔴 نقطه آسیب‌پذیری: استفاده از innerHTML برای نمایش نظر کاربر
+                div.innerHTML = `<strong>کاربر ${index + 1}:</strong><br>${c.text}`; 
+                
+                list.appendChild(div);
+            });
         }
 
-        function showText() {
-            let input = document.getElementById('userInput').value;
-            document.getElementById('output').innerHTML = input; 
+        // ۲. تابع اضافه کردن نظر
+        function addComment() {
+            let input = document.getElementById('commentInput').value;
+            if (input.trim() === '') return;
+
+            let comments = JSON.parse(localStorage.getItem('site_comments')) || [];
+            comments.push({ text: input, time: Date.now() });
+            
+            localStorage.setItem('site_comments', JSON.stringify(comments));
+            document.getElementById('commentInput').value = '';
+            renderComments();
         }
+
+        // ۳. اجرای اولیه هنگام باز شدن سایت
+        renderComments();
     </script>
 </body>
 </html>
