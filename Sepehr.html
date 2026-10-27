@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وبلاگ شخصی</title>
+    <title>وبلاگ شخصی من</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f8f9fa; color: #333; }
         .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         h2 { color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        textarea { width: 100%; height: 90px; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; color: #333; box-sizing: border-box; font-family: inherit; resize: none;}
+        textarea { width: 100%; height: 90px; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; color: #333; box-sizing: border-box; font-family: inherit; resize: none; }
         textarea:focus { outline: none; border-color: #007bff; background: #fff; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s;}
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.3s; }
         button:hover { background: #0056b3; }
         .comment { background: #f1f3f5; border-right: 4px solid #007bff; padding: 15px; margin-bottom: 15px; border-radius: 8px; word-wrap: break-word; }
         .comment strong { color: #007bff; display: block; margin-bottom: 5px; }
@@ -31,61 +31,38 @@
         <div id="commentsList"></div>
     </div>
 
-    <!-- کتابخانه Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // 🔴 مقادیر خودت رو اینجا جایگزین کن (اگر از Supabase استفاده می‌کنی)
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // تابعی برای دریافت نظرات از دیتابیس
-        async function loadComments() {
-            const { data, error } = await supabase
-                .from('comments')
-                .select('*')
-                .order('created_at', { ascending: true });
-
-            if (error) {
-                console.error('خطا در دریافت:', error);
-                return;
-            }
-
-            const list = document.getElementById('commentsList');
+        // دریافت و نمایش نظرات از حافظه مرورگر
+        function loadComments() {
+            let comments = JSON.parse(localStorage.getItem('sepehr_comments')) || [];
+            let list = document.getElementById('commentsList');
             list.innerHTML = ''; // پاک کردن لیست قبلی
 
-            data.forEach((comment, index) => {
-                const div = document.createElement('div');
+            comments.forEach((c, index) => {
+                let div = document.createElement('div');
                 div.className = 'comment';
                 
-                // 🚨 نقطه آسیب‌پذیری (Stored XSS):
-                // دیتای خام از دیتابیس خونده میشه و با innerHTML تزریق میشه
-                div.innerHTML = `<strong>کاربر ${index + 1}</strong><span class="comment-content">${comment.content}</span>`;
+                // 🚨 نقطه آسیب‌پذیری (Stored XSS): استفاده از innerHTML
+                div.innerHTML = `<strong>کاربر ${index + 1}</strong><div class="comment-content">${c.text}</div>`;
                 
                 list.appendChild(div);
             });
         }
 
-        // تابعی برای ارسال نظر جدید به دیتابیس
-        async function addComment() {
-            const input = document.getElementById('commentInput');
-            const text = input.value;
-            if (!text) return;
+        // ارسال نظر جدید
+        function addComment() {
+            let input = document.getElementById('commentInput').value;
+            if (input.trim() === '') return;
 
-            const { error } = await supabase
-                .from('comments')
-                .insert([{ content: text }]);
-
-            if (error) {
-                alert('خطا در ارسال! کلیدهای Supabase رو چک کن.');
-                console.error(error);
-            } else {
-                input.value = '';
-                loadComments(); // لیست رو دوباره بخون
-            }
+            let comments = JSON.parse(localStorage.getItem('sepehr_comments')) || [];
+            comments.push({ text: input, time: Date.now() });
+            
+            localStorage.setItem('sepehr_comments', JSON.stringify(comments));
+            document.getElementById('commentInput').value = '';
+            loadComments();
         }
 
-        // اجرای اولیه هنگام باز شدن صفحه
+        // اجرای اولیه
         loadComments();
     </script>
 </body>
