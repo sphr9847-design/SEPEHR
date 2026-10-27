@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست XSS با دیتابیس</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #121212; color: #fff; }
+        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        textarea { width: 100%; height: 80px; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #333; background: #2d2d2d; color: white; box-sizing: border-box;}
+        button { width: 100%; padding: 10px; background: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
+        .comment { background: #2d2d2d; border-right: 4px solid #ff4757; padding: 10px; margin-bottom: 10px; border-radius: 5px; word-wrap: break-word; }
+        .comment strong { color: #ff4757; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>💬 بخش نظرات آنلاین (ناامن)</h2>
+        
+        <textarea id="commentInput" placeholder="کد مخربت رو اینجا بنویس..."></textarea>
+        <button onclick="addComment()">ارسال به دیتابیس</button>
+        
+        <hr style="margin: 20px 0; border-color: #333;">
+        
+        <h3>نظرات ذخیره شده:</h3>
+        <div id="commentsList"></div>
+    </div>
+
+    <!-- کتابخانه Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // 🔴 مقادیر خودت رو اینجا جایگزین کن
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // تابعی برای دریافت نظرات از دیتابیس
+        async function loadComments() {
+            const { data, error } = await supabase
+                .from('comments')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error('خطا در دریافت:', error);
+                return;
+            }
+
+            const list = document.getElementById('commentsList');
+            list.innerHTML = ''; // پاک کردن لیست قبلی
+
+            data.forEach((comment, index) => {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                
+                // 🚨 نقطه آسیب‌پذیری (Stored XSS):
+                // دیتای خام از دیتابیس خونده میشه و با innerHTML تزریق میشه
+                div.innerHTML = `<strong>کاربر ${index + 1}:</strong><br>${comment.content}`;
+                
+                list.appendChild(div);
+            });
+        }
+
+        // تابعی برای ارسال نظر جدید به دیتابیس
+        async function addComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value;
+            if (!text) return;
+
+            const { error } = await supabase
+                .from('comments')
+                .insert([{ content: text }]);
+
+            if (error) {
+                alert('خطا در ارسال! کلیدهای Supabase رو چک کن.');
+                console.error(error);
+            } else {
+                input.value = '';
+                loadComments(); // لیست رو دوباره بخون
+            }
+        }
+
+        // اجرای اولیه هنگام باز شدن صفحه
+        loadComments();
+    </script>
+</body>
+</html>
