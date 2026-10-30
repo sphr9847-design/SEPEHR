@@ -10,90 +10,101 @@
         textarea { width: 100%; height: 80px; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
         button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;}
         .comment { background: #f1f3f5; border-right: 4px solid #007bff; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
-        .error-box { background: #f8d7da; color: #721c24; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #f5c6cb; font-size: 14px; }
+        .error-box { background: #f8d7da; color: #721c24; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>💬 نظرات کاربران</h2>
         <textarea id="commentInput" placeholder="نظر خود را بنویسید..."></textarea>
-        <button onclick="addComment()">ثبت نظر</button>
+        <button id="submitBtn">ثبت نظر</button>
         <hr>
         <h3>آخرین نظرات:</h3>
         <div id="commentsList">در حال دریافت...</div>
         <div id="errorBox" class="error-box" style="display:none;"></div>
     </div>
 
-    <!-- کتابخانه Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://wjgnbgbcqdtdcxonyrsb.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs';
 
-        // ساخت کلاینت سوپابیس در سطح جهانی
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // تابع نمایش خطا
         function showError(msg) {
             const errorBox = document.getElementById('errorBox');
             errorBox.style.display = 'block';
             errorBox.innerText = 'خطا: ' + msg;
         }
 
-        // دریافت نظرات از دیتابیس
+        // دریافت نظرات
         async function loadComments() {
-            const { data, error } = await supabase
-                .from('xss_comments')
-                .select('*')
-                .order('created_at', { ascending: true });
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/xss_comments?select=*&order=created_at.asc', {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY
+                    }
+                });
+                
+                if (!res.ok) throw new Error('خطای شبکه در دریافت: ' + res.status);
+                
+                const data = await res.json();
+                const list = document.getElementById('commentsList');
+                list.innerHTML = ''; 
 
-            if (error) {
-                console.error('خطای دیتابیس:', error);
-                showError(error.message);
-                document.getElementById('commentsList').innerText = 'خطا در دریافت نظرات.';
+                if (data.length === 0) {
+                    list.innerText = 'هنوز هیچ نظری ثبت نشده است.';
+                }
+
+                data.forEach((c, index) => {
+                    let div = document.createElement('div');
+                    div.className = 'comment';
+                    // 🚨 نقطه آسیب‌پذیری (Stored XSS)
+                    div.innerHTML = `<strong>کاربر ${index + 1}</strong><br>${c.content}`;
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                showError(err.message);
+                document.getElementById('commentsList').innerText = 'خطا در دریافت.';
+            }
+        }
+
+        // ارسال نظر
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const input = document.getElementById('commentInput');
+            const text = input.value;
+            if (!text.trim()) {
+                alert('لطفا متنی بنویسید!');
                 return;
             }
 
-            const list = document.getElementById('commentsList');
-            list.innerHTML = ''; 
+            try {
+                const res = await fetch(SUPABASE_URL + '/rest/v1/xss_comments', {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ content: text })
+                });
 
-            if (data.length === 0) {
-                list.innerText = 'هنوز هیچ نظری ثبت نشده است.';
-            }
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error('خطای سرور: ' + res.status + ' - ' + errText);
+                }
 
-            data.forEach((c, index) => {
-                let div = document.createElement('div');
-                div.className = 'comment';
-                // 🚨 نقطه آسیب‌پذیری (Stored XSS)
-                div.innerHTML = `<strong>کاربر ${index + 1}</strong><br>${c.content}`;
-                list.appendChild(div);
-            });
-        }
-
-        // ارسال نظر به دیتابیس
-        async function addComment() {
-            const input = document.getElementById('commentInput');
-            const text = input.value;
-            if (!text.trim()) return;
-
-            console.log('در حال ارسال به دیتابیس...');
-
-            const { error } = await supabase
-                .from('xss_comments')
-                .insert([{ content: text }]);
-
-            if (error) {
-                console.error('خطای ارسال:', error);
-                showError(error.message);
-            } else {
-                console.log('با موفقیت ارسال شد!');
+                // اگر موفق بود
                 input.value = '';
                 document.getElementById('errorBox').style.display = 'none';
-                loadComments(); // لیست رو دوباره بخون
-            }
-        }
+                loadComments(); // آپدیت لیست
 
-        // اجرای اولیه هنگام باز شدن صفحه
+            } catch (err) {
+                alert('خطا در ارسال!');
+                showError(err.message);
+            }
+        });
+
+        // اجرای اولیه
         loadComments();
     </script>
 </body>
