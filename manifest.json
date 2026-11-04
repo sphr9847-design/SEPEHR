@@ -1,18 +1,33 @@
 {
-  "name": "تیراندازی فضایی",
-  "short_name": "Space Shooter",
-  "description": "یک بازی هیجان‌انگیز فضایی",
+  "name": "سپهر - بازی تیراندازی فضایی",
+  "short_name": "سپهر",
+  "description": "بازی تیراندازی فضایی با فروشگاه و سیستم ارتقای سلاح",
+  "lang": "fa",
+  "dir": "rtl",
   "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#04060f",
-  "theme_color": "#00ffff",
+  "scope": "./",
+  "display": "fullscreen",
   "orientation": "portrait",
+  "background_color": "#000011",
+  "theme_color": "#000011",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3097/3097180.png",
+      "src": "./launchericon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./launchericon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./launchericon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
