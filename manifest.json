@@ -1,30 +1,31 @@
 {
+  "id": "/SEPEHR/",
   "name": "سپهر - بازی تیراندازی فضایی",
   "short_name": "سپهر",
   "description": "بازی تیراندازی فضایی با فروشگاه و سیستم ارتقای سلاح",
   "lang": "fa",
   "dir": "rtl",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/SEPEHR/",
+  "scope": "/SEPEHR/",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#000011",
   "theme_color": "#000011",
   "icons": [
     {
-      "src": "./launchericon-192x192.png",
+      "src": "launchericon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./launchericon-512x512.png",
+      "src": "launchericon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./launchericon-512x512.png",
+      "src": "launchericon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
