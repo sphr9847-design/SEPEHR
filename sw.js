@@ -5,7 +5,6 @@ const DYNAMIC_CACHE = CACHE_VERSION + '-dynamic';
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './market.html',
   './manifest.json',
   './launchericon-192x192.png',
   './launchericon-512x512.png'
@@ -35,6 +34,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
+  // استراتژی Cache First برای فایل‌های خود بازی
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(req).then((cached) => {
@@ -53,6 +53,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // استراتژی Network First برای درخواست‌های خارجی (مثل رکورد آنلاین)
   event.respondWith(
     fetch(req).then((res) => {
       if (res && res.status === 200) {
