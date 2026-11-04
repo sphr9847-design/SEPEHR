@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#000011">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="./launchericon-192x192.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>🚀 تیراندازی فضایی</title>
@@ -1330,6 +1334,13 @@ function loop(ts){
 requestAnimationFrame(loop);
 
 renderShop();
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW OK:', r.scope))
+      .catch(e => console.error('SW fail:', e));
+  });
+  }
 </script>
 </body>
 </html>
