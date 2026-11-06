@@ -1,7 +1,7 @@
 {
   "id": "/SEPEHR/",
-  "name": "سپهر - بازی تیراندازی فضایی",
-  "short_name": "سپهر",
+  "name": "Astro",
+  "short_name": "Astro",
   "description": "بازی تیراندازی فضایی با فروشگاه و سیستم ارتقای سلاح",
   "lang": "fa",
   "dir": "rtl",
@@ -11,6 +11,7 @@
   "orientation": "portrait",
   "background_color": "#000011",
   "theme_color": "#000011",
+  "categories": ["games", "entertainment"],
   "icons": [
     {
       "src": "launchericon-192x192.png",
