@@ -19,16 +19,16 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 #dangerOverlay.show{opacity:1;animation:edgePulse 0.8s infinite alternate}
 @keyframes edgePulse{from{opacity:0.4}to{opacity:1}}
 
-#bossWarning{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(20,0,10,0.95);border:2px solid #ff3366;padding:15px 40px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:15px;font-size:30px;font-weight:900;color:#fff;letter-spacing:5px;z-index:1500;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 0 50px rgba(255,51,102,.5),inset 0 0 20px rgba(255,51,102,.3);text-shadow:0 0 15px #ff3366}
+#bossWarning{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(20,0,10,0.7);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:2px solid rgba(255,51,102,0.5);padding:15px 40px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:15px;font-size:30px;font-weight:900;color:#fff;letter-spacing:5px;z-index:1500;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 8px 32px 0 rgba(255,51,102,0.3);text-shadow:0 0 15px #ff3366}
 #bossWarning.show{opacity:1;animation:warnPulse 1s infinite alternate}
 @keyframes warnPulse{from{transform:translate(-50%,-50%) scale(0.95)}to{transform:translate(-50%,-50%) scale(1.05)}}
 .warn-icon svg{width:32px;height:32px;filter:drop-shadow(0 0 10px #ff3366);animation:iconPulse 0.5s infinite alternate}
 @keyframes iconPulse{from{transform:scale(1)}to{transform:scale(1.2)}}
 
-#toastNotification{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:rgba(10, 20, 40, 0.9);border:1px solid #00ffff;color:#00ffff;padding:12px 30px;border-radius:30px;font-size:16px;font-weight:700;z-index:2000;transition:all .5s cubic-bezier(.175,.885,.32,1.275);opacity:0;pointer-events:none;box-shadow:0 0 20px rgba(0,255,255,.3), inset 0 0 10px rgba(0,255,255,.2);text-shadow:0 0 8px #00ffff}
+#toastNotification{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:rgba(10, 20, 40, 0.8);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(0,255,255,0.4);color:#00ffff;padding:12px 30px;border-radius:30px;font-size:16px;font-weight:700;z-index:2000;transition:all .5s cubic-bezier(.175,.885,.32,1.275);opacity:0;pointer-events:none;box-shadow:0 8px 32px 0 rgba(0,255,255,0.2);text-shadow:0 0 8px #00ffff}
 #toastNotification.show{top:20px;opacity:1}
 
-#tabs{position:fixed;top:0;left:0;right:0;height:55px;background:rgba(5,10,20,0.95);border-bottom:1px solid rgba(0,255,255,.15);display:flex;z-index:10}
+#tabs{position:fixed;top:0;left:0;right:0;height:55px;background:rgba(10, 15, 30, 0.65);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,255,255,.2);display:flex;z-index:10}
 .tab{flex:1;background:transparent;border:none;color:#5a7d8f;font-size:16px;font-family:'Lalezar', cursive;cursor:pointer;transition:.3s;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 5px}
 .tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;transition:.3s}
 .tab.active{color:#00ffff;text-shadow:0 0 10px #00ffff}
@@ -36,7 +36,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:3px;background:#00ffff;border-radius:3px 3px 0 0;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 0 15px #00ffff}
 .tab.active::after{width:60%;left:20%}
 
-.panel{position:fixed;top:55px;left:0;right:0;bottom:0;background:rgba(3,6,15,0.95);color:#7df9ff;padding:25px 20px;overflow-y:auto;display:none;z-index:5}
+.panel{position:fixed;top:55px;left:0;right:0;bottom:0;background:rgba(8, 12, 25, 0.75);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);color:#7df9ff;padding:25px 20px;overflow-y:auto;display:none;z-index:5}
 .panel.show{display:block;animation:panelSlide .4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 @keyframes panelSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .panel h2{text-align:center;font-size:30px;margin-bottom:20px;color:#fff;font-family:'Lalezar', cursive;text-shadow:0 0 15px rgba(255,255,255,0.3)}
@@ -44,18 +44,18 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .panel::-webkit-scrollbar-track{background:transparent}
 .panel::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:10px}
 
-.quest-card{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(0,0,0,.4));border:1px solid rgba(255,255,255,.1);padding:15px;border-radius:15px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;max-width:500px;margin-left:auto;margin-right:auto;box-shadow:0 4px 15px rgba(0,0,0,.5)}
-.quest-card.completed{border-color:#00ff88;box-shadow:0 0 15px rgba(0,255,136,.2)}
-.quest-card.daily{background:linear-gradient(145deg, rgba(255,215,0,.1), rgba(0,0,0,.6));border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.2)}
+.quest-card{background:rgba(255,255,255,.05);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.1);padding:15px;border-radius:15px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;max-width:500px;margin-left:auto;margin-right:auto;box-shadow:0 8px 32px 0 rgba(0,0,0,.3)}
+.quest-card.completed{border-color:rgba(0,255,136,0.5);box-shadow:0 0 15px rgba(0,255,136,.2)}
+.quest-card.daily{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,0.4);box-shadow:0 0 20px rgba(255,215,0,.2)}
 .quest-info h3{font-size:18px;margin-bottom:5px;color:#fff;font-family:'Lalezar', cursive;}
 .quest-info p{font-size:12px;color:#8bb5c9;}
-.quest-progress-bar{width:100%;height:6px;background:#222;border-radius:3px;margin-top:8px;overflow:hidden;}
+.quest-progress-bar{width:100%;height:6px;background:rgba(0,0,0,0.5);border-radius:3px;margin-top:8px;overflow:hidden;}
 .quest-progress-fill{height:100%;background:linear-gradient(90deg,#0ff,#00ff88);border-radius:3px;transition:width 0.3s;}
 .claim-btn{padding:10px 15px;border-radius:20px;border:none;background:linear-gradient(135deg, #ffd700, #ff8800);color:#000;font-size:14px;cursor:pointer;transition:0.3s;margin-right:10px;font-family:'Lalezar', cursive;}
-.claim-btn:disabled{background:#333;color:#666;cursor:not-allowed;box-shadow:none;}
+.claim-btn:disabled{background:rgba(255,255,255,0.1);color:#666;cursor:not-allowed;box-shadow:none;}
 
 #rankList{list-style:none;max-width:450px;margin:0 auto;padding:0}
-#rankList li{display:flex;align-items:center;padding:15px 20px;margin-bottom:12px;background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.2);border-radius:15px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
+#rankList li{display:flex;align-items:center;padding:15px 20px;margin-bottom:12px;background:rgba(0,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(0,255,255,.2);border-radius:15px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
 #rankList li:hover{background:rgba(0,255,255,.1);box-shadow:0 0 15px rgba(0,255,255,.15);transform:translateX(-5px)}
 #rankList li.empty{justify-content:center;color:#5a7d8f;font-size:15px}
 #rankList li.error{justify-content:center;color:#ff5c8a;font-size:15px;text-align:center}
@@ -68,12 +68,12 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 #rankList .name{color:#aaa;font-size:15px;margin-right:10px;width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold;font-family:'Lalezar', cursive;}
 #rankList .sc{flex:1;font-size:18px;font-weight:900;color:#fff;text-align:left;text-shadow:0 0 10px rgba(255,255,255,0.3)}
 
-.profile-card,.music-player,.cloud-sync-box{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,255,.15);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 20px rgba(0,255,255,.05)}
-.weapon-card,.skin-card,.mini-card{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(0,0,0,.4));border:1px solid rgba(255,255,255,.05);padding:18px 22px;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.6);transition:all .3s ease}
-.weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(0,255,255,.4);box-shadow:0 15px 35px rgba(0,0,0,.8), 0 0 20px rgba(0,255,255,.15)}
-.weapon-card.equipped,.skin-card.equipped,.mini-card.equipped{border-color:#00ffff;background:linear-gradient(145deg, rgba(0,255,255,.08), rgba(0,0,0,.5));box-shadow:0 0 25px rgba(0,255,255,.2)}
+.profile-card,.music-player,.cloud-sync-box{background:rgba(255,255,255,.05);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.1);border-radius:20px;box-shadow:0 8px 32px 0 rgba(0,0,0,.37)}
+.weapon-card,.skin-card,.mini-card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);padding:18px 22px;border-radius:18px;box-shadow:0 8px 32px 0 rgba(0,0,0,.37);transition:all .3s ease}
+.weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(0,255,255,.4);box-shadow:0 15px 35px rgba(0,0,0,.5), 0 0 20px rgba(0,255,255,.15)}
+.weapon-card.equipped,.skin-card.equipped,.mini-card.equipped{border-color:rgba(0,255,255,0.6);background:rgba(0,255,255,.08);box-shadow:0 0 25px rgba(0,255,255,.2)}
 
-.w-btn,.m-btn{padding:12px 18px;border-radius:30px;font-size:15px;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.5);font-family:'Lalezar', cursive;}
+.w-btn,.m-btn{padding:12px 18px;border-radius:30px;font-size:15px;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.5);font-family:'Lalezar', cursive;backdrop-filter:blur(5px);}
 .btn-buy{background:linear-gradient(135deg, #ffd700, #ff8800);color:#000;border:none}
 .btn-buy:not(:disabled):hover{box-shadow:0 0 20px rgba(255,215,0,.6);transform:translateY(-2px)}
 .btn-equip{background:transparent;border:2px solid #00ffff;color:#00ffff}
@@ -83,35 +83,45 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 
 .save-btn{background:linear-gradient(135deg, #00d2ff, #0055ff);border-radius:15px;box-shadow:0 5px 20px rgba(0,85,255,.4);transition:0.3s;font-family:'Lalezar', cursive;}
 .save-btn:hover{box-shadow:0 0 30px rgba(0,210,255,.6);transform:translateY(-2px)}
-.restore-btn{border:2px solid #ff4fd8;color:#ff4fd8;border-radius:15px;transition:0.3s;font-family:'Lalezar', cursive;}
-.restore-btn:hover{background:rgba(255,79,216,.1);box-shadow:0 0 20px rgba(255,79,216,.3)}
+.restore-btn{border:2px solid rgba(255,79,216,0.8);color:#ff4fd8;border-radius:15px;transition:0.3s;font-family:'Lalezar', cursive;background:rgba(255,79,216,0.1);backdrop-filter:blur(5px);}
+.restore-btn:hover{background:rgba(255,79,216,.2);box-shadow:0 0 20px rgba(255,79,216,.3)}
 
-.refresh-btn{background:rgba(0,255,255,.05);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;font-family:'Lalezar', cursive;font-size:16px;}
+.refresh-btn{background:rgba(0,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;font-family:'Lalezar', cursive;font-size:16px;}
 .refresh-btn:hover{background:rgba(0,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.4);transform:translateY(-2px);border-color:#00ffff}
 
-.form-group input[type="text"]{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;transition:0.3s;color:#fff;width:100%;font-family:'Vazirmatn';}
+.form-group input[type="text"]{background:rgba(0,0,0,.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;transition:0.3s;color:#fff;width:100%;font-family:'Vazirmatn';}
 .form-group input[type="text"]:focus{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.2);outline:none}
-.avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.05);padding:5px;display:flex;justify-content:center;align-items:center;cursor:pointer}
+.avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.1);padding:5px;display:flex;justify-content:center;align-items:center;cursor:pointer;background:rgba(0,0,0,0.3);backdrop-filter:blur(5px);}
 .avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
 .avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
 
-.sound-toggle { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; padding: 15px; background: rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.sound-toggle { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; padding: 15px; background: rgba(0,255,255,0.05);backdrop-filter:blur(10px); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; }
 .sound-toggle span { font-weight: bold; color: #fff; font-size: 16px; font-family:'Lalezar', cursive;}
 .sound-toggle .icon { width: 44px; height: 24px; border-radius: 12px; background: #333; position: relative; transition: 0.3s; flex-shrink: 0; }
 .sound-toggle .icon::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #666; top: 3px; left: 3px; transition: 0.3s; }
 .sound-toggle.on .icon { background: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.7); }
 .sound-toggle.on .icon::after { left: 23px; background: #04060f; }
 
-#gameOver{background:rgba(5,0,10,.95);position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;color:#fff;text-align:center;z-index:20}
+#gameOver{background:rgba(5,0,10,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;color:#fff;text-align:center;z-index:20}
 #gameOver h1{color:#ff0055;text-shadow:0 0 30px #ff0055, 0 0 60px #ff0055;font-size:55px;letter-spacing:2px;font-family:'Lalezar', cursive;}
 #restartBtn{background:#ff0055;color:#fff;border:none;box-shadow:0 0 30px rgba(255,0,85,.5);letter-spacing:2px;transition:0.3s;margin-top:10px;padding:14px 40px;font-size:24px;border-radius:40px;cursor:pointer;font-family:'Lalezar', cursive;}
 #restartBtn:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(255,0,85,.8)}
 #syncIndicator{position:fixed;bottom:20px;left:20px;color:#0ff;font-size:24px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100;text-shadow:0 0 10px #0ff}
 #syncIndicator.syncing{opacity:1;animation:pulse 1s infinite alternate}
 @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.2)}}
+
+/* Animated Splash Screen */
+#astro-splash {position: fixed;top: 0; left: 0; width: 100vw; height: 100vh;background-color: #000011;display: flex; justify-content: center; align-items: center;z-index: 99999;transition: opacity 1s ease-in-out;}
+.astro-text {font-family: 'Arial Black', Impact, sans-serif;font-size: 5rem;letter-spacing: 5px;color: #ffffff;text-transform: uppercase;text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff, 0 0 40px #0055ff, 0 0 80px #ff00cc;animation: pulse-glow 1.5s infinite alternate;}
+@keyframes pulse-glow {0% { text-shadow: 0 0 10px #00f3ff, 0 0 20px #0055ff; transform: scale(1); }100% { text-shadow: 0 0 20px #00f3ff, 0 0 40px #ff00cc, 0 0 60px #ff00cc; transform: scale(1.05); }}
 </style>
 </head>
 <body>
+<!-- Animated Splash Screen -->
+<div id="astro-splash">
+  <div class="astro-text">ASTRO</div>
+</div>
+
 <div id="dangerOverlay"></div>
 <div id="bossWarning">
   <div class="warn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
@@ -132,10 +142,10 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <h2>🛒 فروشگاه</h2>
   <div class="shop-header" style="text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;font-family:'Lalezar';">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
   <div class="shop-tabs" style="display:flex;gap:10px;margin-bottom:20px;">
-    <button class="shop-tab active" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
-    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
-    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('minis', this)">🛸 همراه</button>
-    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.1);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('quests', this)">📜 ماموریت</button>
+    <button class="shop-tab active" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.15);backdrop-filter:blur(10px);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('weapons', this)">🔫 سلاح</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.15);backdrop-filter:blur(10px);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('skins', this)">🚀 سفینه</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.15);backdrop-filter:blur(10px);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('minis', this)">🛸 همراه</button>
+    <button class="shop-tab" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,255,255,.3);background:rgba(0,255,255,.15);backdrop-filter:blur(10px);color:#fff;font-family:'Lalezar';font-size:16px;cursor:pointer;transition:0.3s;" onclick="switchShopTab('quests', this)">📜 ماموریت</button>
   </div>
   <div class="shop-list" id="shopList" style="display:flex;flex-direction:column;gap:15px;"></div>
 </div>
@@ -207,8 +217,9 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <div id="bonusCoins" style="font-size:24px;color:#ffd700;margin-bottom:15px;font-family:'Lalezar';">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
 </div>
+
 <script>
-const cvs = document.getElementById('c');
+  const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d', { alpha: false });
 let W, H;
 
@@ -315,7 +326,6 @@ let totalScore = 0;
 let recoveryCode = generateRecoveryCode();
 let currentRunScore = safeNum(localStorage.getItem('shooter_current_run_score'), 0);
 
-// سیستم ماموریت‌ها و جایزه روزانه
 const QUEST_TEMPLATES = [
   { id: 'q_bosses', text: '۲ غول بزرگ را شکست بده', type: 'bosses', target: 2, reward: 600 },
   { id: 'q_score', text: 'در یک دست ۲۰۰۰ امتیاز بگیر', type: 'score', target: 2000, reward: 500 },
@@ -332,97 +342,6 @@ function checkQuestReset() {
     localStorage.setItem('shooter_quests_v1', JSON.stringify(questState));
   }
 }
-
-function addQuestProgress(type, amount, isMax = false) {
-  checkQuestReset();
-  if (isMax) {
-    if (amount > (questState.progress[type] || 0)) questState.progress[type] = amount;
-  } else {
-    questState.progress[type] = (questState.progress[type] || 0) + amount;
-  }
-  localStorage.setItem('shooter_quests_v1', JSON.stringify(questState));
-  if (document.getElementById('shopPanel').classList.contains('show') && currentShopTab === 'quests') renderQuests();
-}
-
-function renderQuests() {
-  checkQuestReset();
-  const list = document.getElementById('shopList');
-  
-  const today = new Date().toDateString();
-  const dailyIsClaimed = (questState.dailyClaimedDate === today);
-  
-  let dailyHtml = `
-    <div class="quest-card daily ${dailyIsClaimed ? 'completed' : ''}">
-      <div class="quest-info" style="flex:1;">
-        <h3>🎁 جایزه ورود روزانه</h3>
-        <p>هر روز ۱۰۰۰ سکه رایگان بگیر!</p>
-      </div>
-      ${dailyIsClaimed ? `<button class="claim-btn" disabled>دریافت شد ✅</button>` : `<button class="claim-btn" onclick="claimDaily()" style="background:#ffd700;color:#000;">دریافت 🎁</button>`}
-    </div>
-  `;
-
-  let questsHtml = QUEST_TEMPLATES.map(q => {
-    let current = questState.progress[q.type] || 0;
-    if (current > q.target) current = q.target;
-    let pct = (current / q.target) * 100;
-    let isCompleted = current >= q.target;
-    let isClaimed = questState.claimed.includes(q.id);
-    
-    let btnHtml = '';
-    if (isClaimed) {
-      btnHtml = `<button class="claim-btn" disabled>دریافت شد ✅</button>`;
-    } else if (isCompleted) {
-      btnHtml = `<button class="claim-btn" onclick="claimQuest('${q.id}', ${q.reward})" style="background:#00ff88;color:#000;">دریافت جایزه 🎁</button>`;
-    } else {
-      btnHtml = `<button class="claim-btn" disabled>در حال انجام...</button>`;
-    }
-    
-    return `
-      <div class="quest-card ${isCompleted ? 'completed' : ''}">
-        <div class="quest-info" style="flex:1;">
-          <h3>${q.text}</h3>
-          <p>جایزه: 💰 ${q.reward} سکه</p>
-          <div class="quest-progress-bar">
-            <div class="quest-progress-fill" style="width: ${pct}%;"></div>
-          </div>
-          <p style="margin-top:4px;font-size:10px;color:#aaa;">${current} / ${q.target}</p>
-        </div>
-        ${btnHtml}
-      </div>
-    `;
-  }).join('');
-
-  list.innerHTML = dailyHtml + questsHtml;
-}
-
-window.claimDaily = () => {
-  checkQuestReset();
-  const today = new Date().toDateString();
-  if (questState.dailyClaimedDate !== today) {
-    questState.dailyClaimedDate = today;
-    coins += 1000;
-    localStorage.setItem('shooter_quests_v1', JSON.stringify(questState));
-    saveGameData(); 
-    SND.play('purchase');
-    showToast(`🎉 ۱۰۰۰ سکه بابت ورود روزانه دریافت کردی!`);
-    renderQuests();
-    updateCoinsUI();
-  }
-};
-
-window.claimQuest = (questId, reward) => {
-  checkQuestReset();
-  if (!questState.claimed.includes(questId)) {
-    questState.claimed.push(questId);
-    coins += reward;
-    localStorage.setItem('shooter_quests_v1', JSON.stringify(questState));
-    saveGameData(); 
-    SND.play('purchase');
-    showToast(`🎉 جایزه ${reward} سکه دریافت شد!`);
-    renderQuests();
-    updateCoinsUI();
-  }
-};
 
 function getRunScore() { return (typeof S !== 'undefined' && S && !isDead) ? (S.score || 0) : 0; }
 function getEffectiveTotalScore() { return totalScore + getRunScore(); }
@@ -470,7 +389,7 @@ loadGameData();
 checkQuestReset();
 if(!profile || profile.name === 'بازیکن ناشناس' || !profile.name) { profile = { name: defaultName, avatar: 1 }; saveGameData(); }
 
-setInterval(() => { saveGameData(); }, 1000); // ذخیره در حافظه گوشی هر ۱ ثانیه (خواسته شما)
+setInterval(() => { saveGameData(); }, 1000); 
 
 function handleExitSave() { 
   saveGameData(); 
@@ -485,25 +404,15 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) handl
 let selectedAvatarId = profile.avatar;
 
 function updateCoinsUI() {
-  document.getElementById('shopCoins').textContent = coins;
-}
-
-function renderProfileUI() {
-  document.getElementById('nameInput').value = profile.name;
-  const av = getAvatarById(selectedAvatarId);
-  document.getElementById('previewAvatar').innerHTML = av.svg;
-  document.getElementById('previewAvatar').style.color = av.color;
-  document.getElementById('previewName').textContent = profile.name;
-  document.getElementById('totalScoreVal').textContent = totalScore;
-  document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
-  document.getElementById('avatarGrid').innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
-  document.getElementById('soundToggle').classList.toggle('on', SND.enabled);
-  updateCoinsUI();
+  const el = document.getElementById('shopCoins');
+  if(el) el.textContent = coins;
 }
 
 function showToast(msg) {
   const toast = document.getElementById('toastNotification');
-  document.getElementById('toastText').textContent = msg;
+  const toastText = document.getElementById('toastText');
+  if(!toast || !toastText) return;
+  toastText.textContent = msg;
   toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
   clearTimeout(toast.hideTimer); toast.hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
@@ -517,203 +426,7 @@ window.copyRecoveryCode = () => {
 window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
 window.updatePreview = () => { const val = document.getElementById('nameInput').value.trim(); document.getElementById('previewName').textContent = val || profile.name; };
 
-document.getElementById('saveProfileBtn').onclick = async () => {
-  const newName = document.getElementById('nameInput').value.trim();
-  const btn = document.getElementById('saveProfileBtn');
-  if(!newName) { showToast('❌ لطفا یک اسم وارد کنید.'); return; }
-  SND.play('uiClick'); btn.innerHTML = 'در حال بررسی...'; btn.disabled = true;
-  const currentScores = await getScores();
-  const isTaken = Array.isArray(currentScores) && currentScores.some(s => s.name.toLowerCase() === newName.toLowerCase() && s.dev_id !== deviceId);
-  if(isTaken) { showToast('❌ این اسم قبلا انتخاب شده است.'); btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; return; }
-  const oldName = profile.name;
-  profile = { name: newName, avatar: selectedAvatarId };
-  saveGameData(); await saveScoreToLeaderboard(getEffectiveTotalScore());
-  showToast(oldName !== newName ? `✨ اسم شما به «${newName}» تغییر یافت و سیو شد!` : '✅ پروفایل و پیشرفت شما در ابر ذخیره شد!');
-  btn.innerHTML = 'ذخیره در فضای ابری'; btn.disabled = false; document.querySelector('.tab[data-tab="game"]').click();
-};
-
-window.restoreAccount = async () => {
-  const nameToRestore = prompt("نام فرمانده‌ای که قبلاً ساختی را وارد کن:");
-  if (!nameToRestore) return;
-  const codeToRestore = prompt("کد بازیابی (Recovery Code) خود را وارد کن (مثلا SEPI-1234):");
-  if (!codeToRestore) return;
-  showToast("⏳ در حال جستجوی اکانت...");
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=ilike.${nameToRestore}&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-    const data = await res.json();
-    if (data && data.length > 0 && data[0].save_data) {
-      const remoteSave = data[0].save_data;
-      if (remoteSave.recoveryCode !== codeToRestore) { showToast("❌ کد بازیابی اشتباه است! دسترسی رد شد."); return; }
-      profile = remoteSave.profile || { name: data[0].name, avatar: data[0].avatar };
-      coins = remoteSave.coins || 0; ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
-      ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
-      ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
-      weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
-      totalScore = safeNum(remoteSave.totalScore, 0);
-      currentRunScore = safeNum(remoteSave.currentRunScore, 0);
-      localStorage.setItem('shooter_current_run_score', String(currentRunScore));
-      recoveryCode = remoteSave.recoveryCode || generateRecoveryCode();
-      deviceId = data[0].dev_id; localStorage.setItem('shooter_device_id', deviceId);
-      saveGameData(); showToast("✅ اکانت با موفقیت بازیابی شد! در حال رفرش..."); setTimeout(() => { location.reload(); }, 1500);
-    } else { showToast("❌ اکانتی با این نام پیدا نشد."); }
-  } catch (e) { showToast("❌ خطای شبکه در بازیابی اکانت."); }
-};
-
-document.getElementById('soundToggle').addEventListener('click', () => { 
-  SND.init(); 
-  SND.setEnabled(!SND.enabled); 
-  renderProfileUI(); 
-  if (SND.enabled) SND.play('uiClick'); 
-});
-renderProfileUI();
-
-let bgmAudio = new Audio();
-document.getElementById('bgmUpload').addEventListener('change', function(e) { const file = e.target.files[0]; if (file) { bgmAudio.src = URL.createObjectURL(file); bgmAudio.play(); } });
-document.getElementById('playBgmBtn').onclick = () => bgmAudio.play();
-document.getElementById('pauseBgmBtn').onclick = () => bgmAudio.pause();
-
-let currentShopTab = 'weapons';
-function switchShopTab(tab, btn) {
-  SND.play('uiClick'); currentShopTab = tab;
-  document.querySelectorAll('.shop-tab').forEach(b => { b.style.background = 'rgba(0,255,255,.1)'; b.style.color = '#fff'; b.classList.remove('active'); });
-  btn.style.background = '#00ffff'; btn.style.color = '#000'; btn.classList.add('active');
-  
-  if (tab === 'quests') {
-    renderQuests();
-  } else {
-    renderShop();
-  }
-}
-
-function renderShop() {
-  updateCoinsUI();
-  const list = document.getElementById('shopList');
-  if (currentShopTab === 'weapons') {
-    list.innerHTML = WEAPONS.map(w => {
-      const isOwned = ownedWeapons.includes(w.id); const isEquipped = equippedWeapon === w.id;
-      const lvl = weaponLevels[w.id] || 0; const actualDmg = w.dmg + (lvl * 2); const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>`;
-      let upgradeHtml = isOwned ? `<button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
-      return `<div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? `<div class="w-price">💰 ${w.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div>`;
-    }).join('');
-  } else if (currentShopTab === 'skins') {
-    list.innerHTML = SKINS.map(sk => {
-      const isOwned = ownedSkins.includes(sk.id); const isEquipped = equippedSkin === sk.id;
-      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>`;
-      return `<div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? `<div class="s-price">💰 ${sk.cost}</div>` : ''}${actionHtml}</div></div></div>`;
-    }).join('');
-    setTimeout(() => { document.querySelectorAll('.skin-preview').forEach(el => { drawSkinPreview(el, parseInt(el.dataset.skin)); }); }, 50);
-  } else if (currentShopTab === 'minis') {
-    list.innerHTML = MINI_SHIPS.map(m => {
-      const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
-      const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
-      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button>` : `<button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>`;
-      let upgradeHtml = isOwned ? `<button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
-      return `<div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="m-action">${!isOwned ? `<div class="m-price">💰 ${m.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div></div>`;
-    }).join('');
-    setTimeout(() => { document.querySelectorAll('.mini-preview').forEach(el => { drawMiniPreview(el, parseInt(el.dataset.mini)); }); }, 50);
-  }
-}
-
-function drawSkinPreview(container, skinId) {
-  const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 100;
-  canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block'; canvas.style.position = 'static';
-  const c = canvas.getContext('2d'); const sk = getSkinById(skinId); c.translate(50, 50); drawShipShape(c, sk, 1.1);
-  container.innerHTML = ''; container.appendChild(canvas);
-}
-
-function drawMiniPreview(container, miniId) {
-  const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 100;
-  canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block'; canvas.style.position = 'static';
-  const c = canvas.getContext('2d'); const m = getMiniById(miniId); c.translate(50, 50);
-  drawMiniShape(c, m, 2.5);
-  container.innerHTML = ''; container.appendChild(canvas);
-}
-
-window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
-window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
-window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
-window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
-window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
-window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
-
-function drawShipShape(c, skin, scale) {
-  scale = scale || 1; c.save(); c.scale(scale, scale);
-  const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
-  const gg = (x0,y0,x1,y1,c1,c2,c3) => { const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,c1); if(c3){g.addColorStop(.5,c2);g.addColorStop(1,c3);}else{g.addColorStop(1,c2);} return g; };
-  c.shadowBlur = 10; c.shadowColor = skin.glow;
-  if (t === 'interceptor') {
-    c.fillStyle = gg(0,-20,0,30,'#ff1a1a','#800000','#ff4d4d'); c.beginPath(); c.moveTo(0,-5); c.lineTo(45,15); c.lineTo(50,25); c.lineTo(20,25); c.lineTo(0,35); c.lineTo(-20,25); c.lineTo(-50,25); c.lineTo(-45,15); c.closePath(); c.fill();
-    c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(15,18); c.lineTo(35,22); c.moveTo(-15,18); c.lineTo(-35,22); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#ffffff','#aaaaaa','#555555'); c.beginPath(); c.moveTo(0,-35); c.lineTo(12,-5); c.lineTo(15,15); c.lineTo(5,25); c.lineTo(-5,25); c.lineTo(-15,15); c.lineTo(-12,-5); c.closePath(); c.fill();
-    c.shadowBlur = 15; c.shadowColor = '#00ffff'; c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0,-15,4,10,0,0,Math.PI*2); c.fill();
-  } else if (t === 'falcon') {
-    c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
-    c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
-    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
-  } else if (t === 'phantom') {
-    c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
-    c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#1a0033','#000000'); c.beginPath(); c.moveTo(0,-35); c.lineTo(8,-5); c.lineTo(5,15); c.lineTo(-5,15); c.lineTo(-8,-5); c.closePath(); c.fill();
-    c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0,-5,4,0,Math.PI*2); c.fill();
-  } else if (t === 'aegis') {
-    c.fillStyle = gg(0,0,0,30,'#cc9900','#ffd700','#997a00'); c.beginPath(); c.moveTo(0,-10); c.lineTo(40,-5); c.lineTo(55,15); c.lineTo(30,25); c.lineTo(0,20); c.lineTo(-30,25); c.lineTo(-55,15); c.lineTo(-40,-5); c.closePath(); c.fill();
-    c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(15,0); c.lineTo(30,10); c.moveTo(-15,0); c.lineTo(-30,10); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#dddddd','#777777'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-5); c.lineTo(12,20); c.lineTo(0,25); c.lineTo(-12,20); c.lineTo(-15,-5); c.closePath(); c.fill();
-    c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00'; c.fillRect(-18,-5,5,15); c.fillRect(13,-5,5,15);
-    c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0,-15,4,6,0,0,Math.PI*2); c.fill();
-  } else if (t === 'crystal') {
-    c.fillStyle = gg(0,-20,0,30,'#ffffff','#7df9ff','#00d2ff'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-10); c.lineTo(40,-5); c.lineTo(20,15); c.lineTo(25,25); c.lineTo(0,15); c.lineTo(-25,25); c.lineTo(-20,15); c.lineTo(-40,-5); c.lineTo(-15,-10); c.closePath(); c.fill();
-    c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = gg(0,-35,0,20,'#e0ffff','#7df9ff'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,-5); c.lineTo(5,20); c.lineTo(-5,20); c.lineTo(-10,-5); c.closePath(); c.fill();
-    c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff'; c.beginPath(); c.arc(0,-10,6,0,Math.PI*2); c.fill();
-  }
-  c.shadowBlur = 0; c.restore();
-}
-
-function drawMiniShape(c, mini, scale) {
-  scale = scale || 1; c.save(); c.scale(scale, scale);
-  c.shadowBlur = 10; c.shadowColor = mini.color;
-  if (mini.type === 'jet') {
-    let grad = c.createLinearGradient(0,-14,0,14); grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#555555');
-    c.fillStyle = grad; c.beginPath(); c.moveTo(0,-14); c.lineTo(6,-2); c.lineTo(14,6); c.lineTo(4,4); c.lineTo(3,12); c.lineTo(0,8); c.lineTo(-3,12); c.lineTo(-4,4); c.lineTo(-14,6); c.lineTo(-6,-2); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 1.5; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.ellipse(0,-3,2.5,5,0,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'phantom') {
-    c.fillStyle = '#1a0033'; c.beginPath(); c.moveTo(0,-15); c.lineTo(10,0); c.lineTo(0,15); c.lineTo(-10,0); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'guardian') {
-    c.fillStyle = '#332200'; c.beginPath(); c.moveTo(-12,-12); c.lineTo(12,-12); c.lineTo(12,12); c.lineTo(-12,12); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'eye') {
-    c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
-    c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'gatling') {
-    c.fillStyle = '#222'; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.save(); c.rotate(S.t ? S.t * 0.1 : 0);
-    c.fillStyle = '#555'; c.fillRect(-2,-16,4,10); c.fillRect(-2,6,4,10); c.fillRect(-16,-2,10,4); c.fillRect(6,-2,10,4);
-    c.restore();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'crystal') {
-    c.fillStyle = '#003344'; c.beginPath(); for(let i=0;i<6;i++){ let ang=i*Math.PI/3; let px=Math.cos(ang)*12, py=Math.sin(ang)*12; i===0?c.moveTo(px,py):c.lineTo(px,py); } c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'blackhole') {
-    c.fillStyle = '#000'; c.shadowBlur = 20; c.shadowColor = mini.color; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  }
-  c.shadowBlur = 0; c.restore();
-}
-  function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
+function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
 resize();
 addEventListener('resize', () => { resize(); if(S){ S.player.y = Math.min(S.player.y, H - 40); S.player.x = Math.min(S.player.x, W - 22); } });
 
@@ -747,9 +460,10 @@ function reset(){
   nextBossScore = (currentBossIndex + 1) * 1000;
   isBossActive = false; isDead = false;
   isBossWarningActive = false; bossWarningTimer = 0;
-  dangerOverlay.classList.remove('show');
-  bossWarning.classList.remove('show');
-  document.getElementById('gameOver').style.display = 'none';
+  if(dangerOverlay) dangerOverlay.classList.remove('show');
+  if(bossWarning) bossWarning.classList.remove('show');
+  const go = document.getElementById('gameOver');
+  if(go) go.style.display = 'none';
   
   for(let i = 0; i < 50; i++) S.stars.push({ x: Math.random()*W, y: Math.random()*H, z: Math.random()*0.8 + 0.2 });
 }
@@ -847,6 +561,80 @@ function boom(x, y, hue, n){
   if (n > 5) S.shockwaves.push({ x, y, r: 5, maxR: 80, life: 1 });
   for(let i = 0; i < n; i++){ const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05; S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 }); } 
 }
+function drawShipShape(c, skin, scale) {
+  scale = scale || 1; c.save(); c.scale(scale, scale);
+  const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
+  const gg = (x0,y0,x1,y1,c1,c2,c3) => { const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,c1); if(c3){g.addColorStop(.5,c2);g.addColorStop(1,c3);}else{g.addColorStop(1,c2);} return g; };
+  c.shadowBlur = 10; c.shadowColor = skin.glow;
+  if (t === 'interceptor') {
+    c.fillStyle = gg(0,-20,0,30,'#ff1a1a','#800000','#ff4d4d'); c.beginPath(); c.moveTo(0,-5); c.lineTo(45,15); c.lineTo(50,25); c.lineTo(20,25); c.lineTo(0,35); c.lineTo(-20,25); c.lineTo(-50,25); c.lineTo(-45,15); c.closePath(); c.fill();
+    c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(15,18); c.lineTo(35,22); c.moveTo(-15,18); c.lineTo(-35,22); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#ffffff','#aaaaaa','#555555'); c.beginPath(); c.moveTo(0,-35); c.lineTo(12,-5); c.lineTo(15,15); c.lineTo(5,25); c.lineTo(-5,25); c.lineTo(-15,15); c.lineTo(-12,-5); c.closePath(); c.fill();
+    c.shadowBlur = 15; c.shadowColor = '#00ffff'; c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0,-15,4,10,0,0,Math.PI*2); c.fill();
+  } else if (t === 'falcon') {
+    c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
+    c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
+    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
+  } else if (t === 'phantom') {
+    c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
+    c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#1a0033','#000000'); c.beginPath(); c.moveTo(0,-35); c.lineTo(8,-5); c.lineTo(5,15); c.lineTo(-5,15); c.lineTo(-8,-5); c.closePath(); c.fill();
+    c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0,-5,4,0,Math.PI*2); c.fill();
+  } else if (t === 'aegis') {
+    c.fillStyle = gg(0,0,0,30,'#cc9900','#ffd700','#997a00'); c.beginPath(); c.moveTo(0,-10); c.lineTo(40,-5); c.lineTo(55,15); c.lineTo(30,25); c.lineTo(0,20); c.lineTo(-30,25); c.lineTo(-55,15); c.lineTo(-40,-5); c.closePath(); c.fill();
+    c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(15,0); c.lineTo(30,10); c.moveTo(-15,0); c.lineTo(-30,10); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#dddddd','#777777'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-5); c.lineTo(12,20); c.lineTo(0,25); c.lineTo(-12,20); c.lineTo(-15,-5); c.closePath(); c.fill();
+    c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00'; c.fillRect(-18,-5,5,15); c.fillRect(13,-5,5,15);
+    c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0,-15,4,6,0,0,Math.PI*2); c.fill();
+  } else if (t === 'crystal') {
+    c.fillStyle = gg(0,-20,0,30,'#ffffff','#7df9ff','#00d2ff'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-10); c.lineTo(40,-5); c.lineTo(20,15); c.lineTo(25,25); c.lineTo(0,15); c.lineTo(-25,25); c.lineTo(-20,15); c.lineTo(-40,-5); c.lineTo(-15,-10); c.closePath(); c.fill();
+    c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = gg(0,-35,0,20,'#e0ffff','#7df9ff'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,-5); c.lineTo(5,20); c.lineTo(-5,20); c.lineTo(-10,-5); c.closePath(); c.fill();
+    c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff'; c.beginPath(); c.arc(0,-10,6,0,Math.PI*2); c.fill();
+  }
+  c.shadowBlur = 0; c.restore();
+}
+
+function drawMiniShape(c, mini, scale) {
+  scale = scale || 1; c.save(); c.scale(scale, scale);
+  c.shadowBlur = 10; c.shadowColor = mini.color;
+  if (mini.type === 'jet') {
+    let grad = c.createLinearGradient(0,-14,0,14); grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#555555');
+    c.fillStyle = grad; c.beginPath(); c.moveTo(0,-14); c.lineTo(6,-2); c.lineTo(14,6); c.lineTo(4,4); c.lineTo(3,12); c.lineTo(0,8); c.lineTo(-3,12); c.lineTo(-4,4); c.lineTo(-14,6); c.lineTo(-6,-2); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.ellipse(0,-3,2.5,5,0,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'phantom') {
+    c.fillStyle = '#1a0033'; c.beginPath(); c.moveTo(0,-15); c.lineTo(10,0); c.lineTo(0,15); c.lineTo(-10,0); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'guardian') {
+    c.fillStyle = '#332200'; c.beginPath(); c.moveTo(-12,-12); c.lineTo(12,-12); c.lineTo(12,12); c.lineTo(-12,12); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'eye') {
+    c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
+    c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'gatling') {
+    c.fillStyle = '#222'; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.save(); c.rotate(S.t ? S.t * 0.1 : 0);
+    c.fillStyle = '#555'; c.fillRect(-2,-16,4,10); c.fillRect(-2,6,4,10); c.fillRect(-16,-2,10,4); c.fillRect(6,-2,10,4);
+    c.restore();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'crystal') {
+    c.fillStyle = '#003344'; c.beginPath(); for(let i=0;i<6;i++){ let ang=i*Math.PI/3; let px=Math.cos(ang)*12, py=Math.sin(ang)*12; i===0?c.moveTo(px,py):c.lineTo(px,py); } c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'blackhole') {
+    c.fillStyle = '#000'; c.shadowBlur = 20; c.shadowColor = mini.color; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  }
+  c.shadowBlur = 0; c.restore();
+}
 
 let lastSync = 0;
 async function autoSync() { 
@@ -896,19 +684,16 @@ function update(dt){
         boom(e.x, e.y, e.hue, 30);
         if (e.isBoss) {
           S.score += 300;
-          addQuestProgress('bosses', 1);
           isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000;
           spawnHeart(e.x, e.y);
         } else {
           S.combo++; S.comboTimer = 2500;
           let comboMult = Math.min(1 + Math.floor(S.combo / 10), 3);
           S.score += 10 * comboMult;
-          addQuestProgress('kills', 1);
         }
         let coinMultiplier = 1 + Math.floor(S.score / 2000);
         coins += (e.isBoss ? 60 : 3) * coinMultiplier;
       });
-      addQuestProgress('score', S.score, true);
       S.enemies = []; 
       S.ebullets = []; 
       saveGameData();
@@ -998,13 +783,10 @@ function update(dt){
           if (e.isBoss) {
             S.score += 300;
             S.rocketCharge = Math.min(100, S.rocketCharge + 30);
-            addQuestProgress('bosses', 1);
           } else {
             S.score += 10 * comboMult;
             S.rocketCharge = Math.min(100, S.rocketCharge + 4);
-            addQuestProgress('kills', 1);
           }
-          addQuestProgress('score', S.score, true);
           
           let coinMultiplier = 1 + Math.floor(S.score / 2000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
           if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
@@ -1075,7 +857,6 @@ function drawBoss(c, e, bossLvl) {
 
 function triggerGameOver() {
   isDead = true; SND.play('gameOver'); const achievedScore = S.score; const bonusCoins = Math.floor(achievedScore / 8);
-  addQuestProgress('score', S.score, true);
   if(achievedScore > 0) {
     totalScore += achievedScore; coins += bonusCoins; currentRunScore = 0;
     localStorage.setItem('shooter_current_run_score', '0'); saveGameData(); saveScoreToLeaderboard(totalScore);
@@ -1333,14 +1114,81 @@ function loop(ts){
 }
 requestAnimationFrame(loop);
 
+function renderShop() {
+  updateCoinsUI();
+  const list = document.getElementById('shopList');
+  if (currentShopTab === 'weapons') {
+    list.innerHTML = WEAPONS.map(w => {
+      const isOwned = ownedWeapons.includes(w.id); const isEquipped = equippedWeapon === w.id;
+      const lvl = weaponLevels[w.id] || 0; const actualDmg = w.dmg + (lvl * 2); const upgradeCost = Math.floor(200 * Math.pow(1.5, lvl));
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipWeapon(${w.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < w.cost ? 'disabled' : ''} onclick="buyWeapon(${w.id})">خرید</button>`;
+      let upgradeHtml = isOwned ? `<button class="w-btn btn-upgrade" ${coins < upgradeCost ? 'disabled' : ''} onclick="upgradeWeapon(${w.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
+      return `<div class="weapon-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="w-info"><h3>${w.name}</h3><p>دمیج: ${actualDmg} | تعداد تیر: ${w.count}</p></div><div class="w-action">${!isOwned ? `<div class="w-price">💰 ${w.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div>`;
+    }).join('');
+  } else if (currentShopTab === 'skins') {
+    list.innerHTML = SKINS.map(sk => {
+      const isOwned = ownedSkins.includes(sk.id); const isEquipped = equippedSkin === sk.id;
+      let actionHtml = isEquipped ? '<button class="w-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="w-btn btn-equip" onclick="equipSkin(${sk.id})">مجهز کردن</button>` : `<button class="w-btn btn-buy" ${coins < sk.cost ? 'disabled' : ''} onclick="buySkin(${sk.id})">خرید</button>`;
+      return `<div class="skin-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="s-info"><h3>${sk.name}</h3><p>ظاهر سفینه</p></div><div style="display:flex;align-items:center;"><div class="skin-preview" data-skin="${sk.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="s-action">${!isOwned ? `<div class="s-price">💰 ${sk.cost}</div>` : ''}${actionHtml}</div></div></div>`;
+    }).join('');
+    setTimeout(() => { document.querySelectorAll('.skin-preview').forEach(el => { drawSkinPreview(el, parseInt(el.dataset.skin)); }); }, 50);
+  } else if (currentShopTab === 'minis') {
+    list.innerHTML = MINI_SHIPS.map(m => {
+      const isOwned = ownedMinis.includes(m.id); const isEquipped = equippedMini === m.id;
+      const lvl = miniShipLevels[m.id] || 0; const upgradeCost = Math.floor(2000 * Math.pow(1.8, lvl));
+      let actionHtml = isEquipped ? '<button class="m-btn btn-equipped">مجهز شده</button>' : isOwned ? `<button class="m-btn btn-equip" onclick="equipMini(${m.id})">مجهز کردن</button>` : `<button class="m-btn btn-buy" ${coins < m.cost ? 'disabled' : ''} onclick="buyMini(${m.id})">خرید</button>`;
+      let upgradeHtml = isOwned ? `<button class="m-btn m-btn-upgrade" ${coins < upgradeCost || lvl >= 5 ? 'disabled' : ''} onclick="upgradeMini(${m.id})">⚡ ارتقا Lvl ${lvl} - 💰 ${upgradeCost}</button>` : '';
+      return `<div class="mini-card ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}"><div class="m-info"><h3>${m.name}</h3><p>مینی سفینه همراه</p></div><div style="display:flex;align-items:center;"><div class="mini-preview" data-mini="${m.id}" style="width:65px;height:65px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid rgba(0,255,255,.2);display:flex;align-items:center;justify-content:center;margin-left:10px;overflow:hidden;"></div><div class="m-action">${!isOwned ? `<div class="m-price">💰 ${m.cost}</div>` : ''}${actionHtml}${upgradeHtml}</div></div></div>`;
+    }).join('');
+    setTimeout(() => { document.querySelectorAll('.mini-preview').forEach(el => { drawMiniPreview(el, parseInt(el.dataset.mini)); }); }, 50);
+  }
+}
+
+function drawSkinPreview(container, skinId) {
+  const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 100;
+  canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block'; canvas.style.position = 'static';
+  const c = canvas.getContext('2d'); const sk = getSkinById(skinId); c.translate(50, 50); drawShipShape(c, sk, 1.1);
+  container.innerHTML = ''; container.appendChild(canvas);
+}
+
+function drawMiniPreview(container, miniId) {
+  const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 100;
+  canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block'; canvas.style.position = 'static';
+  const c = canvas.getContext('2d'); const m = getMiniById(miniId); c.translate(50, 50);
+  drawMiniShape(c, m, 2.5);
+  container.innerHTML = ''; container.appendChild(canvas);
+}
+
+window.buyWeapon = (id) => { SND.init(); const w = WEAPONS.find(x => x.id === id); if (coins >= w.cost && !ownedWeapons.includes(id)) { coins -= w.cost; ownedWeapons.push(id); equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🔫 سلاح «${w.name}» خریداری شد!`); SND.play('purchase'); } };
+window.upgradeWeapon = (id) => { SND.init(); const lvl = weaponLevels[id] || 0; const cost = Math.floor(200 * Math.pow(1.5, lvl)); if (coins >= cost) { coins -= cost; weaponLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ ارتقا به لول ${lvl+1} انجام شد!`); SND.play('upgrade'); } };
+window.equipWeapon = (id) => { SND.init(); SND.play('uiClick'); if (ownedWeapons.includes(id)) { equippedWeapon = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
+window.buySkin = (id) => { SND.init(); const sk = getSkinById(id); if (coins >= sk.cost && !ownedSkins.includes(id)) { coins -= sk.cost; ownedSkins.push(id); equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🚀 اسکین «${sk.name}» خریداری شد!`); SND.play('purchase'); } };
+window.equipSkin = (id) => { SND.init(); SND.play('uiClick'); if (ownedSkins.includes(id)) { equippedSkin = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
+window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m.cost && !ownedMinis.includes(id)) { coins -= m.cost; ownedMinis.push(id); equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`🛸 همراه «${m.name}» خریداری شد!`); SND.play('purchase'); } };
+window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
+window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
+
 renderShop();
-  if ('serviceWorker' in navigator) {
+
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then(r => console.log('SW OK:', r.scope))
       .catch(e => console.error('SW fail:', e));
   });
-  }
+}
+
+// Animated Splash Logic
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('astro-splash');
+    if (splash) {
+      splash.style.opacity = '0';
+      splash.style.pointerEvents = 'none';
+      setTimeout(() => splash.remove(), 1000);
+    }
+  }, 3000);
+});
 </script>
 </body>
 </html>
