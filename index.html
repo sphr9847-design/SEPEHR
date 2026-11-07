@@ -51,8 +51,6 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .quest-info p{font-size:12px;color:#8bb5c9;}
 .quest-progress-bar{width:100%;height:6px;background:rgba(0,0,0,0.5);border-radius:3px;margin-top:8px;overflow:hidden;}
 .quest-progress-fill{height:100%;background:linear-gradient(90deg,#0ff,#00ff88);border-radius:3px;transition:width 0.3s;}
-.claim-btn{padding:10px 15px;border-radius:20px;border:none;background:linear-gradient(135deg, #ffd700, #ff8800);color:#000;font-size:14px;cursor:pointer;transition:0.3s;margin-right:10px;font-family:'Lalezar', cursive;}
-.claim-btn:disabled{background:rgba(255,255,255,0.1);color:#666;cursor:not-allowed;box-shadow:none;}
 
 #rankList{list-style:none;max-width:450px;margin:0 auto;padding:0}
 #rankList li{display:flex;align-items:center;padding:15px 20px;margin-bottom:12px;background:rgba(0,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(0,255,255,.2);border-radius:15px;font-size:16px;transition:transform .25s,background .25s,box-shadow .25s}
@@ -73,24 +71,87 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .weapon-card:hover,.skin-card:hover,.mini-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(0,255,255,.4);box-shadow:0 15px 35px rgba(0,0,0,.5), 0 0 20px rgba(0,255,255,.15)}
 .weapon-card.equipped,.skin-card.equipped,.mini-card.equipped{border-color:rgba(0,255,255,0.6);background:rgba(0,255,255,.08);box-shadow:0 0 25px rgba(0,255,255,.2)}
 
-.w-btn,.m-btn{padding:12px 18px;border-radius:30px;font-size:15px;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.5);font-family:'Lalezar', cursive;backdrop-filter:blur(5px);}
-.btn-buy{background:linear-gradient(135deg, #ffd700, #ff8800);color:#000;border:none}
-.btn-buy:not(:disabled):hover{box-shadow:0 0 20px rgba(255,215,0,.6);transform:translateY(-2px)}
-.btn-equip{background:transparent;border:2px solid #00ffff;color:#00ffff}
-.btn-equipped{background:linear-gradient(135deg, #00ffcc, #00ccff);color:#000;border:none}
-.btn-upgrade,.m-btn-upgrade{background:linear-gradient(135deg, #ff00cc, #5500ff);color:#fff;border:1px solid rgba(255,255,255,.2)}
-.btn-upgrade:not(:disabled):hover{box-shadow:0 0 25px rgba(255,0,204,.6);transform:translateY(-2px)}
+/* --- دکمه‌های شیشه‌ای جدید فروشگاه --- */
+.w-btn, .m-btn, .claim-btn {
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-family: 'Lalezar', cursive;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.w-btn:hover:not(:disabled), .m-btn:hover:not(:disabled), .claim-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.2);
+}
 
-.save-btn{background:linear-gradient(135deg, #00d2ff, #0055ff);border-radius:15px;box-shadow:0 5px 20px rgba(0,85,255,.4);transition:0.3s;font-family:'Lalezar', cursive;}
-.save-btn:hover{box-shadow:0 0 30px rgba(0,210,255,.6);transform:translateY(-2px)}
+/* دکمه خرید (طلایی شفاف) */
+.btn-buy {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 136, 0, 0.3));
+  color: #ffd700;
+  border-color: rgba(255, 215, 0, 0.5);
+}
+.btn-buy:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 136, 0, 0.6));
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* دکمه مجهز کردن (فیروزه‌ای شفاف) */
+.btn-equip {
+  background: linear-gradient(135deg, rgba(0, 255, 204, 0.1), rgba(0, 85, 255, 0.1));
+  color: #00ffff;
+  border-color: rgba(0, 255, 255, 0.4);
+}
+.btn-equip:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0, 255, 204, 0.4), rgba(0, 85, 255, 0.4));
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* دکمه مجهز شده (سبز شفاف) */
+.btn-equipped {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.4), rgba(0, 204, 255, 0.4));
+  color: #ffffff;
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* دکمه ارتقا (بنفش/صورتی شفاف) */
+.btn-upgrade, .m-btn-upgrade {
+  background: linear-gradient(135deg, rgba(255, 0, 204, 0.2), rgba(85, 0, 255, 0.2));
+  color: #ff4fd8;
+  border-color: rgba(255, 0, 204, 0.5);
+}
+.btn-upgrade:hover:not(:disabled), .m-btn-upgrade:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255, 0, 204, 0.6), rgba(85, 0, 255, 0.6));
+  color: #fff;
+  box-shadow: 0 0 25px rgba(255, 0, 204, 0.6), inset 0 0 15px rgba(255, 0, 204, 0.3);
+}
+
+/* حالت غیرفعال (قفل) */
+.w-btn:disabled, .m-btn:disabled, .claim-btn:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+  box-shadow: none;
+  text-shadow: none;
+}
+
 .restore-btn{border:2px solid rgba(255,79,216,0.8);color:#ff4fd8;border-radius:15px;transition:0.3s;font-family:'Lalezar', cursive;background:rgba(255,79,216,0.1);backdrop-filter:blur(5px);}
 .restore-btn:hover{background:rgba(255,79,216,.2);box-shadow:0 0 20px rgba(255,79,216,.3)}
 
 .refresh-btn{background:rgba(0,255,255,.08);backdrop-filter:blur(10px);border:1px solid rgba(0,255,255,.3);color:#00ffff;border-radius:30px;box-shadow:0 0 15px rgba(0,255,255,.1);transition:0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 20px auto;padding:12px 25px;font-family:'Lalezar', cursive;font-size:16px;}
 .refresh-btn:hover{background:rgba(0,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.4);transform:translateY(-2px);border-color:#00ffff}
 
-.form-group input[type="text"], .form-group input[type="password"]{background:rgba(0,0,0,.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;transition:0.3s;color:#fff;width:100%;font-family:'Vazirmatn';}
-.form-group input:focus{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.2);outline:none}
 .avatar-btn{border-radius:15px;transition:0.3s;border:1px solid rgba(255,255,255,.1);padding:5px;display:flex;justify-content:center;align-items:center;cursor:pointer;background:rgba(0,0,0,0.3);backdrop-filter:blur(5px);}
 .avatar-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1)}
 .avatar-btn.selected{border-color:#00ffff;box-shadow:0 0 20px rgba(0,255,255,.3);background:rgba(0,255,255,.15);transform:scale(1.1)}
@@ -112,9 +173,8 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 
 /* Animated Splash Screen */
 #astro-splash {position: fixed;top: 0; left: 0; width: 100vw; height: 100vh;background-color: #000011;display: flex; justify-content: center; align-items: center;z-index: 99999;transition: opacity 1s ease-in-out;}
-.astro-text {font-family: 'Arial Black', Impact, sans-serif;font-size: 5rem;letter-spacing: 5px;color: #ffffff;text-transform: uppercase;text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff, 0 0 40px #0055ff, 0 0 80px #ff00cc;animation: pulse-glow 1.5s infinite alternate;}
-@keyframes pulse-glow {0% { text-shadow: 0 0 10px #00f3ff, 0 0 20px #0055ff; transform: scale(1); }100% { text-shadow: 0 0 20px #00f3ff, 0 0 40px #ff00cc, 0 0 60px #ff00cc; transform: scale(1.05); }}
-
+.astro-text {font-family: 'Arial Black', Impact, sans-serif;font-size: 5rem;letter-spacing: 5px;color: #ffffff;text-transform: uppercase;text-shadow: 0 0 20px #00f3ff, 0 0 40px #ff00cc;animation: pulse-glow 1.5s infinite alternate;will-change: transform, opacity;}
+@keyframes pulse-glow {0% { transform: scale(1); opacity: 0.7; }100% { transform: scale(1.1); opacity: 1; }}
 /* Auth Overlay Styles */
 .auth-overlay {position: fixed; inset: 0; background: rgba(3, 6, 15, 0.8);backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);display: flex; justify-content: center; align-items: center;z-index: 100000; padding: 20px; transition: opacity 0.5s;}
 .auth-box {background: rgba(10, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.3);border-radius: 25px; padding: 30px 20px; width: 100%; max-width: 400px;text-align: center; box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);}
@@ -124,10 +184,23 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .auth-btn {width: 100%; padding: 15px; border-radius: 12px; border: none;background: linear-gradient(135deg, #00d2ff, #0055ff); color: #fff;font-family: 'Lalezar'; font-size: 20px; cursor: pointer; transition: 0.3s;margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0, 85, 255, 0.4);}
 .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 210, 255, 0.6); }
 .auth-error { color: #ff3333; font-size: 14px; margin-top: 10px; min-height: 20px; }
+
+/* --- Logout Confirmation Modal --- */
+#logoutModal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 200000; display: none; justify-content: center; align-items: center; padding: 20px; }
+.logout-box { background: rgba(10, 20, 40, 0.9); border: 1px solid rgba(255, 51, 102, 0.4); border-radius: 20px; padding: 25px; text-align: center; width: 100%; max-width: 350px; box-shadow: 0 0 30px rgba(255, 51, 102, 0.2); transform: scale(0.9); transition: transform 0.3s; }
+#logoutModal.show .logout-box { transform: scale(1); }
+.logout-box h3 { color: #ff3366; font-family: 'Lalezar'; font-size: 24px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,51,102,0.5); }
+.logout-box p { color: #8bb5c9; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-family: 'Lalezar'; font-size: 16px; cursor: pointer; transition: 0.3s; }
+.modal-btn-yes { background: rgba(255, 51, 102, 0.2); border: 1px solid #ff3366; color: #ff3366; }
+.modal-btn-yes:hover { background: rgba(255, 51, 102, 0.4); color: #fff; box-shadow: 0 0 15px rgba(255,51,102,0.4); }
+.modal-btn-no { background: rgba(0, 255, 255, 0.1); border: 1px solid #00ffff; color: #00ffff; }
+.modal-btn-no:hover { background: rgba(0, 255, 255, 0.3); color: #fff; box-shadow: 0 0 15px rgba(0,255,255,0.4); }
 </style>
 </head>
 <body>
-<!-- Auth Overlay -->
+<!-- Auth Overlay (Login/Register) -->
 <div id="authOverlay" class="auth-overlay" style="display:none;">
   <div class="auth-box">
     <h2>ورود به ASTRO</h2>
@@ -160,6 +233,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 <div id="syncIndicator">☁️</div>
 <canvas id="c"></canvas>
 
+<!-- Shop Panel -->
 <div id="shopPanel" class="panel">
   <h2>🛒 فروشگاه</h2>
   <div class="shop-header" style="text-align:center;margin-bottom:20px;font-size:20px;color:#ffd700;font-weight:900;font-family:'Lalezar';">💰 موجودی شما: <span id="shopCoins">0</span> سکه</div>
@@ -172,6 +246,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <div class="shop-list" id="shopList" style="display:flex;flex-direction:column;gap:15px;"></div>
 </div>
 
+<!-- Rank Panel -->
 <div id="rankPanel" class="panel">
   <h2>🏆 رتبه‌بندی آنلاین</h2>
   <button class="refresh-btn" onclick="renderRank()" id="refreshRankBtn">
@@ -185,6 +260,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <ol id="rankList"></ol>
 </div>
 
+<!-- Profile Panel -->
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
   <div class="profile-top-section" style="display:flex;gap:15px;margin-bottom:20px;align-items:stretch;">
@@ -206,23 +282,21 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
       <div class="preview-total" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,255,255,.2);font-size:16px;color:#ffd700;font-family:'Lalezar';">🌟 امتیاز: <span id="totalScoreVal">0</span></div>
     </div>
   </div>
-  <div class="form-group" style="margin-bottom:15px;">
-    <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:16px;font-family:'Lalezar';">اسم شما (نام فرمانده):</label>
-    <input type="text" id="nameInput" maxlength="12" placeholder="اسمت رو بنویس..." oninput="updatePreview()">
-  </div>
+  
   <div class="form-group" style="margin-bottom:15px;">
     <label style="display:block;margin-bottom:8px;color:#8bb5c9;font-size:16px;font-family:'Lalezar';">انتخاب آواتار (نشان فرماندهی):</label>
     <div class="avatar-grid" id="avatarGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:10px;"></div>
   </div>
+  
   <div class="sound-toggle on" id="soundToggle">
     <span>🔊 افکت‌های صوتی</span>
     <div class="icon"></div>
   </div>
+  
   <div class="cloud-sync-box" style="padding:20px;">
     <div class="cloud-sync-title" style="text-align:center;color:#fff;font-size:20px;margin-bottom:15px;font-family:'Lalezar';">☁️ وضعیت اکانت</div>
     <p style="text-align:center;color:#00ff88;margin-bottom:15px;">شما با نام <strong id="profileNameDisplay"></strong> وارد شده‌اید.</p>
-    <button class="save-btn" id="saveProfileBtn" style="width:100%;padding:14px;margin-bottom:10px;font-size:18px;cursor:pointer;">ذخیره دستی در فضای ابری</button>
-    <button class="restore-btn" onclick="logoutUser()" style="width:100%;padding:12px;font-size:16px;cursor:pointer;background:rgba(255,0,0,0.2);color:#ff5555;border-color:#ff5555;">خروج از اکانت</button>
+    <button class="restore-btn" onclick="showLogoutModal()" style="width:100%;padding:12px;font-size:16px;cursor:pointer;background:rgba(255,0,0,0.2);color:#ff5555;border-color:#ff5555;">خروج از اکانت</button>
   </div>
 </div>
 
@@ -232,6 +306,18 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
   <div class="final-score" style="font-size:28px;color:#fff;margin:10px 0;font-family:'Lalezar';">امتیاز این دست: <span id="finalScoreVal">0</span></div>
   <div id="bonusCoins" style="font-size:24px;color:#ffd700;margin-bottom:15px;font-family:'Lalezar';">💰 پاداش سکه: +0</div>
   <button id="restartBtn">شروع مجدد</button>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal">
+  <div class="logout-box">
+    <h3>🚪 خروج از اکانت</h3>
+    <p>آیا مطمئنی می‌خوای از اکانتت خارج بشی؟<br><span style="font-size:12px;color:#aaa;">(پیشرفتت توی سرور ذخیره شده و با وارد کردن مجدد اسم و رمز برمی‌گرده)</span></p>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-yes" onclick="confirmLogout()">بله، خروج</button>
+      <button class="modal-btn modal-btn-no" onclick="closeLogoutModal()">انصراف</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -328,7 +414,7 @@ let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
 function safeNum(v, fallback) { const n = parseFloat(v); return isFinite(n) ? n : fallback; }
 
 let profile = { name: defaultName, avatar: 1 };
-let currentPassword = null; // رمز عبور برای سیو در دیتابیس
+let currentPassword = null; 
 let coins = 0;
 let ownedWeapons = [1];
 let equippedWeapon = 1;
@@ -428,8 +514,38 @@ function showToast(msg) {
   clearTimeout(toast.hideTimer); toast.hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
-window.selectAvatar = (id) => { selectedAvatarId = id; renderProfileUI(); };
-window.updatePreview = () => { const val = document.getElementById('nameInput').value.trim(); document.getElementById('previewName').textContent = val || profile.name; };
+window.selectAvatar = (id) => { 
+  selectedAvatarId = id; 
+  profile.avatar = id;
+  saveGameData();
+  renderProfileUI(); 
+  saveScoreToLeaderboard(getEffectiveTotalScore(), true);
+};
+
+function renderProfileUI() {
+  const nameDisplay = document.getElementById('profileNameDisplay');
+  if(nameDisplay) nameDisplay.textContent = profile.name;
+  
+  const av = getAvatarById(selectedAvatarId);
+  const pAvatar = document.getElementById('previewAvatar');
+  const pName = document.getElementById('previewName');
+  
+  if(pAvatar) { pAvatar.innerHTML = av.svg; pAvatar.style.color = av.color; }
+  if(pName) pName.textContent = profile.name;
+  
+  const scoreVal = document.getElementById('totalScoreVal');
+  if(scoreVal) scoreVal.textContent = totalScore;
+  
+  const grid = document.getElementById('avatarGrid');
+  if(grid) {
+    grid.innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
+  }
+  
+  const sToggle = document.getElementById('soundToggle');
+  if(sToggle) sToggle.classList.toggle('on', SND.enabled);
+  
+  updateCoinsUI();
+}
 
 // --- سیستم ورود و ثبت‌نام ---
 window.handleAuth = async () => {
@@ -494,12 +610,21 @@ window.handleAuth = async () => {
   }
 };
 
-window.logoutUser = () => {
-  if(confirm('آیا مطمئنی می‌خوای از اکانت خارج بشی؟ (اطلاعاتت در سرور ذخیره شده)')) {
-    localStorage.removeItem('astro_auth_user');
-    localStorage.removeItem('astro_auth_pass');
-    location.reload();
-  }
+// توابع مربوط به مودال شیشه‌ای خروج
+window.showLogoutModal = () => {
+  document.getElementById('logoutModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('logoutModal').classList.add('show'), 10);
+};
+
+window.closeLogoutModal = () => {
+  document.getElementById('logoutModal').classList.remove('show');
+  setTimeout(() => document.getElementById('logoutModal').style.display = 'none', 300);
+};
+
+window.confirmLogout = () => {
+  localStorage.removeItem('astro_auth_user');
+  localStorage.removeItem('astro_auth_pass');
+  location.reload();
 };
 
 function checkAuthOnStart() {
@@ -508,7 +633,7 @@ function checkAuthOnStart() {
   if(savedUser && savedPass) {
     currentPassword = savedPass;
     profile.name = savedUser;
-    // سینک در پس‌زمینه
+    renderProfileUI();
     setTimeout(() => { saveScoreToLeaderboard(getEffectiveTotalScore(), true); }, 2000);
   } else {
     document.getElementById('authOverlay').style.display = 'flex';
@@ -540,6 +665,80 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
     if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
     return false;
   }
+}
+function drawShipShape(c, skin, scale) {
+  scale = scale || 1; c.save(); c.scale(scale, scale);
+  const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
+  const gg = (x0,y0,x1,y1,c1,c2,c3) => { const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,c1); if(c3){g.addColorStop(.5,c2);g.addColorStop(1,c3);}else{g.addColorStop(1,c2);} return g; };
+  c.shadowBlur = 10; c.shadowColor = skin.glow;
+  if (t === 'interceptor') {
+    c.fillStyle = gg(0,-20,0,30,'#ff1a1a','#800000','#ff4d4d'); c.beginPath(); c.moveTo(0,-5); c.lineTo(45,15); c.lineTo(50,25); c.lineTo(20,25); c.lineTo(0,35); c.lineTo(-20,25); c.lineTo(-50,25); c.lineTo(-45,15); c.closePath(); c.fill();
+    c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(15,18); c.lineTo(35,22); c.moveTo(-15,18); c.lineTo(-35,22); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#ffffff','#aaaaaa','#555555'); c.beginPath(); c.moveTo(0,-35); c.lineTo(12,-5); c.lineTo(15,15); c.lineTo(5,25); c.lineTo(-5,25); c.lineTo(-15,15); c.lineTo(-12,-5); c.closePath(); c.fill();
+    c.shadowBlur = 15; c.shadowColor = '#00ffff'; c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0,-15,4,10,0,0,Math.PI*2); c.fill();
+  } else if (t === 'falcon') {
+    c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
+    c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
+    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
+  } else if (t === 'phantom') {
+    c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
+    c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#1a0033','#000000'); c.beginPath(); c.moveTo(0,-35); c.lineTo(8,-5); c.lineTo(5,15); c.lineTo(-5,15); c.lineTo(-8,-5); c.closePath(); c.fill();
+    c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0,-5,4,0,Math.PI*2); c.fill();
+  } else if (t === 'aegis') {
+    c.fillStyle = gg(0,0,0,30,'#cc9900','#ffd700','#997a00'); c.beginPath(); c.moveTo(0,-10); c.lineTo(40,-5); c.lineTo(55,15); c.lineTo(30,25); c.lineTo(0,20); c.lineTo(-30,25); c.lineTo(-55,15); c.lineTo(-40,-5); c.closePath(); c.fill();
+    c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(15,0); c.lineTo(30,10); c.moveTo(-15,0); c.lineTo(-30,10); c.stroke();
+    c.fillStyle = gg(0,-30,0,20,'#dddddd','#777777'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-5); c.lineTo(12,20); c.lineTo(0,25); c.lineTo(-12,20); c.lineTo(-15,-5); c.closePath(); c.fill();
+    c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00'; c.fillRect(-18,-5,5,15); c.fillRect(13,-5,5,15);
+    c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0,-15,4,6,0,0,Math.PI*2); c.fill();
+  } else if (t === 'crystal') {
+    c.fillStyle = gg(0,-20,0,30,'#ffffff','#7df9ff','#00d2ff'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-10); c.lineTo(40,-5); c.lineTo(20,15); c.lineTo(25,25); c.lineTo(0,15); c.lineTo(-25,25); c.lineTo(-20,15); c.lineTo(-40,-5); c.lineTo(-15,-10); c.closePath(); c.fill();
+    c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = gg(0,-35,0,20,'#e0ffff','#7df9ff'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,-5); c.lineTo(5,20); c.lineTo(-5,20); c.lineTo(-10,-5); c.closePath(); c.fill();
+    c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff'; c.beginPath(); c.arc(0,-10,6,0,Math.PI*2); c.fill();
+  }
+  c.shadowBlur = 0; c.restore();
+}
+
+function drawMiniShape(c, mini, scale) {
+  scale = scale || 1; c.save(); c.scale(scale, scale);
+  c.shadowBlur = 10; c.shadowColor = mini.color;
+  if (mini.type === 'jet') {
+    let grad = c.createLinearGradient(0,-14,0,14); grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#555555');
+    c.fillStyle = grad; c.beginPath(); c.moveTo(0,-14); c.lineTo(6,-2); c.lineTo(14,6); c.lineTo(4,4); c.lineTo(3,12); c.lineTo(0,8); c.lineTo(-3,12); c.lineTo(-4,4); c.lineTo(-14,6); c.lineTo(-6,-2); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.ellipse(0,-3,2.5,5,0,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'phantom') {
+    c.fillStyle = '#1a0033'; c.beginPath(); c.moveTo(0,-15); c.lineTo(10,0); c.lineTo(0,15); c.lineTo(-10,0); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'guardian') {
+    c.fillStyle = '#332200'; c.beginPath(); c.moveTo(-12,-12); c.lineTo(12,-12); c.lineTo(12,12); c.lineTo(-12,12); c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'eye') {
+    c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
+    c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'gatling') {
+    c.fillStyle = '#222'; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.save(); c.rotate(S.t ? S.t * 0.1 : 0);
+    c.fillStyle = '#555'; c.fillRect(-2,-16,4,10); c.fillRect(-2,6,4,10); c.fillRect(-16,-2,10,4); c.fillRect(6,-2,10,4);
+    c.restore();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'crystal') {
+    c.fillStyle = '#003344'; c.beginPath(); for(let i=0;i<6;i++){ let ang=i*Math.PI/3; let px=Math.cos(ang)*12, py=Math.sin(ang)*12; i===0?c.moveTo(px,py):c.lineTo(px,py); } c.closePath(); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  } else if (mini.type === 'blackhole') {
+    c.fillStyle = '#000'; c.shadowBlur = 20; c.shadowColor = mini.color; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
+    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
+    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
+  }
+  c.shadowBlur = 0; c.restore();
 }
 
 function resize(){ W = innerWidth; H = innerHeight; cvs.width = W; cvs.height = H; cvs.style.width = W + 'px'; cvs.style.height = H + 'px'; }
@@ -676,80 +875,6 @@ function spawnHeart(x, y) { S.powerups.push({ x, y, vy: 0.4, isHeart: true, r: 1
 function boom(x, y, hue, n){ 
   if (n > 5) S.shockwaves.push({ x, y, r: 5, maxR: 80, life: 1 });
   for(let i = 0; i < n; i++){ const a = Math.random()*6.28, s = Math.random()*0.45 + 0.05; S.parts.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, hue, r: Math.random()*2.5 + 1 }); } 
-}
-function drawShipShape(c, skin, scale) {
-  scale = scale || 1; c.save(); c.scale(scale, scale);
-  const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
-  const gg = (x0,y0,x1,y1,c1,c2,c3) => { const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,c1); if(c3){g.addColorStop(.5,c2);g.addColorStop(1,c3);}else{g.addColorStop(1,c2);} return g; };
-  c.shadowBlur = 10; c.shadowColor = skin.glow;
-  if (t === 'interceptor') {
-    c.fillStyle = gg(0,-20,0,30,'#ff1a1a','#800000','#ff4d4d'); c.beginPath(); c.moveTo(0,-5); c.lineTo(45,15); c.lineTo(50,25); c.lineTo(20,25); c.lineTo(0,35); c.lineTo(-20,25); c.lineTo(-50,25); c.lineTo(-45,15); c.closePath(); c.fill();
-    c.strokeStyle = '#00ffff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(15,18); c.lineTo(35,22); c.moveTo(-15,18); c.lineTo(-35,22); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#ffffff','#aaaaaa','#555555'); c.beginPath(); c.moveTo(0,-35); c.lineTo(12,-5); c.lineTo(15,15); c.lineTo(5,25); c.lineTo(-5,25); c.lineTo(-15,15); c.lineTo(-12,-5); c.closePath(); c.fill();
-    c.shadowBlur = 15; c.shadowColor = '#00ffff'; c.fillStyle = '#00ffff'; c.beginPath(); c.ellipse(0,-15,4,10,0,0,Math.PI*2); c.fill();
-  } else if (t === 'falcon') {
-    c.fillStyle = gg(0,0,0,30,'#002244','#00d2ff','#00ffcc'); c.beginPath(); c.moveTo(0,-15); c.lineTo(40,5); c.lineTo(55,25); c.lineTo(25,20); c.lineTo(0,30); c.lineTo(-25,20); c.lineTo(-55,25); c.lineTo(-40,5); c.closePath(); c.fill();
-    c.fillStyle = gg(0,-30,0,20,'#333333','#111111','#000000'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,0); c.lineTo(15,20); c.lineTo(0,25); c.lineTo(-15,20); c.lineTo(-10,0); c.closePath(); c.fill(); c.strokeStyle = '#00ffcc'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = '#ffffff'; c.shadowBlur = 20; c.shadowColor = '#00ffcc'; c.beginPath(); c.ellipse(0,-20,3,8,0,0,Math.PI*2); c.fill();
-    c.fillStyle = '#00d2ff'; c.beginPath(); c.arc(-8,20,5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(8,20,5,0,Math.PI*2); c.fill();
-  } else if (t === 'phantom') {
-    c.fillStyle = gg(0,-20,0,30,'#440066','#2a0033','#11001a'); c.beginPath(); c.moveTo(0,-20); c.lineTo(20,0); c.lineTo(45,10); c.lineTo(20,25); c.lineTo(0,15); c.lineTo(-20,25); c.lineTo(-45,10); c.lineTo(-20,0); c.closePath(); c.fill();
-    c.strokeStyle = '#ff4fd8'; c.lineWidth = 2; c.shadowBlur = 15; c.shadowColor = '#ff4fd8'; c.beginPath(); c.moveTo(-20,0); c.lineTo(-10,10); c.moveTo(20,0); c.lineTo(10,10); c.moveTo(0,-20); c.lineTo(0,15); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#1a0033','#000000'); c.beginPath(); c.moveTo(0,-35); c.lineTo(8,-5); c.lineTo(5,15); c.lineTo(-5,15); c.lineTo(-8,-5); c.closePath(); c.fill();
-    c.fillStyle = '#d68cff'; c.beginPath(); c.arc(0,-5,4,0,Math.PI*2); c.fill();
-  } else if (t === 'aegis') {
-    c.fillStyle = gg(0,0,0,30,'#cc9900','#ffd700','#997a00'); c.beginPath(); c.moveTo(0,-10); c.lineTo(40,-5); c.lineTo(55,15); c.lineTo(30,25); c.lineTo(0,20); c.lineTo(-30,25); c.lineTo(-55,15); c.lineTo(-40,-5); c.closePath(); c.fill();
-    c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(15,0); c.lineTo(30,10); c.moveTo(-15,0); c.lineTo(-30,10); c.stroke();
-    c.fillStyle = gg(0,-30,0,20,'#dddddd','#777777'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-5); c.lineTo(12,20); c.lineTo(0,25); c.lineTo(-12,20); c.lineTo(-15,-5); c.closePath(); c.fill();
-    c.fillStyle = '#ffaa00'; c.shadowBlur = 10; c.shadowColor = '#ffaa00'; c.fillRect(-18,-5,5,15); c.fillRect(13,-5,5,15);
-    c.fillStyle = '#00ffcc'; c.beginPath(); c.ellipse(0,-15,4,6,0,0,Math.PI*2); c.fill();
-  } else if (t === 'crystal') {
-    c.fillStyle = gg(0,-20,0,30,'#ffffff','#7df9ff','#00d2ff'); c.beginPath(); c.moveTo(0,-30); c.lineTo(15,-10); c.lineTo(40,-5); c.lineTo(20,15); c.lineTo(25,25); c.lineTo(0,15); c.lineTo(-25,25); c.lineTo(-20,15); c.lineTo(-40,-5); c.lineTo(-15,-10); c.closePath(); c.fill();
-    c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = gg(0,-35,0,20,'#e0ffff','#7df9ff'); c.beginPath(); c.moveTo(0,-40); c.lineTo(10,-5); c.lineTo(5,20); c.lineTo(-5,20); c.lineTo(-10,-5); c.closePath(); c.fill();
-    c.fillStyle = '#ffffff'; c.shadowBlur = 25; c.shadowColor = '#7df9ff'; c.beginPath(); c.arc(0,-10,6,0,Math.PI*2); c.fill();
-  }
-  c.shadowBlur = 0; c.restore();
-}
-
-function drawMiniShape(c, mini, scale) {
-  scale = scale || 1; c.save(); c.scale(scale, scale);
-  c.shadowBlur = 10; c.shadowColor = mini.color;
-  if (mini.type === 'jet') {
-    let grad = c.createLinearGradient(0,-14,0,14); grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,'#555555');
-    c.fillStyle = grad; c.beginPath(); c.moveTo(0,-14); c.lineTo(6,-2); c.lineTo(14,6); c.lineTo(4,4); c.lineTo(3,12); c.lineTo(0,8); c.lineTo(-3,12); c.lineTo(-4,4); c.lineTo(-14,6); c.lineTo(-6,-2); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 1.5; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.ellipse(0,-3,2.5,5,0,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'phantom') {
-    c.fillStyle = '#1a0033'; c.beginPath(); c.moveTo(0,-15); c.lineTo(10,0); c.lineTo(0,15); c.lineTo(-10,0); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'guardian') {
-    c.fillStyle = '#332200'; c.beginPath(); c.moveTo(-12,-12); c.lineTo(12,-12); c.lineTo(12,12); c.lineTo(-12,12); c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'eye') {
-    c.fillStyle = '#003300'; c.beginPath(); c.arc(0,0,12,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,Math.PI*2); c.fill();
-    c.fillStyle = mini.color; c.beginPath(); c.arc(0,0,2,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'gatling') {
-    c.fillStyle = '#222'; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.save(); c.rotate(S.t ? S.t * 0.1 : 0);
-    c.fillStyle = '#555'; c.fillRect(-2,-16,4,10); c.fillRect(-2,6,4,10); c.fillRect(-16,-2,10,4); c.fillRect(6,-2,10,4);
-    c.restore();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,3,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'crystal') {
-    c.fillStyle = '#003344'; c.beginPath(); for(let i=0;i<6;i++){ let ang=i*Math.PI/3; let px=Math.cos(ang)*12, py=Math.sin(ang)*12; i===0?c.moveTo(px,py):c.lineTo(px,py); } c.closePath(); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  } else if (mini.type === 'blackhole') {
-    c.fillStyle = '#000'; c.shadowBlur = 20; c.shadowColor = mini.color; c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill();
-    c.strokeStyle = mini.color; c.lineWidth = 2; c.stroke();
-    c.fillStyle = mini.bulletColor; c.beginPath(); c.arc(0,0,4,0,Math.PI*2); c.fill();
-  }
-  c.shadowBlur = 0; c.restore();
 }
 
 let lastSync = 0;
@@ -1190,11 +1315,15 @@ let last = 0;
 function loop(ts){
   const dt = last ? Math.min(ts - last, 50) : 16;
   last = ts;
+  
+  // 🛠️ فیکس لگ: اگر صفحه اسپلش ASTRO هنوز وجود داره، بازی رو آپدیت نکن
+  const isSplashActive = document.getElementById('astro-splash');
+  
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
                  !document.getElementById('profilePanel').classList.contains('show') && 
                  !document.getElementById('shopPanel').classList.contains('show');
   
-  if(onGame){ 
+  if(onGame && !isSplashActive){ 
     if (S.hitStop > 0) {
       S.hitStop -= dt; 
       draw(); 
@@ -1261,16 +1390,7 @@ window.buyMini = (id) => { SND.init(); const m = getMiniById(id); if (coins >= m
 window.equipMini = (id) => { SND.init(); SND.play('uiClick'); if (ownedMinis.includes(id)) { equippedMini = id; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); } };
 window.upgradeMini = (id) => { SND.init(); const m = getMiniById(id); const lvl = miniShipLevels[id] || 0; const cost = Math.floor(2000 * Math.pow(1.8, lvl)); if (coins >= cost && lvl < 5) { coins -= cost; miniShipLevels[id] = lvl + 1; saveGameData(); renderShop(); saveScoreToLeaderboard(getEffectiveTotalScore(), true); showToast(`⚡ همراه «${m.name}» به لول ${lvl+1} ارتقا یافت!`); SND.play('upgrade'); } };
 
-// راه‌اندازی اولیه
-document.getElementById('saveProfileBtn').onclick = async () => {
-  const btn = document.getElementById('saveProfileBtn');
-  btn.innerHTML = 'در حال ذخیره...';
-  const success = await saveScoreToLeaderboard(getEffectiveTotalScore());
-  if(success) { showToast('✅ اطلاعات با موفقیت ذخیره شد!'); SND.play('purchase'); }
-  else { showToast('❌ خطا در ذخیره‌سازی!'); }
-  btn.innerHTML = 'ذخیره دستی در فضای ابری';
-};
-
+// راه‌اندازی اولیه سیستم لاگین و بازی
 checkAuthOnStart();
 
 if ('serviceWorker' in navigator) {
@@ -1281,7 +1401,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Animated Splash Logic
+// Animated Splash Logic (با فیکس لگ و حذف کامل از DOM)
 window.addEventListener('load', () => {
   setTimeout(() => {
     const splash = document.getElementById('astro-splash');
