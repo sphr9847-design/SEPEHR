@@ -175,9 +175,16 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 #astro-splash {position: fixed;top: 0; left: 0; width: 100vw; height: 100vh;background-color: #000011;display: flex; justify-content: center; align-items: center;z-index: 99999;transition: opacity 1s ease-in-out;}
 .astro-text {font-family: 'Arial Black', Impact, sans-serif;font-size: 5rem;letter-spacing: 5px;color: #ffffff;text-transform: uppercase;text-shadow: 0 0 20px #00f3ff, 0 0 40px #ff00cc;animation: pulse-glow 1.5s infinite alternate;will-change: transform, opacity;}
 @keyframes pulse-glow {0% { transform: scale(1); opacity: 0.7; }100% { transform: scale(1.1); opacity: 1; }}
+
 /* Auth Overlay Styles */
 .auth-overlay {position: fixed; inset: 0; background: rgba(3, 6, 15, 0.8);backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);display: flex; justify-content: center; align-items: center;z-index: 100000; padding: 20px; transition: opacity 0.5s;}
 .auth-box {background: rgba(10, 20, 40, 0.6); border: 1px solid rgba(0, 255, 255, 0.3);border-radius: 25px; padding: 30px 20px; width: 100%; max-width: 400px;text-align: center; box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);}
+
+/* Auth Tabs */
+.auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+.auth-tab { flex: 1; padding: 10px; background: transparent; border: 1px solid rgba(0, 255, 255, 0.3); color: #8bb5c9; border-radius: 12px; font-family: 'Lalezar'; font-size: 16px; cursor: pointer; transition: 0.3s; }
+.auth-tab.active { background: rgba(0, 255, 255, 0.2); color: #00ffff; border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.3); }
+
 .auth-box h2 { color: #00ffff; font-family: 'Lalezar'; font-size: 28px; margin-bottom: 20px; text-shadow: 0 0 10px rgba(0,255,255,0.5); }
 .auth-box input {width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px;border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.5);color: #fff; font-family: 'Vazirmatn'; font-size: 16px; text-align: center;}
 .auth-box input:focus { outline: none; border-color: #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); }
@@ -203,11 +210,14 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 <!-- Auth Overlay (Login/Register) -->
 <div id="authOverlay" class="auth-overlay" style="display:none;">
   <div class="auth-box">
-    <h2>ورود به ASTRO</h2>
-    <p style="color:#8bb5c9; margin-bottom:20px; font-size:14px;">برای ذخیره پیشرفتت، یک اکانت بساز یا وارد شو.</p>
+    <div class="auth-tabs">
+      <button id="tabLogin" class="auth-tab active" onclick="setAuthMode('login')">ورود</button>
+      <button id="tabRegister" class="auth-tab" onclick="setAuthMode('register')">ساخت اکانت</button>
+    </div>
+    <h2 id="authTitle">ورود به ASTRO</h2>
     <input type="text" id="authUsername" placeholder="نام کاربری (مثلاً Ali)">
     <input type="password" id="authPassword" placeholder="رمز عبور (حداقل ۴ رقم)">
-    <button class="auth-btn" onclick="handleAuth()">ورود / ساخت اکانت</button>
+    <button class="auth-btn" id="authBtn" onclick="handleAuth()">ورود</button>
     <div id="authError" class="auth-error"></div>
   </div>
 </div>
@@ -415,6 +425,7 @@ function safeNum(v, fallback) { const n = parseFloat(v); return isFinite(n) ? n 
 
 let profile = { name: defaultName, avatar: 1 };
 let currentPassword = null; 
+let currentAuthMode = 'login';
 let coins = 0;
 let ownedWeapons = [1];
 let equippedWeapon = 1;
@@ -426,6 +437,7 @@ let weaponLevels = {};
 let miniShipLevels = {};
 let totalScore = 0;
 let currentRunScore = safeNum(localStorage.getItem('astro_current_run_score'), 0);
+let currentShopTab = 'weapons';
 
 const QUEST_TEMPLATES = [
   { id: 'q_bosses', text: '۲ غول بزرگ را شکست بده', type: 'bosses', target: 2, reward: 600 },
@@ -547,7 +559,16 @@ function renderProfileUI() {
   updateCoinsUI();
 }
 
-// --- سیستم ورود و ثبت‌نام ---
+// --- سیستم ورود و ثبت‌نام (تب‌دار) ---
+window.setAuthMode = (mode) => {
+  currentAuthMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+  document.getElementById('authTitle').textContent = mode === 'login' ? 'ورود به ASTRO' : 'ساخت اکانت ASTRO';
+  document.getElementById('authBtn').textContent = mode === 'login' ? 'ورود' : 'ساخت اکانت';
+  document.getElementById('authError').textContent = '';
+};
+
 window.handleAuth = async () => {
   const user = document.getElementById('authUsername').value.trim();
   const pass = document.getElementById('authPassword').value.trim();
@@ -564,33 +585,40 @@ window.handleAuth = async () => {
     });
     const data = await res.json();
     
-    if (data && data.length > 0) {
-      if (data[0].password === pass) {
-        // ورود موفق
-        const remoteSave = data[0].save_data || {};
-        profile = remoteSave.profile || { name: user, avatar: 1 };
-        coins = remoteSave.coins || 0; 
-        ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
-        ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
-        ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
-        weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
-        totalScore = safeNum(remoteSave.totalScore, 0);
-        currentPassword = pass;
-        deviceId = data[0].dev_id; 
-        localStorage.setItem('astro_device_id', deviceId);
-        localStorage.setItem('astro_auth_user', user);
-        localStorage.setItem('astro_auth_pass', pass);
-        
-        saveGameData();
-        errDiv.style.color = '#00ff88';
-        errDiv.textContent = 'ورود موفق! در حال بارگذاری...';
-        setTimeout(() => { document.getElementById('authOverlay').style.display = 'none'; location.reload(); }, 1000);
-      } else {
-        errDiv.style.color = '#ff3333';
-        errDiv.textContent = 'رمز عبور اشتباه است!';
+    if (currentAuthMode === 'login') {
+      if (!data || data.length === 0) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'اکانتی با این نام پیدا نشد!'; return;
       }
+      if (data[0].password !== pass) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'رمز عبور اشتباه است!'; return;
+      }
+      
+      // ورود موفق
+      const remoteSave = data[0].save_data || {};
+      profile = remoteSave.profile || { name: user, avatar: 1 };
+      coins = remoteSave.coins || 0; 
+      ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
+      ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
+      ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
+      weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
+      totalScore = safeNum(remoteSave.totalScore, 0);
+      currentPassword = pass;
+      deviceId = data[0].dev_id; 
+      localStorage.setItem('astro_device_id', deviceId);
+      localStorage.setItem('astro_auth_user', user);
+      localStorage.setItem('astro_auth_pass', pass);
+      
+      saveGameData();
+      errDiv.style.color = '#00ff88';
+      errDiv.textContent = 'ورود موفق! در حال بارگذاری...';
+      setTimeout(() => { document.getElementById('authOverlay').style.display = 'none'; location.reload(); }, 1000);
+      
     } else {
       // ثبت‌نام جدید
+      if (data && data.length > 0) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'این نام کاربری قبلاً گرفته شده!'; return;
+      }
+      
       currentPassword = pass;
       profile = { name: user, avatar: 1 };
       deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
@@ -666,6 +694,105 @@ async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
     return false;
   }
 }
+
+// --- توابع فروشگاه و ماموریت‌ها (اضافه شده) ---
+window.switchShopTab = (tab, btn) => {
+  SND.play('uiClick'); currentShopTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(b => { b.style.background = 'rgba(0,255,255,.1)'; b.style.color = '#fff'; b.classList.remove('active'); });
+  btn.style.background = '#00ffff'; btn.style.color = '#000'; btn.classList.add('active');
+  
+  if (tab === 'quests') { renderQuests(); } else { renderShop(); }
+};
+
+function addQuestProgress(type, amount, isMax = false) {
+  checkQuestReset();
+  if (isMax) {
+    if (amount > (questState.progress[type] || 0)) questState.progress[type] = amount;
+  } else {
+    questState.progress[type] = (questState.progress[type] || 0) + amount;
+  }
+  localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+  if (document.getElementById('shopPanel').classList.contains('show') && currentShopTab === 'quests') renderQuests();
+}
+
+function renderQuests() {
+  checkQuestReset();
+  const list = document.getElementById('shopList');
+  const today = new Date().toDateString();
+  const dailyIsClaimed = (questState.dailyClaimedDate === today);
+  
+  let dailyHtml = `
+    <div class="quest-card daily ${dailyIsClaimed ? 'completed' : ''}">
+      <div class="quest-info" style="flex:1;">
+        <h3>🎁 جایزه ورود روزانه</h3>
+        <p>هر روز ۱۰۰۰ سکه رایگان بگیر!</p>
+      </div>
+      ${dailyIsClaimed ? `<button class="claim-btn" disabled>دریافت شد ✅</button>` : `<button class="claim-btn" onclick="claimDaily()" style="background:#ffd700;color:#000;">دریافت 🎁</button>`}
+    </div>
+  `;
+
+  let questsHtml = QUEST_TEMPLATES.map(q => {
+    let current = questState.progress[q.type] || 0;
+    if (current > q.target) current = q.target;
+    let pct = (current / q.target) * 100;
+    let isCompleted = current >= q.target;
+    let isClaimed = questState.claimed.includes(q.id);
+    
+    let btnHtml = '';
+    if (isClaimed) {
+      btnHtml = `<button class="claim-btn" disabled>دریافت شد ✅</button>`;
+    } else if (isCompleted) {
+      btnHtml = `<button class="claim-btn" onclick="claimQuest('${q.id}', ${q.reward})" style="background:#00ff88;color:#000;">دریافت جایزه 🎁</button>`;
+    } else {
+      btnHtml = `<button class="claim-btn" disabled>در حال انجام...</button>`;
+    }
+    
+    return `
+      <div class="quest-card ${isCompleted ? 'completed' : ''}">
+        <div class="quest-info" style="flex:1;">
+          <h3>${q.text}</h3>
+          <p>جایزه: 💰 ${q.reward} سکه</p>
+          <div class="quest-progress-bar">
+            <div class="quest-progress-fill" style="width: ${pct}%;"></div>
+          </div>
+          <p style="margin-top:4px;font-size:10px;color:#aaa;">${current} / ${q.target}</p>
+        </div>
+        ${btnHtml}
+      </div>
+    `;
+  }).join('');
+
+  list.innerHTML = dailyHtml + questsHtml;
+}
+
+window.claimDaily = () => {
+  checkQuestReset();
+  const today = new Date().toDateString();
+  if (questState.dailyClaimedDate !== today) {
+    questState.dailyClaimedDate = today;
+    coins += 1000;
+    localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+    saveGameData(); 
+    SND.play('purchase');
+    showToast(`🎉 ۱۰۰۰ سکه بابت ورود روزانه دریافت کردی!`);
+    renderQuests();
+    updateCoinsUI();
+  }
+};
+
+window.claimQuest = (questId, reward) => {
+  checkQuestReset();
+  if (!questState.claimed.includes(questId)) {
+    questState.claimed.push(questId);
+    coins += reward;
+    localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+    saveGameData(); 
+    SND.play('purchase');
+    showToast(`🎉 جایزه ${reward} سکه دریافت شد!`);
+    renderQuests();
+    updateCoinsUI();
+  }
+};
 function drawShipShape(c, skin, scale) {
   scale = scale || 1; c.save(); c.scale(scale, scale);
   const t = skin.type; c.lineJoin = 'round'; c.lineCap = 'round';
@@ -1024,10 +1151,13 @@ function update(dt){
           if (e.isBoss) {
             S.score += 300;
             S.rocketCharge = Math.min(100, S.rocketCharge + 30);
+            addQuestProgress('bosses', 1);
           } else {
             S.score += 10 * comboMult;
             S.rocketCharge = Math.min(100, S.rocketCharge + 4);
+            addQuestProgress('kills', 1);
           }
+          addQuestProgress('score', S.score, true);
           
           let coinMultiplier = 1 + Math.floor(S.score / 2000); coins += (e.isBoss ? 60 : 3) * coinMultiplier;
           if (e.isBoss) { isBossActive = false; currentBossIndex++; nextBossScore = (currentBossIndex + 1) * 1000; SND.play('bigExplosion'); spawnHeart(e.x, e.y); if (Math.random() < 0.5) spawnPowerup(e.x, e.y); }
@@ -1098,6 +1228,7 @@ function drawBoss(c, e, bossLvl) {
 
 function triggerGameOver() {
   isDead = true; SND.play('gameOver'); const achievedScore = S.score; const bonusCoins = Math.floor(achievedScore / 8);
+  addQuestProgress('score', S.score, true);
   if(achievedScore > 0) {
     totalScore += achievedScore; coins += bonusCoins; currentRunScore = 0;
     localStorage.setItem('astro_current_run_score', '0'); saveGameData(); saveScoreToLeaderboard(totalScore);
@@ -1316,7 +1447,6 @@ function loop(ts){
   const dt = last ? Math.min(ts - last, 50) : 16;
   last = ts;
   
-  // 🛠️ فیکس لگ: اگر صفحه اسپلش ASTRO هنوز وجود داره، بازی رو آپدیت نکن
   const isSplashActive = document.getElementById('astro-splash');
   
   const onGame = !document.getElementById('rankPanel').classList.contains('show') && 
