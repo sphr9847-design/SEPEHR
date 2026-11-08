@@ -1,4 +1,4 @@
-let CACHE_VERSION = 'astro-v1.0.9';
+let CACHE_VERSION = 'astro-v1.1.0';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const DYNAMIC_CACHE = CACHE_VERSION + '-dynamic';
 
