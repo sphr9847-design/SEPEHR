@@ -36,7 +36,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 .tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:3px;background:#00ffff;border-radius:3px 3px 0 0;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 0 15px #00ffff}
 .tab.active::after{width:60%;left:20%}
 
-/* پنل‌ها کاملاً توپر شدن تا بازی پشتشون دیده نشه */
+/* پنل‌ها کاملاً توپر و بدون شفافیت */
 .panel{position:fixed;top:55px;left:0;right:0;bottom:0;background:#04060f;color:#7df9ff;padding:25px 20px;overflow-y:auto;display:none;z-index:5}
 .panel.show{display:block;animation:panelSlide .4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 @keyframes panelSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -233,10 +233,10 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 <div id="profilePanel" class="panel">
   <h2>👤 پروفایل شما</h2>
   
-  <div class="profile-top-section" style="display:flex;gap:15px;margin-bottom:20px;align-items:stretch;">
+  <div class="profile-top-section" style="display:flex; flex-direction:column; gap:15px; margin-bottom:20px; align-items:stretch;">
     
     <!-- Music Player جدید -->
-    <div class="music-player" style="flex:1;">
+    <div class="music-player">
       <div class="music-title">🎵 پخش‌کننده آهنگ</div>
       <div class="song-name" id="songNameDisplay">هیچ آهنگی انتخاب نشده</div>
       
@@ -255,7 +255,7 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
       <input type="file" id="bgmUpload" accept="audio/*">
     </div>
 
-    <div class="profile-card" style="flex:1;padding:15px;text-align:center;">
+    <div class="profile-card" style="padding:15px;text-align:center;">
       <div class="preview-avatar" id="previewAvatar" style="width:60px;height:60px;margin:0 auto 10px auto;"></div>
       <div class="preview-name" id="previewName" style="font-size:20px;color:#fff;font-family:'Lalezar';"></div>
       <div class="preview-title" style="font-size:12px;color:#0ff;margin-top:5px;">SPACE COMMANDER</div>
@@ -301,6 +301,409 @@ html,body{height:100%;overflow:hidden;background:radial-gradient(circle at cente
 </div>
 
 <script>
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d', { alpha: false });
+let W, H;
+
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (typeof r === 'number') r = {tl: r, tr: r, br: r, bl: r};
+    else if (Array.isArray(r)) { r = {tl: r[0], tr: r[0], br: r[0], bl: r[0]}; }
+    else r = r || {tl:0, tr:0, br:0, bl:0};
+    this.beginPath(); this.moveTo(x + r.tl, y);
+    this.lineTo(x + w - r.tr, y); this.arcTo(x + w, y, x + w, y + r.tr, r.tr);
+    this.lineTo(x + w, y + h - r.br); this.arcTo(x + w, y + h, x + w - r.br, y + h, r.br);
+    this.lineTo(x + r.bl, y + h); this.arcTo(x, y + h, x, y + h - r.bl, r.bl);
+    this.lineTo(x, y + r.tl); this.arcTo(x, y, x + r.tl, y, r.tl);
+    this.closePath(); return this;
+  };
+}
+
+const SUPABASE_URL = "https://wjgnbgbcqdtdcxonyrsb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2vuFvK2Mu51Y_mY6pMsILA_phg-0PIs";
+let deviceId = localStorage.getItem('astro_device_id');
+if (!deviceId) { deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); localStorage.setItem('astro_device_id', deviceId); }
+
+const SND = {
+  ctx: null, masterGain: null, enabled: localStorage.getItem('astro_sound') !== 'false',
+  init() { if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; } try { const AC = window.AudioContext || window.webkitAudioContext; this.ctx = new AC(); this.masterGain = this.ctx.createGain(); this.masterGain.gain.value = this.enabled ? 0.25 : 0; this.masterGain.connect(this.ctx.destination); } catch(e) {} },
+  setEnabled(v) { this.enabled = v; localStorage.setItem('astro_sound', v ? 'true' : 'false'); if (this.masterGain && this.ctx) this.masterGain.gain.setValueAtTime(v ? 0.25 : 0, this.ctx.currentTime); },
+  sweep(type, f0, f1, dur, vol, delay) { if (!this.ctx) return; const t = this.ctx.currentTime + (delay || 0); const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain(); osc.type = type; osc.frequency.setValueAtTime(f0, t); osc.frequency.exponentialRampToValueAtTime(f1, t + dur); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); osc.connect(gain); gain.connect(this.masterGain); osc.start(t); osc.stop(t + dur + 0.02); },
+  noise(dur, vol, filterFreq) { if (!this.ctx) return; const t = this.ctx.currentTime; const bufferSize = Math.floor(this.ctx.sampleRate * dur); const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; const src = this.ctx.createBufferSource(); src.buffer = buffer; const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(filterFreq || 2000, t); filter.frequency.exponentialRampToValueAtTime(200, t + dur); const gain = this.ctx.createGain(); gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(0.001, t + dur); src.connect(filter); filter.connect(gain); gain.connect(this.masterGain); src.start(t); src.stop(t + dur); },
+  play(name) { if (!this.ctx || !this.enabled) return; switch(name) { case 'shoot': this.sweep('square', 800, 200, 0.06, 0.04); break; case 'explosion': this.noise(0.25, 0.12, 1500); this.sweep('sine', 150, 40, 0.2, 0.08); break; case 'bigExplosion': this.noise(0.5, 0.25, 2000); this.sweep('sine', 100, 25, 0.5, 0.18); break; case 'playerHit': this.sweep('sawtooth', 200, 50, 0.35, 0.18); this.noise(0.15, 0.12, 3000); break; case 'powerup': [440, 554, 659, 880].forEach((f, i) => this.sweep('square', f, f, 0.08, 0.06, i * 0.05)); break; case 'purchase': [523, 659, 784].forEach((f, i) => this.sweep('triangle', f, f, 0.12, 0.08, i * 0.06)); break; case 'upgrade': [659, 784, 1047, 1319].forEach((f, i) => this.sweep('triangle', f, f, 0.1, 0.08, i * 0.05)); break; case 'bossWarn': for (let i = 0; i < 3; i++) this.sweep('sawtooth', 400, 600, 0.12, 0.08, i * 0.28); break; case 'bossShoot': this.sweep('square', 300, 100, 0.12, 0.05); break; case 'gameOver': [400, 300, 200, 100].forEach((f, i) => this.sweep('sine', f, f, 0.18, 0.12, i * 0.15)); break; case 'uiClick': this.sweep('square', 600, 800, 0.04, 0.025); break; case 'rocket': this.sweep('sawtooth', 100, 800, 0.4, 0.15); break; } }
+};
+
+const SKINS = [
+  { id: 1, name: "بال قرمز", cost: 0, color: "#ff4d4d", glow: "#ff0000", type: "interceptor" },
+  { id: 2, name: "شاهین کهکشانی", cost: 1000, color: "#00ffcc", glow: "#00d2ff", type: "falcon" },
+  { id: 3, name: "شبح بنفش", cost: 2500, color: "#d68cff", glow: "#ff4fd8", type: "phantom" },
+  { id: 4, name: "سپر طلایی", cost: 5000, color: "#ffd700", glow: "#ffaa00", type: "aegis" },
+  { id: 5, name: "ستاره کریستالی", cost: 10000, color: "#e0ffff", glow: "#7df9ff", type: "crystal" }
+];
+
+const MINI_SHIPS = [
+  { id: 1, name: "جت همراه", cost: 0, color: "#00ffff", bulletColor: "#00ffff", fireRate: 130, type: "jet", baseDmg: 1 },
+  { id: 2, name: "شبح نقره‌ای", cost: 1500, color: "#d68cff", bulletColor: "#ff4fd8", fireRate: 100, type: "phantom", baseDmg: 1.5 },
+  { id: 3, name: "نگهبان طلایی", cost: 3500, color: "#ffd700", bulletColor: "#ffaa00", fireRate: 150, type: "guardian", baseDmg: 2 },
+  { id: 4, name: "چشم فضایی", cost: 7000, color: "#00ff00", bulletColor: "#00ff00", fireRate: 80, type: "eye", baseDmg: 1 },
+  { id: 5, name: "مسلسل چرخان", cost: 15000, color: "#ff3333", bulletColor: "#ffff00", fireRate: 35, type: "gatling", baseDmg: 1 },
+  { id: 6, name: "کریستال کوانتومی", cost: 25000, color: "#ffffff", bulletColor: "#aaffff", fireRate: 25, type: "crystal", baseDmg: 1 },
+  { id: 7, name: "سیاه‌چاله", cost: 40000, color: "#800080", bulletColor: "#ff00ff", fireRate: 250, type: "blackhole", bulletSize: 8, bulletSpeed: 1.5, baseDmg: 5 }
+];
+
+const WEAPONS = [
+  { id: 1, name: "لیزر ساده", cost: 0, color: "#dfffff", dmg: 1, cd: 80, size: 4, count: 1, spread: 0 },
+  { id: 2, name: "شلیک دوقلو", cost: 50, color: "#00ffcc", dmg: 1, cd: 80, size: 4, count: 2, spread: 10 },
+  { id: 3, name: "لیزر سرخ", cost: 150, color: "#ff3333", dmg: 2, cd: 60, size: 6, count: 1, spread: 0 },
+  { id: 4, name: "سه‌گانه", cost: 300, color: "#ffff00", dmg: 1, cd: 75, size: 5, count: 3, spread: 15 },
+  { id: 5, name: "پلاسما", cost: 600, color: "#ff00ff", dmg: 4, cd: 100, size: 10, count: 1, spread: 0 },
+  { id: 6, name: "چهارگانه", cost: 1000, color: "#00ff00", dmg: 1, cd: 70, size: 5, count: 4, spread: 20 },
+  { id: 7, name: "مسلسل نئونی", cost: 1800, color: "#00ccff", dmg: 1, cd: 25, size: 4, count: 1, spread: 5 },
+  { id: 8, name: "شاتگان فضایی", cost: 3000, color: "#ff8800", dmg: 1, cd: 90, size: 6, count: 5, spread: 35 },
+  { id: 9, name: "ریل‌گان", cost: 5000, color: "#ffffff", dmg: 15, cd: 150, size: 8, count: 1, spread: 0 },
+  { id: 10, name: "ابرنواختر", cost: 8000, color: "#ff00aa", dmg: 2, cd: 80, size: 8, count: 7, spread: 45 }
+];
+
+const DROP_WEAPONS = [
+  { id: 'drop_1', name: 'لیزر مافوق سریع', color: '#00ffff', dmg: 4, cd: 10, size: 5, count: 1, spread: 0, isDrop: true },
+  { id: 'drop_2', name: 'شلیک بی‌وقفه', color: '#ff00aa', dmg: 2, cd: 8, size: 4, count: 1, spread: 0, isDrop: true },
+  { id: 'drop_3', name: 'توپ پلاسمای سنگین', color: '#ffffff', dmg: 12, cd: 30, size: 14, count: 1, spread: 0, isDrop: true },
+  { id: 'drop_4', name: 'دوقلوی برق‌آسا', color: '#00ff00', dmg: 4, cd: 15, size: 5, count: 2, spread: 8, isDrop: true },
+  { id: 'drop_5', name: 'سه‌گانه نئونی', color: '#ffff00', dmg: 3, cd: 20, size: 5, count: 3, spread: 20, isDrop: true },
+  { id: 'drop_6', name: 'چهارگانه ویرانگر', color: '#ff8800', dmg: 3, cd: 25, size: 6, count: 4, spread: 30, isDrop: true },
+  { id: 'drop_7', name: 'شاتگان کوانتومی', color: '#ff3333', dmg: 2, cd: 30, size: 7, count: 5, spread: 45, isDrop: true },
+  { id: 'drop_8', name: 'مسلسل فضایی', color: '#00ccff', dmg: 2, cd: 12, size: 4, count: 2, spread: 10, isDrop: true },
+  { id: 'drop_9', name: 'توفان کهکشانی', color: '#ff00ff', dmg: 1, cd: 10, size: 4, count: 3, spread: 25, isDrop: true },
+  { id: 'drop_10', name: 'ابر سلاح کریستالی', color: '#e0ffff', dmg: 6, cd: 35, size: 8, count: 4, spread: 15, isDrop: true }
+];
+
+const AVATARS = [
+  { id: 1, name: "سفینه", color: "#00ffcc", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,85 L50,70 L10,85 Z"/></svg>` },
+  { id: 2, name: "فضایی", color: "#ff00ff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="50" rx="35" ry="45"/><ellipse cx="30" cy="40" rx="8" ry="12" fill="#000"/><ellipse cx="70" cy="40" rx="8" ry="12" fill="#000"/></svg>` },
+  { id: 3, name: "کلاه فضانورد", color: "#00ccff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="45"/><rect x="15" y="40" width="70" height="25" rx="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 4, name: "ربات", color: "#ffcc00", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" rx="15"/><rect x="30" y="45" width="40" height="10" fill="#000" opacity="0.7"/></svg>` },
+  { id: 5, name: "ماسک", color: "#ff3333", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,30 Q50,0 80,30 V60 Q80,90 50,90 Q20,90 20,60 Z"/><circle cx="35" cy="50" r="10" fill="#000"/><circle cx="65" cy="50" r="10" fill="#000"/></svg>` },
+  { id: 6, name: "کریستال", color: "#00ff88", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 95,50 50,95 5,50"/><polygon points="50,5 50,95 5,50" fill="rgba(255,255,255,0.4)"/></svg>` },
+  { id: 7, name: "روح", color: "#aaffff", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M20,50 A30,30 0 0,1 80,50 V90 L65,75 L50,90 L35,75 L20,90 Z"/><circle cx="40" cy="45" r="6" fill="#000"/><circle cx="60" cy="45" r="6" fill="#000"/></svg>` },
+  { id: 8, name: "هسته انرژی", color: "#ff00aa", svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 61,39 98,39 68,61 79,95 50,73 21,95 32,61 2,39 39,39"/><circle cx="50" cy="50" r="15" fill="#fff" opacity="0.8"/></svg>` }
+];
+
+const SAVE_KEY = 'astro_save_v1';
+let defaultName = 'member' + Math.floor(1000 + Math.random() * 9000);
+
+function safeNum(v, fallback) { const n = parseFloat(v); return isFinite(n) ? n : fallback; }
+
+let profile = { name: defaultName, avatar: 1 };
+let currentPassword = null; 
+let currentAuthMode = 'login';
+let coins = 0;
+let ownedWeapons = [1];
+let equippedWeapon = 1;
+let ownedSkins = [1];
+let equippedSkin = 1;
+let ownedMinis = [1];
+let equippedMini = 1;
+let weaponLevels = {};
+let miniShipLevels = {};
+let totalScore = 0;
+let currentRunScore = safeNum(localStorage.getItem('astro_current_run_score'), 0);
+let currentShopTab = 'weapons';
+
+const QUEST_TEMPLATES = [
+  { id: 'q_bosses', text: '۲ غول بزرگ را شکست بده', type: 'bosses', target: 2, reward: 600 },
+  { id: 'q_score', text: 'در یک دست ۲۰۰۰ امتیاز بگیر', type: 'score', target: 2000, reward: 500 },
+  { id: 'q_kills', text: '۴۰ دشمن را منفجر کن', type: 'kills', target: 40, reward: 300 }
+];
+let questState = JSON.parse(localStorage.getItem('astro_quests_v1')) || { date: '', progress: { kills: 0, bosses: 0, score: 0 }, claimed: [], dailyClaimedDate: '' };
+
+function checkQuestReset() {
+  const today = new Date().toDateString();
+  if (questState.date !== today) {
+    questState.date = today;
+    questState.progress = { kills: 0, bosses: 0, score: 0 };
+    questState.claimed = [];
+    localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+  }
+}
+
+function getRunScore() { return (typeof S !== 'undefined' && S && !isDead) ? (S.score || 0) : 0; }
+function getEffectiveTotalScore() { return totalScore + getRunScore(); }
+function getSkinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
+function getMiniById(id) { return MINI_SHIPS.find(s => s.id === id) || MINI_SHIPS[0]; }
+function getAvatarById(id) { return AVATARS.find(a => a.id === id) || AVATARS[0]; }
+
+function loadGameData() {
+  try {
+    let raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.profile) profile = d.profile;
+      if (typeof d.coins === 'number') coins = d.coins;
+      if (Array.isArray(d.ownedWeapons)) ownedWeapons = d.ownedWeapons;
+      if (typeof d.equippedWeapon === 'number') equippedWeapon = d.equippedWeapon;
+      if (Array.isArray(d.ownedSkins)) ownedSkins = d.ownedSkins;
+      if (typeof d.equippedSkin === 'number') equippedSkin = d.equippedSkin;
+      if (Array.isArray(d.ownedMinis)) ownedMinis = d.ownedMinis;
+      if (typeof d.equippedMini === 'number') equippedMini = d.equippedMini;
+      if (d.weaponLevels) weaponLevels = d.weaponLevels;
+      if (d.miniShipLevels) miniShipLevels = d.miniShipLevels;
+      totalScore = safeNum(d.totalScore, 0);
+      currentRunScore = safeNum(d.currentRunScore, 0);
+    }
+  } catch(e) {}
+}
+
+function saveGameData() {
+  try {
+    if (isNaN(totalScore) || !isFinite(totalScore)) totalScore = 0;
+    currentRunScore = safeNum(getRunScore(), 0);
+    localStorage.setItem('astro_current_run_score', String(currentRunScore));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      v: 1, profile, coins, ownedWeapons, equippedWeapon,
+      ownedSkins, equippedSkin, ownedMinis, equippedMini,
+      weaponLevels, miniShipLevels, totalScore, currentRunScore
+    }));
+  } catch(e) {}
+}
+
+loadGameData();
+checkQuestReset();
+setInterval(() => { saveGameData(); }, 1000); 
+
+function handleExitSave() { 
+  saveGameData(); 
+  if (typeof S !== 'undefined' && S && currentPassword) {
+    saveScoreToLeaderboard(getEffectiveTotalScore(), true); 
+  }
+}
+window.addEventListener('beforeunload', handleExitSave);
+window.addEventListener('pagehide', handleExitSave);
+document.addEventListener('visibilitychange', () => { if (document.hidden) handleExitSave(); });
+
+let selectedAvatarId = profile.avatar;
+
+function updateCoinsUI() {
+  const el = document.getElementById('shopCoins');
+  if(el) el.textContent = coins;
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toastNotification');
+  const toastText = document.getElementById('toastText');
+  if(!toast || !toastText) return;
+  toastText.textContent = msg;
+  toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
+  clearTimeout(toast.hideTimer); toast.hideTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+window.selectAvatar = (id) => { 
+  selectedAvatarId = id; 
+  profile.avatar = id;
+  saveGameData();
+  renderProfileUI(); 
+  saveScoreToLeaderboard(getEffectiveTotalScore(), true);
+};
+
+function renderProfileUI() {
+  const nameDisplay = document.getElementById('profileNameDisplay');
+  if(nameDisplay) nameDisplay.textContent = profile.name;
+  
+  const av = getAvatarById(selectedAvatarId);
+  const pAvatar = document.getElementById('previewAvatar');
+  const pName = document.getElementById('previewName');
+  
+  if(pAvatar) { pAvatar.innerHTML = av.svg; pAvatar.style.color = av.color; }
+  if(pName) pName.textContent = profile.name;
+  
+  const scoreVal = document.getElementById('totalScoreVal');
+  if(scoreVal) scoreVal.textContent = totalScore;
+  
+  const grid = document.getElementById('avatarGrid');
+  if(grid) {
+    grid.innerHTML = AVATARS.map(a => `<div class="avatar-btn ${a.id === selectedAvatarId ? 'selected' : ''}" style="color: ${a.color}" onclick="selectAvatar(${a.id})">${a.svg}</div>`).join('');
+  }
+  
+  const sToggle = document.getElementById('soundToggle');
+  if(sToggle) sToggle.classList.toggle('on', SND.enabled);
+  
+  updateCoinsUI();
+}
+
+// --- سیستم ورود و ثبت‌نام (تب‌دار) ---
+window.setAuthMode = (mode) => {
+  currentAuthMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+  document.getElementById('authTitle').textContent = mode === 'login' ? 'ورود به ASTRO' : 'ساخت اکانت ASTRO';
+  document.getElementById('authBtn').textContent = mode === 'login' ? 'ورود' : 'ساخت اکانت';
+  document.getElementById('authError').textContent = '';
+};
+
+window.handleAuth = async () => {
+  const user = document.getElementById('authUsername').value.trim();
+  const pass = document.getElementById('authPassword').value.trim();
+  const errDiv = document.getElementById('authError');
+  
+  if(!user || pass.length < 4) { errDiv.style.color = '#ff3333'; errDiv.textContent = 'نام کاربری یا رمز عبور نامعتبر است (رمز حداقل ۴ رقم).'; return; }
+  
+  errDiv.style.color = '#00ffff';
+  errDiv.textContent = 'در حال بررسی...';
+  
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?name=eq.${user}&select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    
+    if (currentAuthMode === 'login') {
+      if (!data || data.length === 0) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'اکانتی با این نام پیدا نشد!'; return;
+      }
+      if (data[0].password !== pass) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'رمز عبور اشتباه است!'; return;
+      }
+      const remoteSave = data[0].save_data || {};
+      profile = remoteSave.profile || { name: user, avatar: 1 };
+      coins = remoteSave.coins || 0; 
+      ownedWeapons = remoteSave.ownedWeapons || [1]; equippedWeapon = remoteSave.equippedWeapon || 1;
+      ownedSkins = remoteSave.ownedSkins || [1]; equippedSkin = remoteSave.equippedSkin || 1;
+      ownedMinis = remoteSave.ownedMinis || [1]; equippedMini = remoteSave.equippedMini || 1;
+      weaponLevels = remoteSave.weaponLevels || {}; miniShipLevels = remoteSave.miniShipLevels || {};
+      totalScore = safeNum(remoteSave.totalScore, 0);
+      currentPassword = pass;
+      deviceId = data[0].dev_id; 
+      localStorage.setItem('astro_device_id', deviceId);
+      localStorage.setItem('astro_auth_user', user);
+      localStorage.setItem('astro_auth_pass', pass);
+      
+      saveGameData();
+      errDiv.style.color = '#00ff88';
+      errDiv.textContent = 'ورود موفق! در حال بارگذاری...';
+      setTimeout(() => { document.getElementById('authOverlay').style.display = 'none'; location.reload(); }, 1000);
+      
+    } else {
+      if (data && data.length > 0) {
+        errDiv.style.color = '#ff3333'; errDiv.textContent = 'این نام کاربری قبلاً گرفته شده!'; return;
+      }
+      currentPassword = pass;
+      profile = { name: user, avatar: 1 };
+      deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('astro_device_id', deviceId);
+      localStorage.setItem('astro_auth_user', user);
+      localStorage.setItem('astro_auth_pass', pass);
+      await saveScoreToLeaderboard(0);
+      errDiv.style.color = '#00ff88';
+      errDiv.textContent = 'اکانت با موفقیت ساخته شد!';
+      setTimeout(() => { document.getElementById('authOverlay').style.display = 'none'; location.reload(); }, 1000);
+    }
+  } catch(e) {
+    errDiv.style.color = '#ff3333'; errDiv.textContent = 'خطای شبکه. اینترنت خود را بررسی کنید.';
+  }
+};
+
+window.showLogoutModal = () => { document.getElementById('logoutModal').style.display = 'flex'; setTimeout(() => document.getElementById('logoutModal').classList.add('show'), 10); };
+window.closeLogoutModal = () => { document.getElementById('logoutModal').classList.remove('show'); setTimeout(() => document.getElementById('logoutModal').style.display = 'none', 300); };
+window.confirmLogout = () => { localStorage.removeItem('astro_auth_user'); localStorage.removeItem('astro_auth_pass'); location.reload(); };
+
+function checkAuthOnStart() {
+  const savedUser = localStorage.getItem('astro_auth_user');
+  const savedPass = localStorage.getItem('astro_auth_pass');
+  if(savedUser && savedPass) {
+    currentPassword = savedPass;
+    profile.name = savedUser;
+    renderProfileUI();
+    setTimeout(() => { saveScoreToLeaderboard(getEffectiveTotalScore(), true); }, 2000);
+  } else {
+    document.getElementById('authOverlay').style.display = 'flex';
+    document.getElementById('gameOver').style.display = 'none'; 
+  }
+}
+
+async function saveScoreToLeaderboard(newTotalScore, isSilent = false){
+  if(!currentPassword) return false; 
+  if(isNaN(newTotalScore) || newTotalScore < 0) return false;
+  const syncIcon = document.getElementById('syncIndicator'); if (syncIcon) syncIcon.classList.add('syncing');
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?on_conflict=dev_id`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ 
+        dev_id: deviceId, name: profile.name, password: currentPassword,
+        score: newTotalScore, avatar: profile.avatar, 
+        save_data: { profile, coins, ownedWeapons, equippedWeapon, ownedSkins, equippedSkin, ownedMinis, equippedMini, weaponLevels, miniShipLevels, totalScore, currentRunScore } 
+      }),
+      keepalive: true
+    });
+    if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+    return res.ok;
+  } catch(e) { 
+    if (syncIcon) setTimeout(() => syncIcon.classList.remove('syncing'), 500);
+    return false;
+  }
+}
+
+// --- توابع فروشگاه و ماموریت‌ها ---
+window.switchShopTab = (tab, btn) => {
+  SND.play('uiClick'); currentShopTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(b => { b.style.background = 'rgba(0,255,255,.1)'; b.style.color = '#fff'; b.classList.remove('active'); });
+  btn.style.background = '#00ffff'; btn.style.color = '#000'; btn.classList.add('active');
+  if (tab === 'quests') { renderQuests(); } else { renderShop(); }
+};
+
+function addQuestProgress(type, amount, isMax = false) {
+  checkQuestReset();
+  if (isMax) { if (amount > (questState.progress[type] || 0)) questState.progress[type] = amount; }
+  else { questState.progress[type] = (questState.progress[type] || 0) + amount; }
+  localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+  if (document.getElementById('shopPanel').classList.contains('show') && currentShopTab === 'quests') renderQuests();
+}
+
+function renderQuests() {
+  checkQuestReset();
+  const list = document.getElementById('shopList');
+  const today = new Date().toDateString();
+  const dailyIsClaimed = (questState.dailyClaimedDate === today);
+  let dailyHtml = `
+    <div class="quest-card daily ${dailyIsClaimed ? 'completed' : ''}">
+      <div class="quest-info" style="flex:1;"><h3>🎁 جایزه ورود روزانه</h3><p>هر روز ۱۰۰۰ سکه رایگان بگیر!</p></div>
+      ${dailyIsClaimed ? `<button class="claim-btn" disabled>دریافت شد ✅</button>` : `<button class="claim-btn" onclick="claimDaily()" style="background:#ffd700;color:#000;">دریافت 🎁</button>`}
+    </div>`;
+  let questsHtml = QUEST_TEMPLATES.map(q => {
+    let current = questState.progress[q.type] || 0;
+    if (current > q.target) current = q.target;
+    let pct = (current / q.target) * 100;
+    let isCompleted = current >= q.target;
+    let isClaimed = questState.claimed.includes(q.id);
+    let btnHtml = isClaimed ? `<button class="claim-btn" disabled>دریافت شد ✅</button>` : isCompleted ? `<button class="claim-btn" onclick="claimQuest('${q.id}', ${q.reward})" style="background:#00ff88;color:#000;">دریافت جایزه 🎁</button>` : `<button class="claim-btn" disabled>در حال انجام...</button>`;
+    return `
+      <div class="quest-card ${isCompleted ? 'completed' : ''}">
+        <div class="quest-info" style="flex:1;"><h3>${q.text}</h3><p>جایزه: 💰 ${q.reward} سکه</p><div class="quest-progress-bar"><div class="quest-progress-fill" style="width: ${pct}%;"></div></div><p style="margin-top:4px;font-size:10px;color:#aaa;">${current} / ${q.target}</p></div>
+        ${btnHtml}
+      </div>`;
+  }).join('');
+  list.innerHTML = dailyHtml + questsHtml;
+}
+
+window.claimDaily = () => {
+  checkQuestReset();
+  const today = new Date().toDateString();
+  if (questState.dailyClaimedDate !== today) {
+    questState.dailyClaimedDate = today; coins += 1000;
+    localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+    saveGameData(); SND.play('purchase'); showToast(`🎉 ۱۰۰۰ سکه بابت ورود روزانه دریافت کردی!`);
+    renderQuests(); updateCoinsUI();
+  }
+};
+
+window.claimQuest = (questId, reward) => {
+  checkQuestReset();
+  if (!questState.claimed.includes(questId)) {
+    questState.claimed.push(questId); coins += reward;
+    localStorage.setItem('astro_quests_v1', JSON.stringify(questState));
+    saveGameData(); SND.play('purchase'); showToast(`🎉 جایزه ${reward} سکه دریافت شد!`);
+    renderQuests(); updateCoinsUI();
+  }
+};
 // ==========================================
 // 🚀 بهینه‌سازی: کش کردن تصویر سفینه‌ها (Sprite Pre-rendering)
 // ==========================================
@@ -794,7 +1197,6 @@ function draw(){
     ctx.restore();
   }
 
-  // بهینه‌سازی: رسم سفینه اصلی با کش تصویر
   if(S.lives > 0) {
     const p = S.player;
     if (!(p.inv > 0 && Math.floor(S.t * 0.1) % 2 === 0)) {
@@ -805,7 +1207,6 @@ function draw(){
     }
   }
 
-  // بهینه‌سازی: رسم مینی سفینه‌ها با کش تصویر
   if (equippedMini > 0) {
     const p = S.player;
     for (let i = 0; i < 2; i++) {
@@ -963,7 +1364,10 @@ function drawSkinPreview(container, skinId) {
   canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block';
   const c = canvas.getContext('2d');
   const sprite = spriteCache.player[skinId];
-  if (sprite) c.drawImage(sprite, 0, 0, canvas.width, canvas.height);
+  if (sprite) {
+    c.translate(50, 50);
+    c.drawImage(sprite, -sprite.width/2, -sprite.height/2);
+  }
   container.innerHTML = ''; container.appendChild(canvas);
 }
 
@@ -972,7 +1376,10 @@ function drawMiniPreview(container, miniId) {
   canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.display = 'block';
   const c = canvas.getContext('2d');
   const sprite = spriteCache.mini[miniId];
-  if (sprite) c.drawImage(sprite, 0, 0, canvas.width, canvas.height);
+  if (sprite) {
+    c.translate(50, 50);
+    c.drawImage(sprite, -sprite.width/2, -sprite.height/2);
+  }
   container.innerHTML = ''; container.appendChild(canvas);
 }
 
@@ -1009,9 +1416,8 @@ bgmUpload.addEventListener('change', function(e) {
     bgmAudio.src = URL.createObjectURL(file);
     currentBgmName = file.name;
     songNameDisplay.textContent = "🎵 " + currentBgmName;
-    
-    playBtn.classList.remove('active');
-    pauseBtn.classList.remove('active');
+    playBtn.style.color = '#00ffff'; playBtn.style.borderColor = '#00ffff'; playBtn.style.background = 'rgba(0,255,255,0.1)';
+    pauseBtn.style.color = '#00ffff'; pauseBtn.style.borderColor = '#00ffff'; pauseBtn.style.background = 'rgba(0,255,255,0.1)';
   }
 });
 
@@ -1021,8 +1427,8 @@ playBtn.onclick = () => {
     return;
   }
   bgmAudio.play().then(() => {
-    playBtn.classList.add('active');
-    pauseBtn.classList.remove('active');
+    playBtn.style.color = '#00ff88'; playBtn.style.borderColor = '#00ff88'; playBtn.style.background = 'rgba(0,255,136,0.2)';
+    pauseBtn.style.color = '#00ffff'; pauseBtn.style.borderColor = '#00ffff'; pauseBtn.style.background = 'rgba(0,255,255,0.1)';
   }).catch(err => {
     console.error("Play Error:", err);
     showToast('❌ خطا در پخش! شاید فرمت آهنگ پشتیبانی نمیشه.');
@@ -1031,8 +1437,8 @@ playBtn.onclick = () => {
 
 pauseBtn.onclick = () => {
   bgmAudio.pause();
-  playBtn.classList.remove('active');
-  pauseBtn.classList.add('active');
+  pauseBtn.style.color = '#ff5555'; pauseBtn.style.borderColor = '#ff5555'; pauseBtn.style.background = 'rgba(255,85,85,0.2)';
+  playBtn.style.color = '#00ffff'; playBtn.style.borderColor = '#00ffff'; playBtn.style.background = 'rgba(0,255,255,0.1)';
 };
 
 volSlider.addEventListener('input', (e) => {
@@ -1050,16 +1456,15 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const splash = document.getElementById('astro-splash');
-    if (splash) {
-      splash.style.opacity = '0';
-      splash.style.pointerEvents = 'none';
-      setTimeout(() => splash.remove(), 1000);
-    }
-  }, 3000);
-});
+// 🔥 محو کردن قطعی لوگو بدون وابستگی به رویداد Load
+setTimeout(() => {
+  const splash = document.getElementById('astro-splash');
+  if (splash) {
+    splash.style.opacity = '0';
+    splash.style.pointerEvents = 'none';
+    setTimeout(() => splash.remove(), 1000);
+  }
+}, 3000);
 </script>
 </body>
-</html>
+</html>  
