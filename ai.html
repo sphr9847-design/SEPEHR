@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <style>
+        body { background: #0f0f0f; color: #00ff41; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        h1 { text-shadow: 0 0 10px #00ff41; margin-bottom: 30px; }
+        .input-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        input { padding: 12px 20px; width: 60%; max-width: 500px; border-radius: 8px; border: 2px solid #00ff41; background: #1a1a1a; color: #fff; font-size: 16px; outline: none; }
+        input:focus { box-shadow: 0 0 15px #00ff41; }
+        button { padding: 12px 30px; background: #00ff41; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00cc33; box-shadow: 0 0 15px #00ff41; }
+        #loading { display: none; margin-top: 20px; font-size: 18px; color: #ffd000; }
+        #result-container { margin-top: 20px; }
+        img { max-width: 100%; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); display: none; }
+        .note { font-size: 12px; color: #888; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <h1>⚡ تولیدکننده تصویر هوش مصنوعی ⚡</h1>
+    <p>متن انگلیسی خود را وارد کنید (پارامتر safe به صورت پیش‌فرض خاموش است)</p>
+
+    <div class="input-group">
+        <input type="text" id="prompt" placeholder="e.g., A futuristic cyberpunk city at night...">
+        <button onclick="generateImage()">بساز!</button>
+    </div>
+
+    <div id="loading">⏳ در حال ساخت تصویر... (لطفاً صبر کنید)</div>
+    <div id="result-container">
+        <img id="result-image" src="" alt="Generated Image">
+    </div>
+
+    <div class="note">Powered by Pollinations AI</div>
+
+    <script>
+        function generateImage() {
+            const prompt = document.getElementById('prompt').value;
+            const img = document.getElementById('result-image');
+            const loading = document.getElementById('loading');
+
+            if (!prompt) {
+                alert('لطفاً یک متن وارد کنید!');
+                return;
+            }
+
+            // نمایش حالت لودینگ و مخفی کردن عکس قبلی
+            loading.style.display = 'block';
+            img.style.display = 'none';
+
+            // ساخت لینک API
+            const encodedPrompt = encodeURIComponent(prompt);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
+
+            img.src = imageUrl;
+
+            // وقتی عکس لود شد، لودینگ رو مخفی کن
+            img.onload = function() {
+                loading.style.display = 'none';
+                img.style.display = 'inline-block';
+            };
+
+            // اگه ارور داد
+            img.onerror = function() {
+                loading.style.display = 'none';
+                alert('خطا در ساخت تصویر! ممکن است متن شما فیلتر شده باشد یا سرویس شلوغ باشد.');
+            };
+        }
+
+        // قابلیت زدن دکمه Enter
+        document.getElementById('prompt').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateImage();
+            }
+        });
+    </script>
+</body>
+</html>
