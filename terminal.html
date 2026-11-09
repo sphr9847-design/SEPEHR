@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>root@null: ~</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23000'/><text x='2' y='12' font-family='monospace' font-size='12' fill='%2300ff41'>&gt;_</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',Courier,monospace}
+#matrix{position:fixed;inset:0;z-index:0;opacity:.85;transition:opacity .5s}
+#terminal{
+  position:fixed;inset:0;z-index:1;padding:18px 20px;
+  color:#00ff41;font-size:15px;line-height:1.45;
+  background:radial-gradient(ellipse at center,rgba(0,20,0,.35),rgba(0,0,0,.78));
+  text-shadow:0 0 4px rgba(0,255,65,.85);
+  overflow-y:auto;overflow-x:hidden;
+}
+#output{white-space:pre-wrap;word-break:break-word}
+#input-line{display:flex;gap:8px;align-items:center}
+#prompt{color:#00ff41;white-space:nowrap}
+#cmd{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#00ff41;font:inherit;text-shadow:inherit;caret-color:#00ff41;
+}
+.glow-red{color:#ff2b2b;text-shadow:0 0 6px #ff2b2b}
+.dim{color:#0a7c22;text-shadow:none}
+.warn{color:#ffd000;text-shadow:0 0 6px #ffd000}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#00ff41;border-radius:4px}
+@media(max-width:600px){#terminal{font-size:11px}}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div id="terminal">
+  <div id="output"></div>
+  <div id="input-line">
+    <span id="prompt">root@null:~#</span>
+    <input id="cmd" autocomplete="off" spellcheck="false" autocapitalize="off">
+  </div>
+</div>
+<script>
+// ===== Matrix rain =====
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let w,h,cols,drops,fontSize=16;
+const chars='アカサタナハマヤラワイキシチニヒミリウクスツヌフムユルエケセテネヘメレオコソトノホモヨロABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*(){}[]<>/\\|';
+function resize(){
+  w=canvas.width=innerWidth; h=canvas.height=innerHeight;
+  cols=Math.floor(w/fontSize);
+  drops=Array(cols).fill(0).map(()=>Math.random()*h);
+  ctx.font=fontSize+'px monospace';
+}
+addEventListener('resize',resize); resize();
+setInterval(()=>{
+  ctx.fillStyle='rgba(0,0,0,0.08)'; ctx.fillRect(0,0,w,h);
+  for(let i=0;i<cols;i++){
+    const ch=chars[Math.floor(Math.random()*chars.length)];
+    const x=i*fontSize, y=drops[i];
+    ctx.fillStyle=Math.random()>0.97?'#aaffaa':'#00cc33';
+    ctx.fillText(ch,x,y);
+    if(y>h&&Math.random()>0.975) drops[i]=0;
+    drops[i]+=fontSize;
+  }
+},40);
+
+// ===== Terminal =====
+const output=document.getElementById('output');
+const terminal=document.getElementById('terminal');
+const cmdInput=document.getElementById('cmd');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let prompt='root@null:~#', busy=true, history=[], histIdx=0;
+
+function write(text,cls){
+  const s=document.createElement('span');
+  if(cls)s.className=cls;
+  s.textContent=text+'\n';
+  output.appendChild(s);
+  terminal.scrollTop=terminal.scrollHeight;
+}
+async function typeLine(text,speed=4){
+  const s=document.createElement('span');
+  output.appendChild(s);
+  for(const ch of text){
+    s.textContent+=ch;
+    terminal.scrollTop=terminal.scrollHeight;
+    await sleep(speed);
+  }
+  s.textContent+='\n';
+  terminal.scrollTop=terminal.scrollHeight;
+}
+async function progressBar(label,dur=1500){
+  const s=document.createElement('span');
+  output.appendChild(s);
+  const steps=26;
+  for(let i=0;i<=steps;i++){
+    const pct=Math.round(i/steps*100);
+    const filled=Math.round(i/steps*20);
+    const bar='█'.repeat(filled)+'░'.repeat(20-filled);
+    s.textContent=`  [${bar}] ${String(pct).padStart(3)}%  ${label}`;
+    terminal.scrollTop=terminal.scrollHeight;
+    await sleep(dur/steps);
+  }
+  s.textContent+='  ✓\n';
+}
+
+const banner = String.raw`
+   ██████╗  ██████╗  ██████╗ ████████╗
+   ██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝
+   ██████╔╝██║   ██║██║   ██║   ██║
+   ██╔══██╗██║   ██║██║   ██║   ██║
+   ██║  ██║╚██████╔╝╚██████╔╝   ██║
+   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝
+       [ secure shell access granted ]
+`;
+
+const files={
+  'readme.txt':'This system is monitored. Unauthorized access is prohibited.',
+  'notes.txt':'TODO: change root password\nTODO: disable telnet\nTODO: ( ͡° ͜ʖ ͡°)',
+  'shadow.bak':'root:$6$xF9k...$encrypted...\nuser:$6$Lm2p...$encrypted...',
+  '.ssh/config':'Host *\n    StrictHostKeyChecking no',
+  'secret.key':'-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA...REDACTED...\n-----END RSA PRIVATE KEY-----'
+};
+
+const commands={
+  help(){
+    write('Available commands:','dim');
+    write('  help              show this message');
+    write('  banner            print the banner');
+    write('  whoami            current user');
+    write('  ls                list files');
+    write('  cat <file>        print file contents');
+    write('  uname             system info');
+    write('  ping <host>       ping a host');
+    write('  scan              scan local network');
+    write('  nmap <target>     port scan a target');
+    write('  connect <host>    open a connection');
+    write('  hack <target>     ???');
+    write('  sudo su           escalate privileges');
+    write('  matrix            toggle rain opacity');
+    write('  history           command history');
+    write('  clear             clear screen');
+    write('  exit              disconnect');
+  },
+  banner(){ write(banner); },
+  whoami(){ write('root'); },
+  uname(){ write('Linux null 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux'); },
+  ls(){
+    write('total 42','dim');
+    ['drwx------ 4 root root 4096  .ssh',
+     '-rw------- 1 root root 1675  secret.key',
+     '-rw-r--r-- 1 root root  128  readme.txt',
+     '-rw-r--r-- 1 root root  210  notes.txt',
+     '-rw------- 1 root root 2048  shadow.bak'
+    ].forEach(r=>write(r));
+  },
+  async cat(args){
+    const f=args[0];
+    if(!f){ write('usage: cat <file>','warn'); return; }
+    if(files[f]){ for(const l of files[f].split('\n')) await typeLine('  '+l,3); }
+    else write(`cat: ${f}: No such file or directory`,'warn');
+  },
+  async ping(args){
+    const h=args[0]||'8.8.8.8';
+    write(`PING ${h} (${h}) 56(84) bytes of data.`,'dim');
+    for(let i=1;i<=4;i++){
+      await sleep(400);
+      write(`64 bytes from ${h}: icmp_seq=${i} ttl=64 time=${(Math.random()*20+5).toFixed(1)} ms`);
+    }
+    write(`--- ${h} ping statistics ---`,'dim');
+    write('4 packets transmitted, 4 received, 0% packet loss');
+  },
+  async scan(){
+    write('Starting network discovery ...','dim');
+    const ips=['10.0.0.1','10.0.0.5','10.0.0.17','10.0.0.23','10.0.0.42','10.0.0.99','192.168.1.1','192.168.1.100'];
+    const svc=['22/tcp ssh','80/tcp http','443/tcp https','3306/tcp mysql'];
+    for(const ip of ips){
+      await sleep(120+Math.random()*180);
+      write(`  [+] host up: ${ip}   ${svc[Math.floor(Math.random()*4)]}`);
+    }
+    write(`Scan complete: ${ips.length} hosts up.`);
+  },
+  async nmap(args){
+    const t=args[0]||'127.0.0.1';
+    write(`Starting Nmap 7.94 at ${new Date().toISOString()}`,'dim');
+    await sleep(300);
+    write(`Nmap scan report for ${t}`);
+    await sleep(200);
+    write('Host is up (0.0042s latency).');
+    await sleep(200);
+    write('Not shown: 996 closed tcp ports (reset)');
+    const ports=[[21,'ftp'],[22,'ssh'],[80,'http'],[443,'https'],[3306,'mysql'],[8080,'http-proxy']];
+    for(let i=0;i<4;i++){
+      const p=ports[Math.floor(Math.random()*ports.length)];
+      await sleep(150);
+      write(`  ${p[0]}/tcp  open  ${p[1]}`);
+    }
+  },
+  async connect(args){
+    const h=args[0];
+    if(!h){ write('usage: connect <host>','warn'); return; }
+    write(`Connecting to ${h} ...`,'dim');
+    await progressBar('establishing secure tunnel',1200);
+    await progressBar('negotiating handshake',1000);
+    write(`Connected to ${h}.`);
+  },
+  async hack(args){
+    const t=args[0]||'target';
+    write(`[*] Starting attack sequence against ${t}`,'warn');
+    await sleep(200);
+    await progressBar('fingerprinting target',900);
+    await progressBar('brute-forcing credentials',1600);
+    write('  [+] found credential: admin : hunter2');
+    await progressBar('bypassing firewall',1000);
+    await progressBar('injecting payload',1200);
+    await progressBar('escalating privileges',1400);
+    write(`[!] ACCESS GRANTED on ${t}`,'glow-red');
+    await sleep(300);
+    write('  uid=0(root) gid=0(root) groups=0(root)');
+    await progressBar('exfiltrating data',1800);
+    write('[✓] 4.2 GB downloaded.');
+    write('[!] connection closed. leaving no traces.','glow-red');
+  },
+  async sudo(args){
+    if(args.join(' ')===  'su'){
+      write('[sudo] password for root: ');
+      await progressBar('authenticating',1400);
+      write('uid=0(root) gid=0(root) groups=0(root)');
+    } else write('sudo: a terminal is required to read the password','warn');
+  },
+  matrix(){
+    const op=canvas.style.opacity==='0.3'?'0.85':'0.3';
+    canvas.style.opacity=op;
+    write('matrix rain opacity: '+op);
+  },
+  history(){ history.forEach((h,i)=>write(`  ${i+1}  ${h}`)); },
+  clear(){ output.innerHTML=''; },
+  async exit(){
+    write('logout','dim');
+    await sleep(400);
+    write('Connection to null closed.','dim');
+    await sleep(600);
+    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#00ff41;font-family:monospace;font-size:20px;text-shadow:0 0 8px #00ff41">[ connection terminated ]</div>';
+  }
+};
+
+cmdInput.addEventListener('keydown', async e=>{
+  if(busy) return;
+  if(e.key==='Enter'){
+    const val=cmdInput.value;
+    write(prompt+' '+val);
+    cmdInput.value='';
+    if(val.trim()){
+      history.push(val.trim()); histIdx=history.length;
+      busy=true;
+      const [cmd,...args]=val.trim().split(/\s+/);
+      const fn=commands[cmd];
+      if(fn) await fn(args);
+      else write(`${cmd}: command not found`,'warn');
+      busy=false;
+    }
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(histIdx>0){histIdx--; cmdInput.value=history[histIdx]||'';}
+  } else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(histIdx<history.length-1){histIdx++; cmdInput.value=history[histIdx]||'';}
+    else {histIdx=history.length; cmdInput.value='';}
+  } else if(e.key==='l'&&e.ctrlKey){ e.preventDefault(); output.innerHTML=''; }
+});
+document.addEventListener('click',()=>{
+  if(window.getSelection().toString()==='') cmdInput.focus();
+});
+
+// ===== Boot =====
+(async()=>{
+  await sleep(200);
+  const lines=[
+    ['[    0.000000] Booting Linux kernel 5.15.0-91-generic ...','dim'],
+    ['[    0.148213] Initializing cgroup subsys cpuset','dim'],
+    ['[  OK  ] Started Journal Service.'],
+    ['[  OK  ] Reached target Local File Systems.'],
+    ['[  OK  ] Started udev Kernel Device Manager.'],
+    ['[  OK  ] Started Network Manager.'],
+    ['[  OK  ] Reached target Network is Online.'],
+    ['[  OK  ] Started OpenSSH server daemon.']
+  ];
+  for(const [l,c] of lines){ await typeLine(l,3); await sleep(40); }
+  await sleep(150);
+  write(banner);
+  await sleep(300);
+  write('Last login: '+new Date().toUTCString()+' from 10.0.0.42','dim');
+  write('WARNING: Unauthorized access is logged and reported.','warn');
+  write('Type `help` for a list of commands.','dim');
+  write('');
+  busy=false;
+  cmdInput.focus();
+})();
+
+// یادداشت برای خودت (در کنسول مرورگر)
+console.log('%c[simulation] this terminal is a fiction.','color:#00ff41;font-size:14px');
+</script>
+</body>
+</html>
